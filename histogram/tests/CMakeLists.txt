@@ -1,0 +1,8 @@
+add_executable(trace_length_test trace_length_test.cpp)
+target_link_libraries(trace_length_test PRIVATE Histogram)
+
+add_executable(trace_collection_test trace_collection_test.cpp)
+target_link_libraries(trace_collection_test PRIVATE Histogram)
+
+add_test(NAME trace_length_test COMMAND $<TARGET_FILE:trace_length_test>)
+add_test(NAME trace_collection_test COMMAND $<TARGET_FILE:trace_collection_test>)

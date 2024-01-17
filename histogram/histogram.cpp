@@ -4,7 +4,8 @@
 
 using namespace Histogram;
 
-Collector::Collector(int traceLength) : histograms(traceLength) {}
+Collector::Collector(int traceLength)
+    : traceLength(traceLength), histograms(traceLength) {}
 
 void Histogram::Collector::addTrace(std::span<SampleT> trace) {
   if (trace.size() != traceLength) {
@@ -17,3 +18,5 @@ void Histogram::Collector::addTrace(std::span<SampleT> trace) {
     histograms[i][binI]++;
   }
 }
+
+const Collector::CacheT &Collector::getHistograms() const { return histograms; }
