@@ -14,8 +14,8 @@ public:
   /// @brief Type of the counter used for a histogram bin
   using BinT = uint32_t;
 
-  static const int HistogramDepth = std::numeric_limits<SampleT>::digits;
-  static const int NumberOfBins = 1 << HistogramDepth;
+  static constexpr int HistogramDepth = std::numeric_limits<SampleT>::digits;
+  static constexpr int NumberOfBins = 1 << HistogramDepth;
 
   using HistogramT = std::array<BinT, NumberOfBins>;
   using CacheT = std::vector<HistogramT>;
