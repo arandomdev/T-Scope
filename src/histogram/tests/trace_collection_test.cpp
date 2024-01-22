@@ -3,7 +3,6 @@
 
 /// @brief Tests to see if the collector correctly adds traces
 int main(int argc, char const *argv[]) {
-  using SampleT = Histogram::Collector::SampleT;
   static const int traceLength = 4;
 
   auto c = Histogram::Collector(traceLength);
@@ -11,13 +10,13 @@ int main(int argc, char const *argv[]) {
   // Create 256 traces, all filled with a specific bin. i.e. {0, 0, 0, 0},
   // {1, 1, 1, 1}, and so on. This should result in the entire cache being
   // filled with 1s.
-  std::vector<std::vector<Histogram::Collector::SampleT>> traces;
+  std::vector<std::vector<uint8_t>> traces;
   for (size_t i = 0; i < Histogram::Collector::NumberOfBins; i++) {
     traces.emplace_back(traceLength, i);
   }
 
   for (auto &t : traces) {
-    c.addTrace(t);
+    c.addTrace8(t);
   }
 
   // Check result

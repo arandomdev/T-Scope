@@ -4,17 +4,30 @@
 using namespace Histogram;
 namespace py = pybind11;
 
-void Collector_addTrace(Collector &c, py::buffer b) {
+void Collector_addTrace8(Collector &c, py::buffer b) {
   auto info = b.request();
 
-  if (info.format != py::format_descriptor<Collector::SampleT>::format()) {
+  if (info.format != py::format_descriptor<uint8_t>::format()) {
     throw std::invalid_argument("Incorrect sample type");
   }
   if (info.ndim != 1) {
     throw std::invalid_argument("Expected 1D array");
   }
 
-  c.addTrace(std::span<Collector::SampleT>((uint8_t *)info.ptr, info.size));
+  c.addTrace8(std::span<uint8_t>((uint8_t *)info.ptr, info.size));
+}
+
+void Collector_addTrace10(Collector &c, py::buffer b) {
+  auto info = b.request();
+
+  if (info.format != py::format_descriptor<uint16_t>::format()) {
+    throw std::invalid_argument("Incorrect sample type");
+  }
+  if (info.ndim != 1) {
+    throw std::invalid_argument("Expected 1D array");
+  }
+
+  c.addTrace10(std::span<uint16_t>((uint16_t *)info.ptr, info.size));
 }
 
 PYBIND11_MODULE(pyHistogram, m) {
@@ -23,7 +36,8 @@ PYBIND11_MODULE(pyHistogram, m) {
   // Collector
   py::class_<Collector>(m, "Collector")
       .def(pybind11::init<int &>())
-      .def("addTrace", &Collector_addTrace)
+      .def("addTrace8", &Collector_addTrace8)
+      .def("addTrace10", &Collector_addTrace10)
       .def("getHistograms", &Collector::getHistograms);
 
   // CacheT, allows conversion to numpy array
@@ -38,8 +52,6 @@ PYBIND11_MODULE(pyHistogram, m) {
             // dimensions
             std::vector<size_t>{c.size(), Collector::NumberOfBins},
             // stride per index
-            std::vector<size_t>{BinTSize * Collector::NumberOfBins, BinTSize}
-
-        );
+            std::vector<size_t>{BinTSize * Collector::NumberOfBins, BinTSize});
       });
 }
