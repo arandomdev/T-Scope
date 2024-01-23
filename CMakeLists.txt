@@ -15,5 +15,3 @@ endif()
 add_subdirectory(external/pybind11)
 
 add_subdirectory(src)
-
-include(packing.cmake)

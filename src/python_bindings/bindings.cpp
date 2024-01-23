@@ -30,7 +30,7 @@ void Collector_addTrace10(Collector &c, py::buffer b) {
   c.addTrace10(std::span<uint16_t>((uint16_t *)info.ptr, info.size));
 }
 
-PYBIND11_MODULE(pyHistogram, m) {
+PYBIND11_MODULE(_pyHistogram, m) {
   m.doc() = "Wrapper for the Histogram library.";
 
   // Collector

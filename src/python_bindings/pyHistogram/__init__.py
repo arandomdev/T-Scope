@@ -1,1 +1,1 @@
-from 
+from ._pyHistogram import Collector
