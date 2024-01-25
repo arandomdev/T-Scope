@@ -7,7 +7,7 @@ import numpy.typing as npt
 import pyHistogram
 
 TRACE_LENGTH = 0x2000
-ITERATIONS = 100000
+ITERATIONS = 10000
 
 
 def generateTrace8() -> npt.NDArray[np.uint8]:

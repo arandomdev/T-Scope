@@ -14,7 +14,8 @@ void Collector_addTrace8(Collector &c, py::buffer b) {
     throw std::invalid_argument("Expected 1D array");
   }
 
-  c.addTrace8(std::span<uint8_t>((uint8_t *)info.ptr, info.size));
+  uint8_t *begin = (uint8_t *)info.ptr;
+  c.addTrace8(begin, begin + info.size);
 }
 
 void Collector_addTrace10(Collector &c, py::buffer b) {
@@ -27,7 +28,8 @@ void Collector_addTrace10(Collector &c, py::buffer b) {
     throw std::invalid_argument("Expected 1D array");
   }
 
-  c.addTrace10(std::span<uint16_t>((uint16_t *)info.ptr, info.size));
+  uint16_t *begin = (uint16_t *)info.ptr;
+  c.addTrace10(begin, begin + info.size);
 }
 
 PYBIND11_MODULE(_pyHistogram, m) {

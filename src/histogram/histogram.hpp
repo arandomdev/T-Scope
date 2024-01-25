@@ -1,6 +1,5 @@
 #include <array>
 #include <limits>
-#include <span>
 #include <stdint.h>
 #include <vector>
 
@@ -23,14 +22,16 @@ public:
   Collector(int traceLength);
 
   /// @brief Add a trace to the collector.
-  /// @param trace The trace to add
+  /// @param begin Pointer to beginning of trace
+  /// @param end Pointer to end of trace
   /// @throws std::length_error when the trace is not the correct length.
-  void addTrace8(std::span<uint8_t> trace);
+  void addTrace8(const uint8_t *begin, const uint8_t *end);
 
   /// @brief Add a 10-bit trace to the collector. Scales to 8 bit samples.
-  /// @param trace The trace to add
+  /// @param begin Pointer to beginning of trace
+  /// @param end Pointer to end of trace
   /// @throws std::length_error when the trace is not the correct length.
-  void addTrace10(std::span<uint16_t> trace);
+  void addTrace10(const uint16_t *begin, const uint16_t *end);
 
   /// @brief Get the built histogram
   /// @return A 2D-array like stucture representing the histograms.

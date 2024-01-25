@@ -16,7 +16,7 @@ int main(int argc, char const *argv[]) {
   }
 
   for (auto &t : traces) {
-    c.addTrace8(t);
+    c.addTrace8(&(*t.begin()), &(*t.end()));
   }
 
   // Check result
