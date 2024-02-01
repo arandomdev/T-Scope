@@ -62,17 +62,19 @@ class SoftwareEngine(object):
         histA = np.asarray(self._histA.getHistograms())
         histB = np.asarray(self._histB.getHistograms())
 
-        # Get average of each histogram
-        meanA = np.average(histA, axis=1, weights=self._histBinWeights)
-        meanB = np.average(histB, axis=1, weights=self._histBinWeights)
-
         # Get cardinalities
         cardA = histA.sum(axis=1)  # type: ignore
         cardB = histB.sum(axis=1)  # type: ignore
 
+        # Get average of each histogram
+        meanA = (histA * self._histBinWeights).sum(axis=1) / cardA  # type: ignore
+        meanB = (histB * self._histBinWeights).sum(axis=1) / cardB  # type: ignore
+
         # Calculate variance
-        varA = np.average(np.square(histA - np.vstack(meanA)))
-        varB = np.average(np.square(histB - np.vstack(meanB)))
+        centeredWeightsA = np.square(self._histBinWeights - np.vstack(meanA))
+        centeredWeightsB = np.square(self._histBinWeights - np.vstack(meanB))
+        varA = (histA * centeredWeightsA).sum(axis=1) / (cardA - 1)  # type: ignore
+        varB = (histB * centeredWeightsB).sum(axis=1) / (cardB - 1)  # type: ignore
 
         # Calculate t-test
         t = (meanA - meanB) / np.sqrt((varA / cardA) + (varB / cardB))
@@ -80,6 +82,7 @@ class SoftwareEngine(object):
 
 
 def main() -> None:
+    # create some data
     pass
 
 
