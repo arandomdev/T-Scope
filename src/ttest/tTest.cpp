@@ -1,44 +1,22 @@
 #include "tTest.h"
 
-void load(hls::stream<streamPkt>& in_stream, hls::stream<data>& out_stream) {
+void sumStream(hls::stream<streamPkt>& in_stream, countType* fam, sumType* sum, numDataType* numData) {
 	streamPkt in_val;
-    ap_uint<9> i;
-    for (i = 0; i < BINNUM; i++) {
-#pragma HLS pipeline II=1
-    	in_val = in_stream.read();
-    	out_stream.write({in_val.data, i, in_val.last});
-    }
-}
-
-void sumStream(hls::stream<data>& in_stream, hls::stream<data>& out_stream, sumType* sum, numDataType* numData) {
-	data in_val;
+	ap_uint<8> i = 0;
 	sumType tempSum = 0;
 	numDataType tempNumData = 0;
     do {
 #pragma HLS PIPELINE
     	in_val = in_stream.read();
-        tempSum += in_val.dataS * in_val.num;
-        tempNumData += in_val.dataS;
-        out_stream.write(in_val);
+        tempSum += in_val.data * i;
+        tempNumData += in_val.data;
+        fam[i] = in_val.data;
+        i++;
     } while (!in_val.last);
     if (in_val.last) {
     	*sum = tempSum;
     	*numData = tempNumData;
     }
-}
-
-template <typename T> void store(hls::stream<data>& in_stream, T (&fam1), T (&fam2)) {
-	data in_val;
-	ap_uint<9> i;
-	for (i = 0; i < BINNUM; i++) {
-#pragma HLS PIPELINE
-		in_val = in_stream.read();
-		if (in_val.num < BINHALF) {
-			fam1[in_val.num] = in_val.dataS;
-		} else {
-			fam2[in_val.num-BINHALF] = in_val.dataS;
-		}
-	}
 }
 
 template <typename sType, typename qType> void divVal(sType sum, numDataType numData, qType* quotient) {
@@ -50,18 +28,18 @@ void diff(meanType meanA, meanType meanB, meanType* meanDiff) {
 	*meanDiff = meanType(meanA - meanB);
 }
 
-template <typename T, typename S> void varSum(const T (&fam), const S (&binInd), meanType mean, varSumType* sum) {
+void varSum(countType* fam, meanType mean, varSumType* sum) {
 	ap_uint<9> i;
 	varSumType tmpSum = 0;
-	hls::vector<meanType, BINHALF> tmp1;
-	vecMultType tmp2[BINHALF];
-	for (i = 0; i < BINHALF; i++) {
-#pragma HLS PIPELINE II=2
-		tmp1[i] = binInd[i] - mean;
+	meanType tmp1[BINNUM];
+	vecMultType tmp2[BINNUM];
+	for (i = 0; i < BINNUM; i++) {
+#pragma HLS PIPELINE
+		tmp1[i] = i - mean;
 		tmp2[i] = (vecSqType(tmp1[i] * tmp1[i])) * fam[i];
 		tmpSum += tmp2[i];
 	}
-	if (i == BINHALF) {
+	if (i == BINNUM) {
 		*sum = tmpSum;
 	}
 }
@@ -77,7 +55,7 @@ void tCalc1(varSumType varSum1, varSumType varSum2, numDataType numData, tCalcRe
 void tCalc2(tCalcResultType tCalc1ResultA, tCalcResultType tCalc1ResultB, meanType meanDiff, tCalcResultType* t) {
 #pragma HLS DATAFLOW
 	ap_ufixed<32,10> denom;
-	denom = sqrt(tCalc1ResultA + tCalc1ResultB);
+	denom = sqrt(double(tCalc1ResultA + tCalc1ResultB));
 	*t = tCalcResultType(meanDiff/denom); // t wants to be ap_ufixed<38, 30>
 }
 
@@ -85,16 +63,15 @@ void tTest(hls::stream<streamPkt>&A,
 	     hls::stream<streamPkt>&B,
 		 tCalcResultType* C) {
 #pragma HLS INTERFACE mode=axis port=A,B
-#pragma HLS INTERFACE m_axi port=C
-#pragma HLS INTERFACE s_axilite port=C bundle = control
-#pragma HLS INTERFACE s_axilite port=return bundle = control
+#pragma HLS INTERFACE mode=m_axi port=C depth=1 num_read_outstanding=1 max_read_burst_length=1 num_write_outstanding=1 max_write_burst_length=1 offset=slave
+#pragma HLS interface mode=s_axilite port=C
+#pragma HLS INTERFACE mode=s_axilite port=return
 #pragma HLS DATAFLOW
 	streamPkt pktA, pktB;
-	hls::vector<ap_uint<32>,BINHALF> famA1; //bit-widths must be <= 4096 for vector operations
-	hls::vector<ap_uint<32>,BINHALF> famA2;
-	hls::vector<ap_uint<32>,BINHALF> famB1;
-	hls::vector<ap_uint<32>,BINHALF> famB2; // RAM_S2P -> dual-port RAM (read on one port, write on other port)
-#pragma HLS BIND_STORAGE variable=famA1,famA2,famB1,famB2 type=RAM_S2P impl=BRAM
+	countType famA[BINNUM];
+	countType famB[BINNUM];
+#pragma HLS BIND_STORAGE variable=famA,famB type=ram_1wnr impl=bram
+
 	sumType sumA = 0, sumB = 0;
 	numDataType numDataA = 0, numDataB = 0;
 	meanType meanA, meanB, meanDiff; // 8 int, 8 decimal bits, unsigned
@@ -102,23 +79,13 @@ void tTest(hls::stream<streamPkt>&A,
 	tCalcResultType tCalc1ResultA, tCalc1ResultB, t;
 
 // data-driven task parallelism
-    hls::stream<data,BINNUM> A1stream;
-    hls::stream<data,BINNUM> A2stream;
-    hls::stream<data,BINNUM> B1stream;
-    hls::stream<data,BINNUM> B2stream;
-    load(A, A1stream);
-    load(B, B1stream);
-    sumStream(A1stream, A2stream, &sumA, &numDataA);
-	sumStream(B1stream, B2stream, &sumB, &numDataB);
-	store(A2stream, famA1, famA2);
-	store(B2stream, famB1, famB2);
+    sumStream(A, famA, &sumA, &numDataA);
+	sumStream(B, famB, &sumB, &numDataB);
 	divVal(sumA, numDataA, &meanA);
 	divVal(sumB, numDataB, &meanB);
 	diff(meanA, meanB, &meanDiff);
-	varSum(famA1, bins1, meanA, &varSumA1);
-	varSum(famA2, bins2, meanA, &varSumA2);
-	varSum(famB1, bins1, meanB, &varSumB1);
-	varSum(famB2, bins2, meanB, &varSumB2);
+	varSum(famA, meanA, &varSumA1);
+	varSum(famB, meanB, &varSumB1);
 	tCalc1(varSumA1, varSumA2, numDataA, &tCalc1ResultA);
 	tCalc1(varSumB1, varSumB2, numDataB, &tCalc1ResultB);
 	tCalc2(tCalc1ResultA, tCalc1ResultB, meanDiff, &t);
