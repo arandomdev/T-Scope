@@ -1,3 +1,6 @@
+#ifndef __T_TEST_H__
+#define __T_TEST_H__
+
 #define BINNUM 256
 #define BINHALF (BINNUM/2)
 #define BINQUARTER (BINNUM/4)
@@ -27,3 +30,5 @@ struct packet {
 };
 
 void tTest(hls::stream<streamPkt>&A,hls::stream<streamPkt>&B,tCalcResultType* C);
+
+#endif

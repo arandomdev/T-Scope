@@ -1,17 +1,19 @@
 #include "tTest.h"
+#include "tTestVectors.h"
 
 int main() {
 	int err = 0;
 	tCalcResultType C;
+	float f;
 	hls::stream<streamPkt> Astream;
 	hls::stream<streamPkt> Bstream;
 	streamPkt dataStreamA;
 	streamPkt dataStreamB;
 
 	for (int i = 0; i < BINNUM ; i++) {
-		dataStreamA.data = i;
+		dataStreamA.data = hist1[i];
 		dataStreamA.keep = -1;
-		dataStreamB.data = i;
+		dataStreamB.data = hist2[i];
 		dataStreamB.keep = -1;
 		if (i < (BINNUM-1)) {
 			dataStreamA.last = 0;
@@ -24,7 +26,8 @@ int main() {
 		Bstream.write(dataStreamB);
 	}
 
-	tTest(Astream,Bstream,C);
-	printf("T Val = %d \n", C);
+	tTest(Astream,Bstream,&C);
+	f = float(C);
+	printf("T Val = %f \n", f);
 	return err;
 }
