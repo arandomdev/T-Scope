@@ -1,5 +1,3 @@
-from typing import Any
-
 import numpy as np
 import numpy.typing as npt
 
@@ -24,7 +22,7 @@ class RandomDataSource(object):
 
         self.traceLength = traceLength
 
-    def next(self) -> npt.NDArray[np.integer[Any]]:
+    def next(self) -> npt.NDArray[np.uint8] | npt.NDArray[np.uint16]:
         return self._rng.uniform(0, self._upperBound, self.traceLength).astype(
             self._dType
-        )
+        )  # type: ignore

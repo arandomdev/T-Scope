@@ -20,7 +20,8 @@ class TraditionalEngine(object):
             self.tracesB.append(trace)
 
     def calculate(self) -> npt.NDArray[np.floating[Any]]:
-        return scipy.stats.ttest_ind(self.tracesA, self.tracesB, equal_var=False)[0]  # type: ignore
+        with np.errstate(divide="ignore", invalid="ignore"):
+            return scipy.stats.ttest_ind(self.tracesA, self.tracesB, equal_var=False)[0]  # type: ignore
 
 
 class SoftwareEngine(object):
@@ -51,23 +52,24 @@ class SoftwareEngine(object):
                 raise ValueError(f"Unknown trace data type: {trace.dtype}")
 
     def calculate(self) -> npt.NDArray[np.floating[Any]]:
-        histA = np.asarray(self._histA.getHistograms())
-        histB = np.asarray(self._histB.getHistograms())
+        with np.errstate(divide="ignore", invalid="ignore"):
+            histA = np.asarray(self._histA.getHistograms())
+            histB = np.asarray(self._histB.getHistograms())
 
-        # Get cardinalities
-        cardA = histA.sum(axis=1)  # type: ignore
-        cardB = histB.sum(axis=1)  # type: ignore
+            # Get cardinalities
+            cardA = histA.sum(axis=1)  # type: ignore
+            cardB = histB.sum(axis=1)  # type: ignore
 
-        # Get average of each histogram
-        meanA = (histA * self._histBinWeights).sum(axis=1) / cardA  # type: ignore
-        meanB = (histB * self._histBinWeights).sum(axis=1) / cardB  # type: ignore
+            # Get average of each histogram
+            meanA = (histA * self._histBinWeights).sum(axis=1) / cardA  # type: ignore
+            meanB = (histB * self._histBinWeights).sum(axis=1) / cardB  # type: ignore
 
-        # Calculate variance
-        centeredWeightsA = np.square(self._histBinWeights - np.vstack(meanA))
-        centeredWeightsB = np.square(self._histBinWeights - np.vstack(meanB))
-        varA = (histA * centeredWeightsA).sum(axis=1) / (cardA - 1)  # type: ignore
-        varB = (histB * centeredWeightsB).sum(axis=1) / (cardB - 1)  # type: ignore
+            # Calculate variance
+            centeredWeightsA = np.square(self._histBinWeights - np.vstack(meanA))
+            centeredWeightsB = np.square(self._histBinWeights - np.vstack(meanB))
+            varA = (histA * centeredWeightsA).sum(axis=1) / (cardA - 1)  # type: ignore
+            varB = (histB * centeredWeightsB).sum(axis=1) / (cardB - 1)  # type: ignore
 
-        # Calculate t-test
-        t = (meanA - meanB) / np.sqrt((varA / cardA) + (varB / cardB))
-        return t
+            # Calculate t-test
+            t = (meanA - meanB) / np.sqrt((varA / cardA) + (varB / cardB))
+            return t
