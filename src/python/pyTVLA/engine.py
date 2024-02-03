@@ -9,7 +9,7 @@ _TraceType = npt.NDArray[np.uint8] | npt.NDArray[np.uint16]
 
 
 class TraditionalEngine(object):
-    def __init__(self, traceLength: int) -> None:
+    def __init__(self) -> None:
         self.tracesA: list[_TraceType] = []
         self.tracesB: list[_TraceType] = []
 
