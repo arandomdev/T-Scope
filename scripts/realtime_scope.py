@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 import pyTVLA
+from pyTVLA.types import TraceType
 
 TRACE_LENGTH = 8192  # Size of t-test trace
 ELEMENT_TYPE = np.float64  # T-test trace element type
@@ -37,15 +38,13 @@ class Scope(object):
 def dataProcess(sharedMem: Any) -> None:
     data = np.frombuffer(sharedMem, dtype=ELEMENT_TYPE)
 
-    dataSourceA = pyTVLA.datasource.RandomDataSource(TRACE_LENGTH, 8)
-    dataSourceB = pyTVLA.datasource.RandomDataSource(TRACE_LENGTH, 8)
-    engine = pyTVLA.engine.SoftwareEngine(TRACE_LENGTH)
+    dataSource = pyTVLA.datasource.RandomDataSource(TRACE_LENGTH, np.uint8)
+    engine = pyTVLA.engine.SoftwareEngine(TRACE_LENGTH, np.uint8)
 
     while True:
-        engine.ingest(True, dataSourceA.next())
-        engine.ingest(False, dataSourceB.next())
+        engine.ingest(dataSource.next(TraceType.A), TraceType.A)
+        engine.ingest(dataSource.next(TraceType.B), TraceType.B)
         data[:] = engine.calculate()
-        pass
 
 
 def plotProcess(sharedMem: Any) -> None:
@@ -73,7 +72,7 @@ def main() -> None:
             if not plotProc.is_alive() or not dataProc.is_alive():
                 break
     except KeyboardInterrupt:
-        pass
+        print("Terminating processes.")
 
     # Terminate processes
     plotProc.terminate()

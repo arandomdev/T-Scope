@@ -1,55 +1,68 @@
-from typing import Any
+from abc import ABC
+from typing import Any, Generic, Type
 
 import numpy as np
 import numpy.typing as npt
 import pyHistogram
 import scipy.stats  # type: ignore
 
-_TraceType = npt.NDArray[np.uint8] | npt.NDArray[np.uint16]
+from .types import DT, DT_HARDWARE, TraceType
 
 
-class TraditionalEngine(object):
-    def __init__(self) -> None:
-        self.tracesA: list[_TraceType] = []
-        self.tracesB: list[_TraceType] = []
+class Engine(ABC, Generic[DT]):
+    def __init__(self, dtype: Type[DT]) -> None:
+        ...
 
-    def ingest(self, traceType: bool, trace: _TraceType) -> None:
-        if traceType:
+    def ingest(self, trace: npt.NDArray[DT], tType: TraceType) -> None:
+        ...
+
+    def calculate(self) -> npt.NDArray[np.floating[Any]]:
+        ...
+
+
+class TraditionalEngine(Engine[DT]):
+    def __init__(self, dtype: Type[DT]) -> None:
+        self.tracesA: list[npt.NDArray[DT]] = []
+        self.tracesB: list[npt.NDArray[DT]] = []
+
+    def ingest(self, trace: npt.NDArray[DT], tType: TraceType) -> None:
+        if tType == TraceType.A:
             self.tracesA.append(trace)
-        else:
+        elif tType == TraceType.B:
             self.tracesB.append(trace)
+        else:
+            raise NotImplementedError(f"Unknown trace type: {tType}")
 
     def calculate(self) -> npt.NDArray[np.floating[Any]]:
         with np.errstate(divide="ignore", invalid="ignore"):
             return scipy.stats.ttest_ind(self.tracesA, self.tracesB, equal_var=False)[0]  # type: ignore
 
 
-class SoftwareEngine(object):
+class SoftwareEngine(Engine[DT_HARDWARE]):
     """Software based engine. Uses the histogram library."""
 
-    def __init__(self, traceLength: int) -> None:
+    def __init__(self, traceLength: int, dtype: Type[DT_HARDWARE]) -> None:
         self._histA = pyHistogram.Collector(traceLength)
         self._histB = pyHistogram.Collector(traceLength)
 
+        if dtype is np.uint8:
+            self._ingestFuncA = self._histA.addTrace8
+            self._ingestFuncB = self._histB.addTrace8
+        elif dtype is np.uint16:
+            self._ingestFuncA = self._histA.addTrace10
+            self._ingestFuncB = self._histB.addTrace10
+        else:
+            raise ValueError("only uint8 or uint16 is supported.")
+
         self._histBinWeights = np.arange(start=0, stop=0x100, step=1)  # type: ignore
 
-        self.traceLength = traceLength
-
-    def ingest(self, traceType: bool, trace: _TraceType) -> None:
-        if traceType:
-            if trace.dtype == np.uint8:
-                self._histA.addTrace8(trace)  # type: ignore
-            elif trace.dtype == np.uint16:
-                self._histA.addTrace10(trace)  # type: ignore
-            else:
-                raise ValueError(f"Unknown trace data type: {trace.dtype}")
+    def ingest(self, trace: npt.NDArray[DT_HARDWARE], tType: TraceType) -> None:
+        if tType == TraceType.A:
+            self._ingestFuncA(trace)  # type: ignore
+        elif tType == TraceType.B:
+            self._ingestFuncB(trace)  # type: ignore
         else:
-            if trace.dtype == np.uint8:
-                self._histB.addTrace8(trace)  # type: ignore
-            elif trace.dtype == np.uint16:
-                self._histB.addTrace10(trace)  # type: ignore
-            else:
-                raise ValueError(f"Unknown trace data type: {trace.dtype}")
+            raise NotImplementedError(f"Unknown trace type: {tType}")
 
     def calculate(self) -> npt.NDArray[np.floating[Any]]:
         with np.errstate(divide="ignore", invalid="ignore"):
