@@ -11,7 +11,7 @@ install(TARGETS Histogram LIBRARY)
 
 install(TARGETS _pyHistogram
     COMPONENT python
-    LIBRARY DESTINATION "lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/dist-packages/pyHistogram"
+    DESTINATION "lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/dist-packages/pyHistogram"
 )
 
 install(DIRECTORY

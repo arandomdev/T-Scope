@@ -12,7 +12,7 @@ int main(int argc, char const *argv[]) {
   // filled with 1s.
   std::vector<std::vector<uint8_t>> traces;
   for (size_t i = 0; i < Histogram::Collector::NumberOfBins; i++) {
-    traces.emplace_back(traceLength, i);
+    traces.emplace_back(traceLength, (uint8_t)i);
   }
 
   for (auto &t : traces) {

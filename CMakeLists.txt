@@ -10,7 +10,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if (NOT CMAKE_CROSSCOMPILING)
     find_package(Python COMPONENTS Interpreter Development)
     include_directories(${Python_INCLUDE_DIRS})
+    link_directories(${Python_LIBRARY_DIRS})
 endif()
+
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 add_subdirectory(external/pybind11)
 
