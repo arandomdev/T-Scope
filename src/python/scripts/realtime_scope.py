@@ -4,6 +4,7 @@ import multiprocessing as mp
 from typing import Any
 
 import matplotlib.animation
+import matplotlib.container
 import matplotlib.lines
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,7 +14,7 @@ from pyTVLA.types import TraceType
 
 TRACE_LENGTH = 8192  # Size of t-test trace
 ELEMENT_TYPE = np.float64  # T-test trace element type
-DEFAULT_LIMIT_Y = (-8, 8)  # Default Y axis shown
+DEFAULT_LIMIT_Y = (0, 6)  # Default Y axis shown
 
 _ELEMENT_SIZE = ELEMENT_TYPE().itemsize  # Size in bytes of the element type
 
@@ -26,15 +27,26 @@ class Scope(object):
         self.data = data
 
         xAxis = np.arange(0, length, 1)  # type: ignore
-        self.line = matplotlib.lines.Line2D(xAxis, self.data)  # type: ignore
-        self.axs.add_line(self.line)
+        self.stem = self.axs.stem(  # type: ignore
+            xAxis,  # type: ignore
+            self.data,
+            markerfmt="none",
+            basefmt="none",
+        )
+
+        # Pre-compute stems
+        self.stems = np.zeros(shape=(length, 2, 2))  # type: ignore
+        self.stems[:, 0, 0] = xAxis  # type: ignore
+        self.stems[:, 1, 0] = xAxis  # type: ignore
+
         self.axs.set_xlim(0, length)
         self.axs.set_ylim(DEFAULT_LIMIT_Y[0], DEFAULT_LIMIT_Y[1])
         pass
 
-    def update(self, _: Any) -> tuple[matplotlib.lines.Line2D]:
-        self.line.set_ydata(self.data)  # type: ignore
-        return (self.line,)
+    def update(self, _: Any) -> tuple[matplotlib.container.StemContainer]:
+        self.stems[:, 1, 1] = self.data  # type: ignore
+        self.stem.stemlines.set_paths(self.stems)  # type: ignore
+        return (self.stem,)
 
 
 def dataProcess(sharedMem: Any) -> None:

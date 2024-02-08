@@ -35,7 +35,9 @@ class TraditionalEngine(Engine[DT]):
 
     def calculate(self) -> npt.NDArray["np.floating[Any]"]:
         with np.errstate(divide="ignore", invalid="ignore"):
-            return scipy.stats.ttest_ind(self.tracesA, self.tracesB, equal_var=False)[0]  # type: ignore
+            return np.abs(
+                scipy.stats.ttest_ind(self.tracesA, self.tracesB, equal_var=False)[0]  # type: ignore
+            )
 
 
 class SoftwareEngine(Engine[DT_HARDWARE]):
@@ -85,4 +87,4 @@ class SoftwareEngine(Engine[DT_HARDWARE]):
 
             # Calculate t-test
             t = (meanA - meanB) / np.sqrt((varA / cardA) + (varB / cardB))
-            return t
+            return np.abs(t)

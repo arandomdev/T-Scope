@@ -61,10 +61,10 @@ class ChipWhispererDataSource(Generic[DT_HARDWARE]):
     def __enter__(self):
         # Create scope
         self.scope = cw.scope()  # type: ignore
-        self.scope.default_setup()
+        self.scope.default_setup(verbose=False)  # type: ignore
         self.scope.adc.samples = self.traceLength
 
-        self.target = cw.target(self.scope, cw.targets.SimpleSerial)  # type: ignore
+        self.target = cw.target(self.scope)  # type: ignore
         return self
 
     def __exit__(
