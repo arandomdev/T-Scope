@@ -25,13 +25,13 @@ template <typename sType, typename qType> void divVal(sType sum, numDataType num
 }
 
 void diff(meanType meanA, meanType meanB, meanType* meanDiff) {
-	*meanDiff = meanType(meanA - meanB);
+	*meanDiff = (meanA > meanB) ? meanType(meanA - meanB) : meanType(meanB - meanA);
 }
 
 void varSum(countType* fam, meanType mean, varSumType* sum) {
 	ap_uint<9> i;
 	varSumType tmpSum = 0;
-	meanType tmp1[BINNUM];
+	ap_fixed<17,9> tmp1[BINNUM];
 	vecMultType tmp2[BINNUM];
 	for (i = 0; i < BINNUM; i++) {
 #pragma HLS PIPELINE
@@ -44,12 +44,11 @@ void varSum(countType* fam, meanType mean, varSumType* sum) {
 	}
 }
 
-void tCalc1(varSumType varSum1, varSumType varSum2, numDataType numData, tCalcResultType* out) {
+void tCalc1(varSumType varSum, numDataType numData, tCalcResultType* out) {
 #pragma HLS DATAFLOW
 	varType var;
-	varSumType varSum = varSum1 + varSum2;
 	divVal(varSum, numData, &var); //in MATLAB: log2(sum(((quantValues(:,:,1) - (ones(1,256) * 8)).^2) .* (ones(1,256) * 2^32)) / sum((ones(1,256) * 2^32))) = 14.2
-	*out = tCalcResultType((var^2)/numData); // out wants to be ap_fixed<40, 32>
+	*out = tCalcResultType((var*var)/numData); // out wants to be ap_fixed<40, 32>
 }
 
 void tCalc2(tCalcResultType tCalc1ResultA, tCalcResultType tCalc1ResultB, meanType meanDiff, tCalcResultType* t) {
@@ -75,7 +74,7 @@ void tTest(hls::stream<streamPkt>&A,
 	sumType sumA = 0, sumB = 0;
 	numDataType numDataA = 0, numDataB = 0;
 	meanType meanA, meanB, meanDiff; // 8 int, 8 decimal bits, unsigned
-	varSumType varSumA1 = 0, varSumA2 = 0, varSumB1 = 0, varSumB2 = 0; // in MATLAB: log2(sum(((quantValues - (ones(1,256) * 8)).^2) .* (ones(1,BINNUMS) * 2^32))) = 55
+	varSumType varSumA = 0, varSumB = 0; // in MATLAB: log2(sum(((quantValues - (ones(1,256) * 8)).^2) .* (ones(1,BINNUMS) * 2^32))) = 55
 	tCalcResultType tCalc1ResultA, tCalc1ResultB, t;
 
 // data-driven task parallelism
@@ -84,10 +83,10 @@ void tTest(hls::stream<streamPkt>&A,
 	divVal(sumA, numDataA, &meanA);
 	divVal(sumB, numDataB, &meanB);
 	diff(meanA, meanB, &meanDiff);
-	varSum(famA, meanA, &varSumA1);
-	varSum(famB, meanB, &varSumB1);
-	tCalc1(varSumA1, varSumA2, numDataA, &tCalc1ResultA);
-	tCalc1(varSumB1, varSumB2, numDataB, &tCalc1ResultB);
+	varSum(famA, meanA, &varSumA);
+	varSum(famB, meanB, &varSumB);
+	tCalc1(varSumA, numDataA, &tCalc1ResultA);
+	tCalc1(varSumB, numDataB, &tCalc1ResultB);
 	tCalc2(tCalc1ResultA, tCalc1ResultB, meanDiff, &t);
 	*C = t;
 }
