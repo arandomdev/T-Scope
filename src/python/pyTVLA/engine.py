@@ -16,7 +16,7 @@ class Engine(ABC, Generic[DT]):
     def ingest(self, trace: npt.NDArray[DT], tType: TraceType) -> None:
         ...
 
-    def calculate(self) -> npt.NDArray[np.floating[Any]]:
+    def calculate(self) -> npt.NDArray["np.floating[Any]"]:
         ...
 
 
@@ -33,7 +33,7 @@ class TraditionalEngine(Engine[DT]):
         else:
             raise NotImplementedError(f"Unknown trace type: {tType}")
 
-    def calculate(self) -> npt.NDArray[np.floating[Any]]:
+    def calculate(self) -> npt.NDArray["np.floating[Any]"]:
         with np.errstate(divide="ignore", invalid="ignore"):
             return scipy.stats.ttest_ind(self.tracesA, self.tracesB, equal_var=False)[0]  # type: ignore
 
@@ -64,10 +64,10 @@ class SoftwareEngine(Engine[DT_HARDWARE]):
         else:
             raise NotImplementedError(f"Unknown trace type: {tType}")
 
-    def calculate(self) -> npt.NDArray[np.floating[Any]]:
+    def calculate(self) -> npt.NDArray["np.floating[Any]"]:
         with np.errstate(divide="ignore", invalid="ignore"):
-            histA = np.asarray(self._histA.getHistograms())
-            histB = np.asarray(self._histB.getHistograms())
+            histA = np.asarray(self._histA.getHistograms())  # type: ignore
+            histB = np.asarray(self._histB.getHistograms())  # type: ignore
 
             # Get cardinalities
             cardA = histA.sum(axis=1)  # type: ignore
@@ -78,8 +78,8 @@ class SoftwareEngine(Engine[DT_HARDWARE]):
             meanB = (histB * self._histBinWeights).sum(axis=1) / cardB  # type: ignore
 
             # Calculate variance
-            centeredWeightsA = np.square(self._histBinWeights - np.vstack(meanA))
-            centeredWeightsB = np.square(self._histBinWeights - np.vstack(meanB))
+            centeredWeightsA = np.square(self._histBinWeights - np.vstack(meanA))  # type: ignore
+            centeredWeightsB = np.square(self._histBinWeights - np.vstack(meanB))  # type: ignore
             varA = (histA * centeredWeightsA).sum(axis=1) / (cardA - 1)  # type: ignore
             varB = (histB * centeredWeightsB).sum(axis=1) / (cardB - 1)  # type: ignore
 

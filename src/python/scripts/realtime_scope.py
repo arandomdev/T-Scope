@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import multiprocessing as mp
 from typing import Any
 
@@ -31,27 +33,27 @@ class Scope(object):
         pass
 
     def update(self, _: Any) -> tuple[matplotlib.lines.Line2D]:
-        self.line.set_ydata(self.data)
+        self.line.set_ydata(self.data)  # type: ignore
         return (self.line,)
 
 
 def dataProcess(sharedMem: Any) -> None:
-    data = np.frombuffer(sharedMem, dtype=ELEMENT_TYPE)
+    data = np.frombuffer(sharedMem, dtype=ELEMENT_TYPE)  # type: ignore
 
     dataSource = pyTVLA.datasource.RandomDataSource(TRACE_LENGTH, np.uint8)
     engine = pyTVLA.engine.SoftwareEngine(TRACE_LENGTH, np.uint8)
 
     while True:
-        engine.ingest(dataSource.next(TraceType.A), TraceType.A)
-        engine.ingest(dataSource.next(TraceType.B), TraceType.B)
+        engine.ingest(dataSource.next(), TraceType.A)
+        engine.ingest(dataSource.next(), TraceType.B)
         data[:] = engine.calculate()
 
 
 def plotProcess(sharedMem: Any) -> None:
-    data = np.frombuffer(sharedMem, dtype=ELEMENT_TYPE)
+    data = np.frombuffer(sharedMem, dtype=ELEMENT_TYPE)  # type: ignore
 
     fig, axs = plt.subplots()  # type: ignore
-    scope = Scope(axs, data)
+    scope = Scope(axs, data)  # type: ignore
 
     _ = matplotlib.animation.FuncAnimation(fig, scope.update, interval=0, blit=False)
     plt.show()  # type: ignore
