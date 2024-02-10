@@ -86,5 +86,5 @@ class SoftwareEngine(Engine[DT_HARDWARE]):
             varB = (histB * centeredWeightsB).sum(axis=1) / (cardB - 1)  # type: ignore
 
             # Calculate t-test
-            t = (meanA - meanB) / np.sqrt((varA / cardA) + (varB / cardB))
-            return np.abs(t)
+            t = np.abs((meanA - meanB) / np.sqrt((varA / cardA) + (varB / cardB)))  # type: ignore
+            return t
