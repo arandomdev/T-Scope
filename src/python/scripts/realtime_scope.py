@@ -3,6 +3,7 @@
 import multiprocessing as mp
 from typing import Any
 
+import click
 import matplotlib.animation
 import matplotlib.container
 import matplotlib.lines
@@ -55,19 +56,31 @@ class Scope(object):
         return (self.stem,)
 
 
-def dataProcess(sharedMem: Any) -> None:
+def dataProcess(sharedMem: Any, datasource: str, decimationFreq: int) -> None:
     data = np.frombuffer(sharedMem, dtype=ELEMENT_TYPE)  # type: ignore
 
-    scheduler = pyTVLA.scheduler.FixedRandomScheduler(KEY, 16, TEXTS)
-    with pyTVLA.datasource.ChipWhispererDataSource(
-        TRACE_LENGTH, scheduler, np.uint16
-    ) as ds:
+    if datasource == "random":
+        dsInst = pyTVLA.datasource.RandomDataSource(TRACE_LENGTH, np.uint16)
+    elif datasource == "chipwhisperer":
+        sch = pyTVLA.scheduler.FixedRandomScheduler(KEY, 16, TEXTS)
+        dsInst = pyTVLA.datasource.ChipWhispererDataSource(TRACE_LENGTH, sch, np.uint16)
+    else:
+        raise NotImplementedError
+
+    with dsInst as ds:
         engine = pyTVLA.engine.SoftwareEngine(TRACE_LENGTH, np.uint16)
 
+        decimationPhase = 0
         while True:
             tType, trace = ds.next()
             engine.ingest(trace, tType)
             data[:] = engine.calculate()
+
+            if decimationPhase == decimationFreq:
+                engine.decimate()
+                decimationPhase = 0
+            else:
+                decimationPhase += 1
 
 
 def plotProcess(sharedMem: Any) -> None:
@@ -80,13 +93,28 @@ def plotProcess(sharedMem: Any) -> None:
     plt.show()  # type: ignore
 
 
-def main() -> None:
+@click.command(name="realtime_scope")
+@click.option(
+    "-d",
+    "--datasource",
+    help="The datasource to select.",
+    type=click.Choice(["random", "chipwhisperer"], case_sensitive=False),
+    default="random",
+)
+@click.option(
+    "-f",
+    "--decimation-freq",
+    help="How many traces should be ingested before decimation by 2.",
+    type=int,
+    default=100,
+)
+def main(datasource: str, decimation_freq: int) -> None:
     sharedMem = mp.Array("b", TRACE_LENGTH * _ELEMENT_SIZE, lock=False)
 
     # Create and start processes
     processes = [
         mp.Process(target=plotProcess, args=(sharedMem,)),
-        mp.Process(target=dataProcess, args=(sharedMem,)),
+        mp.Process(target=dataProcess, args=(sharedMem, datasource, decimation_freq)),
     ]
 
     for p in processes:

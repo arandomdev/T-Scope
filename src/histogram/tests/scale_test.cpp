@@ -5,7 +5,7 @@
 int main(int argc, char const *argv[]) {
   auto c = Histogram::Collector(6);
 
-  uint16_t correctLen[] = {
+  uint16_t trace[] = {
       0,     // Index 0
       0x3FF, // 255
       0x200, // 128
@@ -14,7 +14,7 @@ int main(int argc, char const *argv[]) {
       0x203  // 129
   };
 
-  c.addTrace10(&correctLen[0], &correctLen[6]);
+  c.addTrace10(&trace[0], &trace[6]);
   auto h = c.getHistograms();
   assert(h[0][0] == 1 && "Fail min");
   assert(h[1][255] == 1 && "Fail max");

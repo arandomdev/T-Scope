@@ -7,7 +7,7 @@ using namespace Histogram;
 Collector::Collector(int traceLength)
     : traceLength(traceLength), histograms(traceLength) {}
 
-void Histogram::Collector::addTrace8(const uint8_t *begin, const uint8_t *end) {
+void Collector::addTrace8(const uint8_t *begin, const uint8_t *end) {
   if (end - begin != traceLength) {
     throw std::length_error("Trace length is incorrect.");
   }
@@ -19,8 +19,7 @@ void Histogram::Collector::addTrace8(const uint8_t *begin, const uint8_t *end) {
   }
 }
 
-void Histogram::Collector::addTrace10(const uint16_t *begin,
-                                      const uint16_t *end) {
+void Collector::addTrace10(const uint16_t *begin, const uint16_t *end) {
   if (end - begin != traceLength) {
     throw std::length_error("Trace length is incorrect.");
   }
@@ -33,6 +32,14 @@ void Histogram::Collector::addTrace10(const uint16_t *begin,
                        ? 0xFF                 // Assign max
                        : (begin[i] + 2) >> 2; // Scale
     histograms[i][binI]++;
+  }
+}
+
+void Collector::decimate() {
+  for (auto &h : histograms) {
+    for (size_t i = 0; i < NumberOfBins; i++) {
+      h[i] >>= 1;
+    }
   }
 }
 

@@ -40,6 +40,7 @@ PYBIND11_MODULE(_pyHistogram, m) {
       .def(pybind11::init<int &>())
       .def("addTrace8", &Collector_addTrace8)
       .def("addTrace10", &Collector_addTrace10)
+      .def("decimate", &Collector::decimate)
       .def("getHistograms", &Collector::getHistograms);
 
   // CacheT, allows conversion to numpy array

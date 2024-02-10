@@ -1,3 +1,7 @@
+add_executable(decimate_test decimate_test.cpp)
+target_link_libraries(decimate_test PRIVATE Histogram)
+add_test(NAME decimate_test COMMAND $<TARGET_FILE:decimate_test>)
+
 add_executable(scale_test scale_test.cpp)
 target_link_libraries(scale_test PRIVATE Histogram)
 add_test(NAME scale_test COMMAND $<TARGET_FILE:scale_test>)

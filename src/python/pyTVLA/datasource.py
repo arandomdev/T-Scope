@@ -14,6 +14,17 @@ class DataSource(ABC, Generic[DT]):
     def next(self) -> tuple[TraceType, npt.NDArray[DT]]:
         ...
 
+    def __enter__(self):
+        ...
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        ...
+
 
 class RandomDataSource(Generic[DT_HARDWARE]):
     def __init__(self, traceLength: int, dtype: Type[DT_HARDWARE]) -> None:
@@ -54,6 +65,17 @@ class RandomDataSource(Generic[DT_HARDWARE]):
             self.dtype
         )
         return self.traceType, trace
+
+    def __enter__(self):
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        pass
 
 
 class ChipWhispererDataSource(Generic[DT_HARDWARE]):

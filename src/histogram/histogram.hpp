@@ -33,6 +33,9 @@ public:
   /// @throws std::length_error when the trace is not the correct length.
   void addTrace10(const uint16_t *begin, const uint16_t *end);
 
+  /// @brief Divide all bin counts by 2.
+  void decimate();
+
   /// @brief Get the built histogram
   /// @return A 2D-array like stucture representing the histograms.
   const CacheT &getHistograms() const;

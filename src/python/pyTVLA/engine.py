@@ -66,6 +66,10 @@ class SoftwareEngine(Engine[DT_HARDWARE]):
         else:
             raise NotImplementedError(f"Unknown trace type: {tType}")
 
+    def decimate(self) -> None:
+        self._histA.decimate()
+        self._histB.decimate()
+
     def calculate(self) -> npt.NDArray["np.floating[Any]"]:
         with np.errstate(divide="ignore", invalid="ignore"):
             histA = np.asarray(self._histA.getHistograms())  # type: ignore
