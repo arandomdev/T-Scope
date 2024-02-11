@@ -2,19 +2,18 @@
 
 import enum
 import multiprocessing as mp
+import socket
+import struct
+import time
 from dataclasses import dataclass
 from types import TracebackType
 from typing import Any, Literal
 
 import click
-import matplotlib.animation
-import matplotlib.container
-import matplotlib.lines
-import matplotlib.pyplot as plt
 import numpy as np
-import numpy.typing as npt
 from pyTVLA.datasource import ChipWhispererDataSource, RandomDataSource
 from pyTVLA.engine import SoftwareEngine
+from pyTVLA.pynq_engine import PynqEngine
 from pyTVLA.scheduler import FixedRandomScheduler
 from pyTVLA.storage import HistogramStorage
 
@@ -34,44 +33,6 @@ TEXTS = (
 )
 
 
-class Scope(object):
-    def __init__(
-        self,
-        axs: plt.Axes,
-        data: npt.NDArray[np.float64],
-        statisticalValue: float,
-        yBound: float,
-    ) -> None:
-        self.axs = axs
-
-        length = len(data)
-        self.data = data
-
-        self.axs.axhline(statisticalValue, color="r")  # type: ignore
-
-        xAxis = np.arange(0, length, 1)  # type: ignore
-        self.stem = self.axs.stem(  # type: ignore
-            xAxis,  # type: ignore
-            self.data,
-            markerfmt="none",
-            basefmt="none",
-        )
-
-        # Pre-compute stems
-        self.stems = np.zeros(shape=(length, 2, 2), dtype=np.float64)  # type: ignore
-        self.stems[:, 0, 0] = xAxis  # type: ignore
-        self.stems[:, 1, 0] = xAxis  # type: ignore
-
-        self.axs.set_xlim(0, length)
-        self.axs.set_ylim(0, yBound)
-
-    def update(self, _: Any) -> tuple[matplotlib.container.StemContainer]:
-        self.stems[:, 1, 1] = self.data  # type: ignore
-
-        self.stem.stemlines.set_paths(self.stems)  # type: ignore
-        return (self.stem,)
-
-
 class MemoryType(enum.Enum):
     histA = 0
     histB = 1
@@ -79,15 +40,12 @@ class MemoryType(enum.Enum):
 
 
 @dataclass
-class MemoryConfig(object):
-    __array_interface__: dict[str, Any]
-    physAddr: int | None
+class SharedMemory(object):
+    __array_interface__: Any
+    memoryObj: Any
 
     def asArray(self) -> Any:
         return np.array(self, copy=False)  # type: ignore
-
-
-MemoryStore = dict[MemoryType, MemoryConfig]
 
 
 class MemoryManager(object):
@@ -95,67 +53,36 @@ class MemoryManager(object):
 
     def __init__(self, traceLen: int) -> None:
         self._traceLen = traceLen
+        self._mems: dict[MemoryType, SharedMemory] = {}
+
+    def _createMem(
+        self, memType: MemoryType, byteSize: int, shape: tuple[int, ...], dtype: Any
+    ) -> None:
+        if memType in self._mems:
+            raise RuntimeError(f"Memory type already created: {memType}")
+
+        if _pynq_available:
+            buf = pynq.allocate(shape=shape, dtype=dtype)  # type:ignore
+            interface = buf.__array_interface__  # type:ignore
+            self._mems[memType] = SharedMemory(interface, buf)
+        else:
+            buf = mp.RawArray("b", byteSize)
+            arr = np.frombuffer(buf, dtype=dtype)  # type:ignore
+            arr.shape = shape
+            interface = arr.__array_interface__  # type:ignore
+            self._mems[memType] = SharedMemory(interface, buf)
+        pass
 
     def __enter__(self):
-        if _pynq_available:
-            bufHistA = pynq.allocate(shape=(self._traceLen, 256), dtype=np.uint32)  # type:ignore
-            bufHistB = pynq.allocate(shape=(self._traceLen, 256), dtype=np.uint32)  # type:ignore
-            bufTvals = pynq.allocate(shape=(self._traceLen,), dtype=np.float64)  # type:ignore
-
-            arrIntHistA = bufHistA.__array_interface__  # type:ignore
-            arrIntHistB = bufHistB.__array_interface__  # type:ignore
-            arrIntTvals = bufTvals.__array_interface__  # type:ignore
-
-            self._pynqBuffers: dict[MemoryType, pynq.buffer.PynqBuffer] = {  # type:ignore
-                MemoryType.histA: bufHistA,
-                MemoryType.histB: bufHistB,
-                MemoryType.tvals: bufTvals,
-            }
-        else:
-            bufHistA = mp.Array("b", self._traceLen * 256 * 4, lock=False)
-            bufHistB = mp.Array("b", self._traceLen * 256 * 4, lock=False)
-            bufTvals = mp.Array("b", self._traceLen * 8, lock=False)
-
-            arrHistA = np.frombuffer(bufHistA, dtype=np.uint32)  # type: ignore
-            arrHistB = np.frombuffer(bufHistB, dtype=np.uint32)  # type: ignore
-            arrTvals = np.frombuffer(bufTvals, dtype=np.float64)  # type: ignore
-
-            arrHistA.shape = (self._traceLen, 256)
-            arrHistB.shape = (self._traceLen, 256)
-            arrTvals.shape = (self._traceLen,)
-
-            arrIntHistA = arrHistA.__array_interface__  # type:ignore
-            arrIntHistB = arrHistB.__array_interface__  # type:ignore
-            arrIntTvals = arrTvals.__array_interface__  # type:ignore
-
-            self._buffers: tuple[Any, ...] = (bufHistA, bufHistB, bufTvals)
-
-        self._mems = {
-            MemoryType.histA: MemoryConfig(
-                arrIntHistA,  # type: ignore
-                (
-                    self._buffers[MemoryType.histA].physical_address  # type: ignore
-                    if _pynq_available
-                    else None
-                ),
-            ),
-            MemoryType.histB: MemoryConfig(
-                arrIntHistB,  # type: ignore
-                (
-                    self._buffers[MemoryType.histB].physical_address  # type: ignore
-                    if _pynq_available
-                    else None
-                ),
-            ),
-            MemoryType.tvals: MemoryConfig(
-                arrIntTvals,  # type: ignore
-                (
-                    self._buffers[MemoryType.tvals].physical_address  # type: ignore
-                    if _pynq_available
-                    else None
-                ),
-            ),
-        }
+        self._createMem(
+            MemoryType.histA, self._traceLen * 256 * 4, (self._traceLen, 256), np.uint32
+        )
+        self._createMem(
+            MemoryType.histB, self._traceLen * 256 * 4, (self._traceLen, 256), np.uint32
+        )
+        self._createMem(
+            MemoryType.tvals, self._traceLen * 8, (self._traceLen,), np.float64
+        )
 
         return self
 
@@ -166,37 +93,45 @@ class MemoryManager(object):
         exc_tb: TracebackType | None,
     ) -> None:
         if _pynq_available:
-            for b in self._pynqBuffers.values():
-                b.freebuffer()
+            for b in self._mems.values():
+                b.memoryObj.freebuffer()
 
-    def getConfigs(self) -> MemoryStore:
-        return self._mems
+    def getConfig(self, memType: MemoryType) -> SharedMemory:
+        return self._mems[memType]
 
 
 @dataclass
 class ProgramArguments(object):
+    viewerAddress: str
+    port: int
     traceLength: int
     datasource: Literal["random", "chipwhisperer"]
+    engine: Literal["software", "pynq"]
     decimationFreq: int
-    statisticalValue: float
-    yBound: float
+    datasourceDelay: float
+    engineDelay: float
+    samplesPerUpdate: int
 
     @classmethod
     def fromDict(cls, options: dict[str, Any]):
         return cls(
+            viewerAddress=options["viewer_address"],
+            port=options["port"],
             traceLength=options["trace_length"],
             datasource=options["datasource"],
+            engine=options["engine"],
             decimationFreq=options["decimation_freq"],
-            statisticalValue=options["statistical_value"],
-            yBound=options["y_bound"],
+            datasourceDelay=options["datasource_delay"],
+            engineDelay=options["engine_delay"],
+            samplesPerUpdate=options["samples_per_update"],
         )
 
 
-def ingestProcess(args: ProgramArguments, mem: MemoryStore) -> None:
+def ingestProcess(args: ProgramArguments, mem: MemoryManager) -> None:
     """Gets new traces and stores them in histograms."""
 
-    histMemA = mem[MemoryType.histA].asArray()
-    histMemB = mem[MemoryType.histB].asArray()
+    histMemA = mem.getConfig(MemoryType.histA).asArray()
+    histMemB = mem.getConfig(MemoryType.histB).asArray()
     store = HistogramStorage(args.traceLength, histMemA, histMemB, np.uint16)
 
     if args.datasource == "random":
@@ -218,38 +153,73 @@ def ingestProcess(args: ProgramArguments, mem: MemoryStore) -> None:
                 store.decimate()
             decimationPhase = (decimationPhase + 1) % args.decimationFreq
 
+            time.sleep(args.datasourceDelay)
 
-def computeProcess(args: ProgramArguments, mem: MemoryStore) -> None:
+
+def computeProcess(args: ProgramArguments, mem: MemoryManager) -> None:
     """Calculates the t values."""
 
-    histMemA = mem[MemoryType.histA].asArray()
-    histMemB = mem[MemoryType.histB].asArray()
-    tvals = mem[MemoryType.tvals].asArray()
+    histMemA = mem.getConfig(MemoryType.histA)
+    histMemB = mem.getConfig(MemoryType.histB)
+    tvals = mem.getConfig(MemoryType.tvals)
 
-    engine = SoftwareEngine(histMemA, histMemB, tvals)
-    while True:
-        engine.calculate()
+    tvalsBuf = mem.getConfig(MemoryType.tvals).asArray()
 
+    # create engine
+    if args.engine == "software":
+        engine = SoftwareEngine(histMemA.asArray(), histMemB.asArray(), tvals.asArray())
+    elif args.engine == "pynq":
+        if _pynq_available:
+            engine = PynqEngine(
+                args.traceLength,
+                histMemA.memoryObj,
+                histMemB.memoryObj,
+                tvals.memoryObj,
+            )
+        else:
+            raise RuntimeError("Unable to use PynqEngine without pynq module.")
+    else:
+        raise NotImplementedError
 
-def plotProcess(args: ProgramArguments, mem: MemoryStore) -> None:
-    tvals = mem[MemoryType.tvals].asArray()
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as clientSocket, engine:
+        addr = (args.viewerAddress, args.port)
+        while True:
+            # Calculate entire trace
+            nSamples = 0
+            while nSamples < args.samplesPerUpdate:
+                start, end = engine.calculate()
+                nSamples += end - start
 
-    fig, axs = plt.subplots()  # type: ignore
-    scope = Scope(axs, tvals, args.statisticalValue, args.yBound)
+            # Send in chunks
+            for i in range(0, args.traceLength, args.samplesPerUpdate):
+                chunk = tvalsBuf[i : i + args.samplesPerUpdate]
+                data = struct.pack("<II", i, len(chunk))
+                data += struct.pack(
+                    f"<{len(chunk)}d",
+                    *chunk,
+                )
+                clientSocket.sendto(data, addr)
 
-    _ = matplotlib.animation.FuncAnimation(fig, scope.update, interval=16, blit=False)
-    plt.show()  # type: ignore
+            time.sleep(args.engineDelay)
 
 
 @click.command(name="realtime_scope")
+@click.argument("viewer_address", type=str)
+@click.option("--port", help="Port of the viewer host.", type=int, default=31671)
 @click.option(
-    "--trace-length", help="How many samples per trace", type=int, default=5000
+    "--trace-length", help="How many samples per trace.", type=int, default=5000
 )
 @click.option(
     "--datasource",
-    help="The datasource to select.",
+    help="The datasource to use.",
     type=click.Choice(["random", "chipwhisperer"], case_sensitive=False),
     default="random",
+)
+@click.option(
+    "--engine",
+    help="The engine to use.",
+    type=click.Choice(["software", "pynq"], case_sensitive=False),
+    default="software",
 )
 @click.option(
     "--decimation-freq",
@@ -258,29 +228,29 @@ def plotProcess(args: ProgramArguments, mem: MemoryStore) -> None:
     default=50,
 )
 @click.option(
-    "--statistical-value",
-    help="The Y-value to draw a red line.",
+    "--datasource-delay",
+    help="How long to wait in seconds between getting samples from the datasource.",
     type=float,
-    default=4.5,
+    default=0.1,
 )
 @click.option(
-    "--y-bound",
-    help="The Y-value to set as the top the plot window.",
+    "--engine-delay",
+    help="How long to wait in seconds between calculating a new t-test trace.",
     type=float,
-    default=10,
+    default=0.5,
+)
+@click.option(
+    "--samples-per-update",
+    help="The number of samples a update should contain when sent to the viewer.",
+    type=int,
+    default=60,
 )
 def main(**kwargs: dict[str, Any]) -> None:
     args = ProgramArguments.fromDict(kwargs)
     with MemoryManager(args.traceLength) as mem:
         # Create and start processes
-        procDefs = (
-            ingestProcess,
-            computeProcess,
-            plotProcess,
-        )
-        processes = [
-            mp.Process(target=p, args=(args, mem.getConfigs())) for p in procDefs
-        ]
+        procDefs = (ingestProcess, computeProcess)
+        processes = [mp.Process(target=p, args=(args, mem)) for p in procDefs]
 
         for p in processes:
             p.start()
@@ -289,6 +259,7 @@ def main(**kwargs: dict[str, Any]) -> None:
             while True:
                 if any(not p.is_alive() for p in processes):
                     break
+                time.sleep(1)
         except KeyboardInterrupt:
             print("Terminating processes.")
 

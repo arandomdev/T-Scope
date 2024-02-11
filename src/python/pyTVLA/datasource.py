@@ -7,14 +7,14 @@ import numpy as np
 import numpy.typing as npt
 
 from .scheduler import Scheduler
-from .types import DT, DT_HARDWARE, TraceType
+from .types import DT, DT_HARDWARE, T, TraceType
 
 
 class DataSource(ABC, Generic[DT]):
     def next(self) -> tuple[TraceType, npt.NDArray[DT]]:
         ...
 
-    def __enter__(self):
+    def __enter__(self: T) -> T:
         ...
 
     def __exit__(
@@ -66,7 +66,7 @@ class RandomDataSource(Generic[DT_HARDWARE]):
         )
         return self.traceType, trace
 
-    def __enter__(self):
+    def __enter__(self: T) -> T:
         return self
 
     def __exit__(
@@ -110,7 +110,7 @@ class ChipWhispererDataSource(Generic[DT_HARDWARE]):
             raise RuntimeError("Timeout when capture trace")
         return tType, trace.wave.astype(self._dtype)  # type: ignore
 
-    def __enter__(self):
+    def __enter__(self: T) -> T:
         # Create scope
         self._scope = cw.scope()  # type: ignore
         self._scope.default_setup(verbose=False)  # type: ignore

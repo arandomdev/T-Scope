@@ -1,7 +1,10 @@
 from abc import ABC
+from types import TracebackType
 
 import numpy as np
 import numpy.typing as npt
+
+from .types import T
 
 
 class Engine(ABC):
@@ -10,6 +13,17 @@ class Engine(ABC):
 
         Returns:
             A continuous index range of the t-values updated."""
+        ...
+
+    def __enter__(self: T) -> T:
+        ...
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
         ...
 
 
@@ -49,3 +63,14 @@ class SoftwareEngine(Engine):
             t = np.abs((meanA - meanB) / np.sqrt((varA / cardA) + (varB / cardB)))  # type: ignore
             self._tVals[:] = t
             return 0, len(t)
+
+    def __enter__(self: T) -> T:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        pass

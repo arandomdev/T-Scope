@@ -3,6 +3,7 @@ from typing import TypeVar
 
 import numpy as np
 
+T = TypeVar("T")
 DT = TypeVar("DT", bound=np.generic)  # Any generic numpy type
 DT_HARDWARE = TypeVar("DT_HARDWARE", np.uint8, np.uint16)  # Hardware supported types
 
