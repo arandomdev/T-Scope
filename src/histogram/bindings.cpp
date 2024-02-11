@@ -10,6 +10,8 @@ Collector Collector_init(unsigned int traceLength,
   // Verify shape and type
   auto info = histograms.request();
   if (info.format != py::format_descriptor<uint32_t>::format()) {
+    throw std::invalid_argument("Incorrect array type");
+  } else if (info.itemsize != sizeof(uint32_t)) {
     throw std::invalid_argument("Incorrect sample type");
   } else if (info.ndim != 2) {
     throw std::invalid_argument("Expected 2D array");
