@@ -1,9 +1,12 @@
 #include <histogram.hpp>
 #include <stdexcept>
 
+using namespace Histogram;
+
 /// @brief Tests to see if the collector catches incorrect length traces.
 int main(int argc, char const *argv[]) {
-  auto c = Histogram::Collector(4);
+  Collector::BinT data[4][256] = {0};
+  auto c = Histogram::Collector(4, &data);
 
   uint8_t correctLen[] = {1, 1, 1, 1};
   uint8_t incorrectLen[] = {1, 1, 1, 1, 1};

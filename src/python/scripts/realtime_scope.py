@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+import enum
 import multiprocessing as mp
-from typing import Any
+from dataclasses import dataclass
+from typing import Any, Literal, Type
 
 import click
 import matplotlib.animation
@@ -28,11 +30,18 @@ TEXTS = (
 
 
 class Scope(object):
-    def __init__(self, axs: plt.Axes, data: npt.NDArray[ELEMENT_TYPE]) -> None:
+    def __init__(
+        self,
+        axs: plt.Axes,
+        data: npt.NDArray[ELEMENT_TYPE],
+        statisticalValue: float,
+    ) -> None:
         self.axs = axs
 
         length = len(data)
         self.data = data
+
+        self.axs.axhline(statisticalValue, color="r")  # type: ignore
 
         xAxis = np.arange(0, length, 1)  # type: ignore
         self.stem = self.axs.stem(  # type: ignore
@@ -52,44 +61,114 @@ class Scope(object):
 
     def update(self, _: Any) -> tuple[matplotlib.container.StemContainer]:
         self.stems[:, 1, 1] = self.data  # type: ignore
+
         self.stem.stemlines.set_paths(self.stems)  # type: ignore
         return (self.stem,)
 
 
-def dataProcess(sharedMem: Any, datasource: str, decimationFreq: int) -> None:
-    data = np.frombuffer(sharedMem, dtype=ELEMENT_TYPE)  # type: ignore
+class SharedMemoryType(enum.Enum):
+    histA = 0
+    histB = 1
+    tvals = 2
 
-    if datasource == "random":
+
+@dataclass
+class MemoryConfig(object):
+    mem: Any
+    dtype: Type[npt.DTypeLike]
+    shape: tuple[int, ...]
+
+
+class SharedMemoryStore(object):
+    """Storage class of all shared memory."""
+
+    def __init__(self, traceLen: int) -> None:
+        self.mems = {
+            SharedMemoryType.histA: MemoryConfig(
+                mp.Array("b", traceLen * 256 * 4, lock=False),
+                np.uint32,
+                (traceLen, 256),
+            ),
+            SharedMemoryType.histB: MemoryConfig(
+                mp.Array("b", traceLen * 256 * 4, lock=False),
+                np.uint32,
+                (traceLen, 256),
+            ),
+            SharedMemoryType.tvals: MemoryConfig(
+                mp.Array("b", traceLen * _ELEMENT_SIZE, lock=False),
+                np.float64,
+                (traceLen,),
+            ),
+        }
+
+    def getArray(self, type: SharedMemoryType) -> Any:
+        config = self.mems[type]
+        a = np.frombuffer(config.mem, dtype=config.dtype)  # type: ignore
+        a.shape = config.shape
+        return a  # type: ignore
+
+
+@dataclass
+class ProgramArguments(object):
+    datasource: Literal["random", "chipwhisperer"]
+    decimationFreq: int
+    statisticalValue: float
+
+    @classmethod
+    def fromDict(cls, options: dict[str, Any]):
+        return cls(
+            datasource=options["datasource"],  # type: ignore
+            decimationFreq=options["decimation_freq"],  # type: ignore
+            statisticalValue=options["statistical_value"],  # type: ignore
+        )
+
+
+def ingestProcess(args: ProgramArguments, mem: SharedMemoryStore) -> None:
+    """Gets new traces and stores them in histograms."""
+
+    histMemA = mem.getArray(SharedMemoryType.histA)
+    histMemB = mem.getArray(SharedMemoryType.histB)
+    store = pyTVLA.storage.HistogramStorage(TRACE_LENGTH, histMemA, histMemB, np.uint16)
+
+    if args.datasource == "random":
         dsInst = pyTVLA.datasource.RandomDataSource(TRACE_LENGTH, np.uint16)
-    elif datasource == "chipwhisperer":
+    elif args.datasource == "chipwhisperer":
         sch = pyTVLA.scheduler.FixedRandomScheduler(KEY, 16, TEXTS)
         dsInst = pyTVLA.datasource.ChipWhispererDataSource(TRACE_LENGTH, sch, np.uint16)
     else:
         raise NotImplementedError
 
     with dsInst as ds:
-        engine = pyTVLA.engine.SoftwareEngine(TRACE_LENGTH, np.uint16)
-
         decimationPhase = 0
+
         while True:
             tType, trace = ds.next()
-            engine.ingest(trace, tType)
-            data[:] = engine.calculate()
+            store.ingest(trace, tType)
 
-            if decimationPhase == decimationFreq:
-                engine.decimate()
-                decimationPhase = 0
-            else:
-                decimationPhase += 1
+            if decimationPhase == 0 and args.decimationFreq != -1:
+                store.decimate()
+            decimationPhase = (decimationPhase + 1) % args.decimationFreq
 
 
-def plotProcess(sharedMem: Any) -> None:
-    data = np.frombuffer(sharedMem, dtype=ELEMENT_TYPE)  # type: ignore
+def computeProcess(args: ProgramArguments, mem: SharedMemoryStore) -> None:
+    """Calculates the t values."""
+
+    histMemA = mem.getArray(SharedMemoryType.histA)
+    histMemB = mem.getArray(SharedMemoryType.histB)
+    tvals = mem.getArray(SharedMemoryType.tvals)
+
+    engine = pyTVLA.engine.SoftwareEngine(histMemA, histMemB, tvals)
+    while True:
+        engine.calculate()
+
+
+def plotProcess(args: ProgramArguments, mem: SharedMemoryStore) -> None:
+    tvals = mem.getArray(SharedMemoryType.tvals)
 
     fig, axs = plt.subplots()  # type: ignore
-    scope = Scope(axs, data)  # type: ignore
+    scope = Scope(axs, tvals, args.statisticalValue)  # type: ignore
 
-    _ = matplotlib.animation.FuncAnimation(fig, scope.update, interval=0, blit=False)
+    _ = matplotlib.animation.FuncAnimation(fig, scope.update, interval=16, blit=False)
     plt.show()  # type: ignore
 
 
@@ -102,20 +181,28 @@ def plotProcess(sharedMem: Any) -> None:
     default="random",
 )
 @click.option(
-    "-f",
     "--decimation-freq",
-    help="How many traces should be ingested before decimation by 2.",
+    help="How many traces should be ingested before decimation by 2. Set to -1 to disable.",
     type=int,
-    default=100,
+    default=50,
 )
-def main(datasource: str, decimation_freq: int) -> None:
-    sharedMem = mp.Array("b", TRACE_LENGTH * _ELEMENT_SIZE, lock=False)
+@click.option(
+    "--statistical-value",
+    help="The Y-value to draw a red line.",
+    type=float,
+    default=4.5,
+)
+def main(**kwargs: dict[str, Any]) -> None:
+    args = ProgramArguments.fromDict(kwargs)
+    mem = SharedMemoryStore(TRACE_LENGTH)
 
     # Create and start processes
-    processes = [
-        mp.Process(target=plotProcess, args=(sharedMem,)),
-        mp.Process(target=dataProcess, args=(sharedMem, datasource, decimation_freq)),
-    ]
+    procDefs = (
+        ingestProcess,
+        computeProcess,
+        plotProcess,
+    )
+    processes = [mp.Process(target=p, args=(args, mem)) for p in procDefs]
 
     for p in processes:
         p.start()

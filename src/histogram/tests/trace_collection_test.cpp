@@ -1,11 +1,14 @@
 #include <histogram.hpp>
 #include <stdexcept>
 
+using namespace Histogram;
+
 /// @brief Tests to see if the collector correctly adds traces
 int main(int argc, char const *argv[]) {
   static const int traceLength = 4;
 
-  auto c = Histogram::Collector(traceLength);
+  Collector::BinT data[traceLength][256] = {0};
+  auto c = Histogram::Collector(traceLength, &data);
 
   // Create 256 traces, all filled with a specific bin. i.e. {0, 0, 0, 0},
   // {1, 1, 1, 1}, and so on. This should result in the entire cache being
@@ -20,8 +23,7 @@ int main(int argc, char const *argv[]) {
   }
 
   // Check result
-  auto histograms = c.getHistograms();
-  for (auto &h : histograms) {
+  for (auto &h : data) {
     for (auto &bin : h) {
       if (bin != 1) {
         throw std::logic_error("Collector incorrectly bins traces.");

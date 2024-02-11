@@ -14,12 +14,12 @@ public:
   static constexpr int HistogramDepth = std::numeric_limits<uint8_t>::digits;
   static constexpr int NumberOfBins = 1 << HistogramDepth;
 
-  using HistogramT = std::array<BinT, NumberOfBins>;
-  using CacheT = std::vector<HistogramT>;
+  using HistogramT = BinT[NumberOfBins];
+  using CacheT = HistogramT[];
 
   /// @brief Initialize the collector.
   /// @param traceLength The length of the input traces.
-  Collector(int traceLength);
+  Collector(unsigned int traceLength, CacheT *histograms);
 
   /// @brief Add a trace to the collector.
   /// @param begin Pointer to beginning of trace
@@ -36,13 +36,9 @@ public:
   /// @brief Divide all bin counts by 2.
   void decimate();
 
-  /// @brief Get the built histogram
-  /// @return A 2D-array like stucture representing the histograms.
-  const CacheT &getHistograms() const;
-
 private:
-  int traceLength;
-  CacheT histograms;
+  unsigned int traceLength;
+  CacheT *histograms;
 };
 
 } // namespace Histogram

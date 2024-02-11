@@ -1,79 +1,35 @@
 from abc import ABC
-from typing import Any, Generic, Type
 
 import numpy as np
 import numpy.typing as npt
-import pyHistogram
-import scipy.stats  # type: ignore
-
-from .types import DT, DT_HARDWARE, TraceType
 
 
-class Engine(ABC, Generic[DT]):
-    def __init__(self, dtype: Type[DT]) -> None:
-        ...
+class Engine(ABC):
+    def calculate(self) -> tuple[int, int]:
+        """Calculate the next range of t-values.
 
-    def ingest(self, trace: npt.NDArray[DT], tType: TraceType) -> None:
-        ...
-
-    def calculate(self) -> npt.NDArray["np.floating[Any]"]:
+        Returns:
+            A continuous index range of the t-values updated."""
         ...
 
 
-class TraditionalEngine(Engine[DT]):
-    def __init__(self, dtype: Type[DT]) -> None:
-        self.tracesA: list[npt.NDArray[DT]] = []
-        self.tracesB: list[npt.NDArray[DT]] = []
+class SoftwareEngine(Engine):
+    def __init__(
+        self,
+        histA: npt.NDArray[np.uint32],
+        histB: npt.NDArray[np.uint32],
+        tVals: npt.NDArray[np.float64],
+    ) -> None:
+        self._histA = histA
+        self._histB = histB
+        self._tVals = tVals
 
-    def ingest(self, trace: npt.NDArray[DT], tType: TraceType) -> None:
-        if tType == TraceType.A:
-            self.tracesA.append(trace)
-        elif tType == TraceType.B:
-            self.tracesB.append(trace)
-        else:
-            raise NotImplementedError(f"Unknown trace type: {tType}")
+        self._histBinWeights = np.arange(start=0, stop=256, step=1)  # type: ignore
 
-    def calculate(self) -> npt.NDArray["np.floating[Any]"]:
+    def calculate(self) -> tuple[int, int]:
         with np.errstate(divide="ignore", invalid="ignore"):
-            return np.abs(
-                scipy.stats.ttest_ind(self.tracesA, self.tracesB, equal_var=False)[0]  # type: ignore
-            )
-
-
-class SoftwareEngine(Engine[DT_HARDWARE]):
-    """Software based engine. Uses the histogram library."""
-
-    def __init__(self, traceLength: int, dtype: Type[DT_HARDWARE]) -> None:
-        self._histA = pyHistogram.Collector(traceLength)
-        self._histB = pyHistogram.Collector(traceLength)
-
-        if dtype is np.uint8:
-            self._ingestFuncA = self._histA.addTrace8
-            self._ingestFuncB = self._histB.addTrace8
-        elif dtype is np.uint16:
-            self._ingestFuncA = self._histA.addTrace10
-            self._ingestFuncB = self._histB.addTrace10
-        else:
-            raise ValueError("only uint8 or uint16 is supported.")
-
-        self._histBinWeights = np.arange(start=0, stop=0x100, step=1)  # type: ignore
-
-    def ingest(self, trace: npt.NDArray[DT_HARDWARE], tType: TraceType) -> None:
-        if tType == TraceType.A:
-            self._ingestFuncA(trace)  # type: ignore
-        elif tType == TraceType.B:
-            self._ingestFuncB(trace)  # type: ignore
-        else:
-            raise NotImplementedError(f"Unknown trace type: {tType}")
-
-    def decimate(self) -> None:
-        self._histA.decimate()
-        self._histB.decimate()
-
-    def calculate(self) -> npt.NDArray["np.floating[Any]"]:
-        with np.errstate(divide="ignore", invalid="ignore"):
-            histA = np.asarray(self._histA.getHistograms())  # type: ignore
-            histB = np.asarray(self._histB.getHistograms())  # type: ignore
+            histA = np.copy(self._histA)  # type: ignore
+            histB = np.copy(self._histB)  # type: ignore
 
             # Get cardinalities
             cardA = histA.sum(axis=1)  # type: ignore
@@ -91,4 +47,5 @@ class SoftwareEngine(Engine[DT_HARDWARE]):
 
             # Calculate t-test
             t = np.abs((meanA - meanB) / np.sqrt((varA / cardA) + (varB / cardB)))  # type: ignore
-            return t
+            self._tVals[:] = t
+            return 0, len(t)

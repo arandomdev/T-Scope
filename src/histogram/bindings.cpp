@@ -1,8 +1,25 @@
 #include <histogram.hpp>
+#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
 using namespace Histogram;
 namespace py = pybind11;
+
+Collector Collector_init(unsigned int traceLength,
+                         py::array_t<Collector::BinT> histograms) {
+  // Verify shape and type
+  auto info = histograms.request();
+  if (info.format != py::format_descriptor<uint32_t>::format()) {
+    throw std::invalid_argument("Incorrect sample type");
+  } else if (info.ndim != 2) {
+    throw std::invalid_argument("Expected 2D array");
+  } else if (info.shape[1] != Collector::NumberOfBins) {
+    throw std::invalid_argument("Incorrect number of bins per histogram");
+  }
+
+  auto histP = static_cast<Collector::CacheT *>(info.ptr);
+  return Collector(traceLength, histP);
+}
 
 void Collector_addTrace8(Collector &c, py::buffer b) {
   auto info = b.request();
@@ -37,24 +54,8 @@ PYBIND11_MODULE(_pyHistogram, m) {
 
   // Collector
   py::class_<Collector>(m, "Collector")
-      .def(pybind11::init<int &>())
+      .def(pybind11::init(&Collector_init))
       .def("addTrace8", &Collector_addTrace8)
       .def("addTrace10", &Collector_addTrace10)
-      .def("decimate", &Collector::decimate)
-      .def("getHistograms", &Collector::getHistograms);
-
-  // CacheT, allows conversion to numpy array
-  py::class_<Collector::CacheT>(m, "HistogramCache", py::buffer_protocol())
-      .def_buffer([](Collector::CacheT &c) -> py ::buffer_info {
-        constexpr size_t BinTSize = sizeof(Collector::BinT);
-        return py::buffer_info(
-            c.data()->data(), // Pointer to beginning of data
-            BinTSize,         // size of element
-            py::format_descriptor<Collector::BinT>::format(), // format desc
-            2,                                                // number of dims
-            // dimensions
-            std::vector<size_t>{c.size(), Collector::NumberOfBins},
-            // stride per index
-            std::vector<size_t>{BinTSize * Collector::NumberOfBins, BinTSize});
-      });
+      .def("decimate", &Collector::decimate);
 }
