@@ -14,17 +14,12 @@ module tTest_divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_s (
         ap_continue,
         ap_idle,
         ap_ready,
+        varSumB_dout,
+        varSumB_num_data_valid,
+        varSumB_fifo_cap,
+        varSumB_empty_n,
+        varSumB_read,
         p_read,
-        numDataB_dout,
-        numDataB_num_data_valid,
-        numDataB_fifo_cap,
-        numDataB_empty_n,
-        numDataB_read,
-        numDataB_c_din,
-        numDataB_c_num_data_valid,
-        numDataB_c_fifo_cap,
-        numDataB_c_full_n,
-        numDataB_c_write,
         ap_return
 );
 
@@ -104,44 +99,37 @@ output   ap_done;
 input   ap_continue;
 output   ap_idle;
 output   ap_ready;
-input  [62:0] p_read;
-input  [39:0] numDataB_dout;
-input  [2:0] numDataB_num_data_valid;
-input  [2:0] numDataB_fifo_cap;
-input   numDataB_empty_n;
-output   numDataB_read;
-output  [39:0] numDataB_c_din;
-input  [2:0] numDataB_c_num_data_valid;
-input  [2:0] numDataB_c_fifo_cap;
-input   numDataB_c_full_n;
-output   numDataB_c_write;
+input  [62:0] varSumB_dout;
+input  [2:0] varSumB_num_data_valid;
+input  [2:0] varSumB_fifo_cap;
+input   varSumB_empty_n;
+output   varSumB_read;
+input  [39:0] p_read;
 output  [22:0] ap_return;
 
 reg ap_done;
 reg ap_idle;
 reg ap_ready;
-reg numDataB_read;
-reg numDataB_c_write;
+reg varSumB_read;
 reg[22:0] ap_return;
 
 reg    ap_done_reg;
 (* fsm_encoding = "none" *) reg   [67:0] ap_CS_fsm;
 wire    ap_CS_fsm_state1;
-reg    numDataB_blk_n;
-reg    numDataB_c_blk_n;
-reg   [39:0] numDataB_read_reg_82;
+reg    varSumB_blk_n;
 reg    ap_block_state1;
+reg   [62:0] varSumB_read_reg_75;
+wire   [0:0] icmp_ln23_fu_51_p2;
+reg   [0:0] icmp_ln23_reg_80;
 wire    ap_CS_fsm_state2;
-wire   [0:0] icmp_ln23_fu_63_p2;
-reg   [0:0] icmp_ln23_reg_93;
-wire   [22:0] trunc_ln24_fu_77_p1;
-reg   [22:0] ap_phi_mux_var_i_out_0_phi_fu_56_p4;
-reg   [22:0] var_i_out_0_reg_52;
+wire   [22:0] trunc_ln24_fu_65_p1;
+reg   [22:0] ap_phi_mux_var_i_out_0_phi_fu_44_p4;
+reg   [22:0] var_i_out_0_reg_40;
 wire    ap_CS_fsm_state68;
-wire   [39:0] grp_fu_71_p1;
-wire   [22:0] grp_fu_71_p2;
-reg    grp_fu_71_ap_start;
-wire    grp_fu_71_ap_done;
+wire   [39:0] grp_fu_60_p1;
+wire   [22:0] grp_fu_60_p2;
+reg    grp_fu_60_ap_start;
+wire    grp_fu_60_ap_done;
 reg   [22:0] ap_return_preg;
 reg   [67:0] ap_NS_fsm;
 reg    ap_ST_fsm_state1_blk;
@@ -212,16 +200,16 @@ wire    ap_ST_fsm_state65_blk;
 wire    ap_ST_fsm_state66_blk;
 wire    ap_ST_fsm_state67_blk;
 wire    ap_ST_fsm_state68_blk;
-wire   [62:0] grp_fu_71_p10;
+wire   [62:0] grp_fu_60_p10;
 wire    ap_ce_reg;
 
 // power-on initialization
 initial begin
 #0 ap_done_reg = 1'b0;
 #0 ap_CS_fsm = 68'd1;
-#0 numDataB_read_reg_82 = 40'd0;
-#0 icmp_ln23_reg_93 = 1'd0;
-#0 var_i_out_0_reg_52 = 23'd0;
+#0 varSumB_read_reg_75 = 63'd0;
+#0 icmp_ln23_reg_80 = 1'd0;
+#0 var_i_out_0_reg_40 = 23'd0;
 #0 ap_return_preg = 23'd0;
 end
 
@@ -231,15 +219,15 @@ tTest_udiv_63ns_40ns_23_67_seq_1 #(
     .din0_WIDTH( 63 ),
     .din1_WIDTH( 40 ),
     .dout_WIDTH( 23 ))
-udiv_63ns_40ns_23_67_seq_1_U62(
+udiv_63ns_40ns_23_67_seq_1_U69(
     .clk(ap_clk),
     .reset(ap_rst),
-    .start(grp_fu_71_ap_start),
-    .done(grp_fu_71_ap_done),
-    .din0(p_read),
-    .din1(grp_fu_71_p1),
+    .start(grp_fu_60_ap_start),
+    .done(grp_fu_60_ap_done),
+    .din0(varSumB_read_reg_75),
+    .din1(grp_fu_60_p1),
     .ce(1'b1),
-    .dout(grp_fu_71_p2)
+    .dout(grp_fu_60_p2)
 );
 
 always @ (posedge ap_clk) begin
@@ -267,37 +255,37 @@ always @ (posedge ap_clk) begin
         ap_return_preg <= 23'd0;
     end else begin
         if ((1'b1 == ap_CS_fsm_state68)) begin
-            ap_return_preg <= ap_phi_mux_var_i_out_0_phi_fu_56_p4;
+            ap_return_preg <= ap_phi_mux_var_i_out_0_phi_fu_44_p4;
         end
     end
 end
 
 always @ (posedge ap_clk) begin
     if (ap_rst == 1'b1) begin
-        icmp_ln23_reg_93 <= 1'd0;
-    end else begin
-        if ((1'b1 == ap_CS_fsm_state2)) begin
-            icmp_ln23_reg_93 <= icmp_ln23_fu_63_p2;
-        end
-    end
-end
-
-always @ (posedge ap_clk) begin
-    if (ap_rst == 1'b1) begin
-        numDataB_read_reg_82 <= 40'd0;
+        icmp_ln23_reg_80 <= 1'd0;
     end else begin
         if (((1'b1 == ap_CS_fsm_state1) & (1'b0 == ap_block_state1))) begin
-            numDataB_read_reg_82 <= numDataB_dout;
+            icmp_ln23_reg_80 <= icmp_ln23_fu_51_p2;
         end
     end
 end
 
 always @ (posedge ap_clk) begin
     if (ap_rst == 1'b1) begin
-        var_i_out_0_reg_52 <= 23'd0;
+        varSumB_read_reg_75 <= 63'd0;
     end else begin
-        if (((1'b1 == ap_CS_fsm_state68) & (icmp_ln23_reg_93 == 1'd0))) begin
-            var_i_out_0_reg_52 <= trunc_ln24_fu_77_p1;
+        if (((1'b1 == ap_CS_fsm_state1) & (1'b0 == ap_block_state1))) begin
+            varSumB_read_reg_75 <= varSumB_dout;
+        end
+    end
+end
+
+always @ (posedge ap_clk) begin
+    if (ap_rst == 1'b1) begin
+        var_i_out_0_reg_40 <= 23'd0;
+    end else begin
+        if (((1'b1 == ap_CS_fsm_state68) & (icmp_ln23_reg_80 == 1'd0))) begin
+            var_i_out_0_reg_40 <= trunc_ln24_fu_65_p1;
         end
     end
 end
@@ -461,10 +449,10 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if (((1'b1 == ap_CS_fsm_state68) & (icmp_ln23_reg_93 == 1'd0))) begin
-        ap_phi_mux_var_i_out_0_phi_fu_56_p4 = trunc_ln24_fu_77_p1;
+    if (((1'b1 == ap_CS_fsm_state68) & (icmp_ln23_reg_80 == 1'd0))) begin
+        ap_phi_mux_var_i_out_0_phi_fu_44_p4 = trunc_ln24_fu_65_p1;
     end else begin
-        ap_phi_mux_var_i_out_0_phi_fu_56_p4 = var_i_out_0_reg_52;
+        ap_phi_mux_var_i_out_0_phi_fu_44_p4 = var_i_out_0_reg_40;
     end
 end
 
@@ -478,67 +466,49 @@ end
 
 always @ (*) begin
     if ((1'b1 == ap_CS_fsm_state68)) begin
-        ap_return = ap_phi_mux_var_i_out_0_phi_fu_56_p4;
+        ap_return = ap_phi_mux_var_i_out_0_phi_fu_44_p4;
     end else begin
         ap_return = ap_return_preg;
     end
 end
 
 always @ (*) begin
-    if (((1'b1 == ap_CS_fsm_state2) & (icmp_ln23_fu_63_p2 == 1'd0))) begin
-        grp_fu_71_ap_start = 1'b1;
+    if ((1'b1 == ap_CS_fsm_state2)) begin
+        grp_fu_60_ap_start = 1'b1;
     end else begin
-        grp_fu_71_ap_start = 1'b0;
+        grp_fu_60_ap_start = 1'b0;
     end
 end
 
 always @ (*) begin
     if ((~((ap_done_reg == 1'b1) | (ap_start == 1'b0)) & (1'b1 == ap_CS_fsm_state1))) begin
-        numDataB_blk_n = numDataB_empty_n;
+        varSumB_blk_n = varSumB_empty_n;
     end else begin
-        numDataB_blk_n = 1'b1;
-    end
-end
-
-always @ (*) begin
-    if ((~((ap_done_reg == 1'b1) | (ap_start == 1'b0)) & (1'b1 == ap_CS_fsm_state1))) begin
-        numDataB_c_blk_n = numDataB_c_full_n;
-    end else begin
-        numDataB_c_blk_n = 1'b1;
+        varSumB_blk_n = 1'b1;
     end
 end
 
 always @ (*) begin
     if (((1'b1 == ap_CS_fsm_state1) & (1'b0 == ap_block_state1))) begin
-        numDataB_c_write = 1'b1;
+        varSumB_read = 1'b1;
     end else begin
-        numDataB_c_write = 1'b0;
-    end
-end
-
-always @ (*) begin
-    if (((1'b1 == ap_CS_fsm_state1) & (1'b0 == ap_block_state1))) begin
-        numDataB_read = 1'b1;
-    end else begin
-        numDataB_read = 1'b0;
+        varSumB_read = 1'b0;
     end
 end
 
 always @ (*) begin
     case (ap_CS_fsm)
         ap_ST_fsm_state1 : begin
-            if (((1'b1 == ap_CS_fsm_state1) & (1'b0 == ap_block_state1))) begin
+            if (((1'b1 == ap_CS_fsm_state1) & (icmp_ln23_fu_51_p2 == 1'd1) & (1'b0 == ap_block_state1))) begin
+                ap_NS_fsm = ap_ST_fsm_state68;
+            end else if (((1'b1 == ap_CS_fsm_state1) & (icmp_ln23_fu_51_p2 == 1'd0) & (1'b0 == ap_block_state1))) begin
                 ap_NS_fsm = ap_ST_fsm_state2;
             end else begin
                 ap_NS_fsm = ap_ST_fsm_state1;
             end
         end
         ap_ST_fsm_state2 : begin
-            if (((1'b1 == ap_CS_fsm_state2) & (icmp_ln23_fu_63_p2 == 1'd1))) begin
-                ap_NS_fsm = ap_ST_fsm_state68;
-            end else begin
-                ap_NS_fsm = ap_ST_fsm_state3;
-            end
+            ap_NS_fsm = ap_ST_fsm_state3;
         end
         ap_ST_fsm_state3 : begin
             ap_NS_fsm = ap_ST_fsm_state4;
@@ -751,17 +721,15 @@ assign ap_CS_fsm_state2 = ap_CS_fsm[32'd1];
 assign ap_CS_fsm_state68 = ap_CS_fsm[32'd67];
 
 always @ (*) begin
-    ap_block_state1 = ((numDataB_empty_n == 1'b0) | (ap_done_reg == 1'b1) | (ap_start == 1'b0) | (numDataB_c_full_n == 1'b0));
+    ap_block_state1 = ((varSumB_empty_n == 1'b0) | (ap_done_reg == 1'b1) | (ap_start == 1'b0));
 end
 
-assign grp_fu_71_p1 = grp_fu_71_p10;
+assign grp_fu_60_p1 = grp_fu_60_p10;
 
-assign grp_fu_71_p10 = numDataB_read_reg_82;
+assign grp_fu_60_p10 = p_read;
 
-assign icmp_ln23_fu_63_p2 = ((numDataB_read_reg_82 == 40'd0) ? 1'b1 : 1'b0);
+assign icmp_ln23_fu_51_p2 = ((p_read == 40'd0) ? 1'b1 : 1'b0);
 
-assign numDataB_c_din = numDataB_dout;
-
-assign trunc_ln24_fu_77_p1 = grp_fu_71_p2[22:0];
+assign trunc_ln24_fu_65_p1 = grp_fu_60_p2[22:0];
 
 endmodule //tTest_divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_s

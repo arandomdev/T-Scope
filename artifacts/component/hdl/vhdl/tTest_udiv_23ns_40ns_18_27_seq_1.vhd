@@ -7,7 +7,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity tTest_udiv_46ns_40ns_26_50_seq_1_divseq is
+entity tTest_udiv_23ns_40ns_18_27_seq_1_divseq is
     generic (
         in0_WIDTH   : INTEGER :=32;
         in1_WIDTH   : INTEGER :=32;
@@ -32,7 +32,7 @@ entity tTest_udiv_46ns_40ns_26_50_seq_1_divseq is
 
 end entity;
 
-architecture rtl of tTest_udiv_46ns_40ns_26_50_seq_1_divseq is
+architecture rtl of tTest_udiv_23ns_40ns_18_27_seq_1_divseq is
     constant cal_WIDTH      : INTEGER := max(in0_WIDTH, in1_WIDTH);
 
     signal dividend0        : UNSIGNED(in0_WIDTH-1 downto 0);
@@ -100,7 +100,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity tTest_udiv_46ns_40ns_26_50_seq_1 is
+entity tTest_udiv_23ns_40ns_18_27_seq_1 is
     generic (
         ID   : INTEGER :=1;
         NUM_STAGE   : INTEGER :=2;
@@ -118,8 +118,8 @@ entity tTest_udiv_46ns_40ns_26_50_seq_1 is
         dout        : out STD_LOGIC_VECTOR(dout_WIDTH-1 downto 0));
 end entity;
 
-architecture rtl of tTest_udiv_46ns_40ns_26_50_seq_1 is
-    component tTest_udiv_46ns_40ns_26_50_seq_1_divseq is
+architecture rtl of tTest_udiv_23ns_40ns_18_27_seq_1 is
+    component tTest_udiv_23ns_40ns_18_27_seq_1_divseq is
         generic (
             in0_WIDTH   : INTEGER :=32;
             in1_WIDTH   : INTEGER :=32;
@@ -147,7 +147,7 @@ architecture rtl of tTest_udiv_46ns_40ns_26_50_seq_1 is
     signal quot       : STD_LOGIC_VECTOR(dout_WIDTH-1 downto 0);
     signal remd       : STD_LOGIC_VECTOR(dout_WIDTH-1 downto 0);
 begin
-    tTest_udiv_46ns_40ns_26_50_seq_1_divseq_u : tTest_udiv_46ns_40ns_26_50_seq_1_divseq
+    tTest_udiv_23ns_40ns_18_27_seq_1_divseq_u : tTest_udiv_23ns_40ns_18_27_seq_1_divseq
         generic map(
             in0_WIDTH   => din0_WIDTH,
             in1_WIDTH   => din1_WIDTH,

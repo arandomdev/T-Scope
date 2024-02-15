@@ -476,7 +476,7 @@ attribute shreg_extract : string;
 
 
 begin
-    dsqrt_64ns_64ns_64_57_no_dsp_1_U76 : component tTest_dsqrt_64ns_64ns_64_57_no_dsp_1
+    dsqrt_64ns_64ns_64_57_no_dsp_1_U83 : component tTest_dsqrt_64ns_64ns_64_57_no_dsp_1
     generic map (
         ID => 1,
         NUM_STAGE => 57,
@@ -491,7 +491,7 @@ begin
         ce => ap_const_logic_1,
         dout => grp_fu_141_p2);
 
-    udiv_38ns_32ns_18_42_seq_1_U77 : component tTest_udiv_38ns_32ns_18_42_seq_1
+    udiv_38ns_32ns_18_42_seq_1_U84 : component tTest_udiv_38ns_32ns_18_42_seq_1
     generic map (
         ID => 1,
         NUM_STAGE => 42,

@@ -17,17 +17,12 @@ port (
     ap_continue : IN STD_LOGIC;
     ap_idle : OUT STD_LOGIC;
     ap_ready : OUT STD_LOGIC;
-    p_read : IN STD_LOGIC_VECTOR (62 downto 0);
-    numDataB_dout : IN STD_LOGIC_VECTOR (39 downto 0);
-    numDataB_num_data_valid : IN STD_LOGIC_VECTOR (2 downto 0);
-    numDataB_fifo_cap : IN STD_LOGIC_VECTOR (2 downto 0);
-    numDataB_empty_n : IN STD_LOGIC;
-    numDataB_read : OUT STD_LOGIC;
-    numDataB_c_din : OUT STD_LOGIC_VECTOR (39 downto 0);
-    numDataB_c_num_data_valid : IN STD_LOGIC_VECTOR (2 downto 0);
-    numDataB_c_fifo_cap : IN STD_LOGIC_VECTOR (2 downto 0);
-    numDataB_c_full_n : IN STD_LOGIC;
-    numDataB_c_write : OUT STD_LOGIC;
+    varSumB_dout : IN STD_LOGIC_VECTOR (62 downto 0);
+    varSumB_num_data_valid : IN STD_LOGIC_VECTOR (2 downto 0);
+    varSumB_fifo_cap : IN STD_LOGIC_VECTOR (2 downto 0);
+    varSumB_empty_n : IN STD_LOGIC;
+    varSumB_read : OUT STD_LOGIC;
+    p_read : IN STD_LOGIC_VECTOR (39 downto 0);
     ap_return : OUT STD_LOGIC_VECTOR (22 downto 0) );
 end;
 
@@ -112,6 +107,7 @@ architecture behav of tTest_divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_s
     constant ap_const_lv40_0 : STD_LOGIC_VECTOR (39 downto 0) := "0000000000000000000000000000000000000000";
     constant ap_const_lv23_0 : STD_LOGIC_VECTOR (22 downto 0) := "00000000000000000000000";
     constant ap_const_lv1_1 : STD_LOGIC_VECTOR (0 downto 0) := "1";
+    constant ap_const_lv63_0 : STD_LOGIC_VECTOR (62 downto 0) := "000000000000000000000000000000000000000000000000000000000000000";
 
 attribute shreg_extract : string;
     signal ap_done_reg : STD_LOGIC := '0';
@@ -120,23 +116,22 @@ attribute shreg_extract : string;
     attribute fsm_encoding of ap_CS_fsm : signal is "none";
     signal ap_CS_fsm_state1 : STD_LOGIC;
     attribute fsm_encoding of ap_CS_fsm_state1 : signal is "none";
-    signal numDataB_blk_n : STD_LOGIC;
-    signal numDataB_c_blk_n : STD_LOGIC;
-    signal numDataB_read_reg_82 : STD_LOGIC_VECTOR (39 downto 0) := "0000000000000000000000000000000000000000";
+    signal varSumB_blk_n : STD_LOGIC;
     signal ap_block_state1 : BOOLEAN;
+    signal varSumB_read_reg_75 : STD_LOGIC_VECTOR (62 downto 0) := "000000000000000000000000000000000000000000000000000000000000000";
+    signal icmp_ln23_fu_51_p2 : STD_LOGIC_VECTOR (0 downto 0);
+    signal icmp_ln23_reg_80 : STD_LOGIC_VECTOR (0 downto 0) := "0";
     signal ap_CS_fsm_state2 : STD_LOGIC;
     attribute fsm_encoding of ap_CS_fsm_state2 : signal is "none";
-    signal icmp_ln23_fu_63_p2 : STD_LOGIC_VECTOR (0 downto 0);
-    signal icmp_ln23_reg_93 : STD_LOGIC_VECTOR (0 downto 0) := "0";
-    signal trunc_ln24_fu_77_p1 : STD_LOGIC_VECTOR (22 downto 0);
-    signal ap_phi_mux_var_i_out_0_phi_fu_56_p4 : STD_LOGIC_VECTOR (22 downto 0);
-    signal var_i_out_0_reg_52 : STD_LOGIC_VECTOR (22 downto 0) := "00000000000000000000000";
+    signal trunc_ln24_fu_65_p1 : STD_LOGIC_VECTOR (22 downto 0);
+    signal ap_phi_mux_var_i_out_0_phi_fu_44_p4 : STD_LOGIC_VECTOR (22 downto 0);
+    signal var_i_out_0_reg_40 : STD_LOGIC_VECTOR (22 downto 0) := "00000000000000000000000";
     signal ap_CS_fsm_state68 : STD_LOGIC;
     attribute fsm_encoding of ap_CS_fsm_state68 : signal is "none";
-    signal grp_fu_71_p1 : STD_LOGIC_VECTOR (39 downto 0);
-    signal grp_fu_71_p2 : STD_LOGIC_VECTOR (22 downto 0);
-    signal grp_fu_71_ap_start : STD_LOGIC;
-    signal grp_fu_71_ap_done : STD_LOGIC;
+    signal grp_fu_60_p1 : STD_LOGIC_VECTOR (39 downto 0);
+    signal grp_fu_60_p2 : STD_LOGIC_VECTOR (22 downto 0);
+    signal grp_fu_60_ap_start : STD_LOGIC;
+    signal grp_fu_60_ap_done : STD_LOGIC;
     signal ap_return_preg : STD_LOGIC_VECTOR (22 downto 0) := "00000000000000000000000";
     signal ap_NS_fsm : STD_LOGIC_VECTOR (67 downto 0);
     signal ap_ST_fsm_state1_blk : STD_LOGIC;
@@ -207,7 +202,7 @@ attribute shreg_extract : string;
     signal ap_ST_fsm_state66_blk : STD_LOGIC;
     signal ap_ST_fsm_state67_blk : STD_LOGIC;
     signal ap_ST_fsm_state68_blk : STD_LOGIC;
-    signal grp_fu_71_p10 : STD_LOGIC_VECTOR (62 downto 0);
+    signal grp_fu_60_p10 : STD_LOGIC_VECTOR (62 downto 0);
     signal ap_ce_reg : STD_LOGIC;
 
     component tTest_udiv_63ns_40ns_23_67_seq_1 IS
@@ -231,7 +226,7 @@ attribute shreg_extract : string;
 
 
 begin
-    udiv_63ns_40ns_23_67_seq_1_U62 : component tTest_udiv_63ns_40ns_23_67_seq_1
+    udiv_63ns_40ns_23_67_seq_1_U69 : component tTest_udiv_63ns_40ns_23_67_seq_1
     generic map (
         ID => 1,
         NUM_STAGE => 67,
@@ -241,12 +236,12 @@ begin
     port map (
         clk => ap_clk,
         reset => ap_rst,
-        start => grp_fu_71_ap_start,
-        done => grp_fu_71_ap_done,
-        din0 => p_read,
-        din1 => grp_fu_71_p1,
+        start => grp_fu_60_ap_start,
+        done => grp_fu_60_ap_done,
+        din0 => varSumB_read_reg_75,
+        din1 => grp_fu_60_p1,
         ce => ap_const_logic_1,
-        dout => grp_fu_71_p2);
+        dout => grp_fu_60_p2);
 
 
 
@@ -287,70 +282,68 @@ begin
                 ap_return_preg <= ap_const_lv23_0;
             else
                 if ((ap_const_logic_1 = ap_CS_fsm_state68)) then 
-                    ap_return_preg <= ap_phi_mux_var_i_out_0_phi_fu_56_p4;
+                    ap_return_preg <= ap_phi_mux_var_i_out_0_phi_fu_44_p4;
                 end if; 
             end if;
         end if;
     end process;
 
 
-    icmp_ln23_reg_93_assign_proc : process(ap_clk)
+    icmp_ln23_reg_80_assign_proc : process(ap_clk)
     begin
         if (ap_clk'event and ap_clk =  '1') then
             if (ap_rst = '1') then
-                icmp_ln23_reg_93 <= ap_const_lv1_0;
-            else
-                if ((ap_const_logic_1 = ap_CS_fsm_state2)) then 
-                    icmp_ln23_reg_93 <= icmp_ln23_fu_63_p2;
-                end if; 
-            end if;
-        end if;
-    end process;
-
-
-    numDataB_read_reg_82_assign_proc : process(ap_clk)
-    begin
-        if (ap_clk'event and ap_clk =  '1') then
-            if (ap_rst = '1') then
-                numDataB_read_reg_82 <= ap_const_lv40_0;
+                icmp_ln23_reg_80 <= ap_const_lv1_0;
             else
                 if (((ap_const_logic_1 = ap_CS_fsm_state1) and (ap_const_boolean_0 = ap_block_state1))) then 
-                    numDataB_read_reg_82 <= numDataB_dout;
+                    icmp_ln23_reg_80 <= icmp_ln23_fu_51_p2;
                 end if; 
             end if;
         end if;
     end process;
 
 
-    var_i_out_0_reg_52_assign_proc : process(ap_clk)
+    varSumB_read_reg_75_assign_proc : process(ap_clk)
     begin
         if (ap_clk'event and ap_clk =  '1') then
             if (ap_rst = '1') then
-                var_i_out_0_reg_52 <= ap_const_lv23_0;
+                varSumB_read_reg_75 <= ap_const_lv63_0;
             else
-                if (((ap_const_logic_1 = ap_CS_fsm_state68) and (icmp_ln23_reg_93 = ap_const_lv1_0))) then 
-                    var_i_out_0_reg_52 <= trunc_ln24_fu_77_p1;
+                if (((ap_const_logic_1 = ap_CS_fsm_state1) and (ap_const_boolean_0 = ap_block_state1))) then 
+                    varSumB_read_reg_75 <= varSumB_dout;
                 end if; 
             end if;
         end if;
     end process;
 
 
-    ap_NS_fsm_assign_proc : process (ap_CS_fsm, ap_CS_fsm_state1, ap_block_state1, ap_CS_fsm_state2, icmp_ln23_fu_63_p2)
+    var_i_out_0_reg_40_assign_proc : process(ap_clk)
+    begin
+        if (ap_clk'event and ap_clk =  '1') then
+            if (ap_rst = '1') then
+                var_i_out_0_reg_40 <= ap_const_lv23_0;
+            else
+                if (((ap_const_logic_1 = ap_CS_fsm_state68) and (icmp_ln23_reg_80 = ap_const_lv1_0))) then 
+                    var_i_out_0_reg_40 <= trunc_ln24_fu_65_p1;
+                end if; 
+            end if;
+        end if;
+    end process;
+
+
+    ap_NS_fsm_assign_proc : process (ap_CS_fsm, ap_CS_fsm_state1, ap_block_state1, icmp_ln23_fu_51_p2)
     begin
         case ap_CS_fsm is
             when ap_ST_fsm_state1 => 
-                if (((ap_const_logic_1 = ap_CS_fsm_state1) and (ap_const_boolean_0 = ap_block_state1))) then
+                if (((ap_const_logic_1 = ap_CS_fsm_state1) and (icmp_ln23_fu_51_p2 = ap_const_lv1_1) and (ap_const_boolean_0 = ap_block_state1))) then
+                    ap_NS_fsm <= ap_ST_fsm_state68;
+                elsif (((ap_const_logic_1 = ap_CS_fsm_state1) and (icmp_ln23_fu_51_p2 = ap_const_lv1_0) and (ap_const_boolean_0 = ap_block_state1))) then
                     ap_NS_fsm <= ap_ST_fsm_state2;
                 else
                     ap_NS_fsm <= ap_ST_fsm_state1;
                 end if;
             when ap_ST_fsm_state2 => 
-                if (((ap_const_logic_1 = ap_CS_fsm_state2) and (icmp_ln23_fu_63_p2 = ap_const_lv1_1))) then
-                    ap_NS_fsm <= ap_ST_fsm_state68;
-                else
-                    ap_NS_fsm <= ap_ST_fsm_state3;
-                end if;
+                ap_NS_fsm <= ap_ST_fsm_state3;
             when ap_ST_fsm_state3 => 
                 ap_NS_fsm <= ap_ST_fsm_state4;
             when ap_ST_fsm_state4 => 
@@ -568,9 +561,9 @@ begin
     ap_ST_fsm_state8_blk <= ap_const_logic_0;
     ap_ST_fsm_state9_blk <= ap_const_logic_0;
 
-    ap_block_state1_assign_proc : process(ap_start, ap_done_reg, numDataB_empty_n, numDataB_c_full_n)
+    ap_block_state1_assign_proc : process(ap_start, ap_done_reg, varSumB_empty_n)
     begin
-                ap_block_state1 <= ((numDataB_empty_n = ap_const_logic_0) or (ap_done_reg = ap_const_logic_1) or (ap_start = ap_const_logic_0) or (numDataB_c_full_n = ap_const_logic_0));
+                ap_block_state1 <= ((varSumB_empty_n = ap_const_logic_0) or (ap_done_reg = ap_const_logic_1) or (ap_start = ap_const_logic_0));
     end process;
 
 
@@ -594,12 +587,12 @@ begin
     end process;
 
 
-    ap_phi_mux_var_i_out_0_phi_fu_56_p4_assign_proc : process(icmp_ln23_reg_93, trunc_ln24_fu_77_p1, var_i_out_0_reg_52, ap_CS_fsm_state68)
+    ap_phi_mux_var_i_out_0_phi_fu_44_p4_assign_proc : process(icmp_ln23_reg_80, trunc_ln24_fu_65_p1, var_i_out_0_reg_40, ap_CS_fsm_state68)
     begin
-        if (((ap_const_logic_1 = ap_CS_fsm_state68) and (icmp_ln23_reg_93 = ap_const_lv1_0))) then 
-            ap_phi_mux_var_i_out_0_phi_fu_56_p4 <= trunc_ln24_fu_77_p1;
+        if (((ap_const_logic_1 = ap_CS_fsm_state68) and (icmp_ln23_reg_80 = ap_const_lv1_0))) then 
+            ap_phi_mux_var_i_out_0_phi_fu_44_p4 <= trunc_ln24_fu_65_p1;
         else 
-            ap_phi_mux_var_i_out_0_phi_fu_56_p4 <= var_i_out_0_reg_52;
+            ap_phi_mux_var_i_out_0_phi_fu_44_p4 <= var_i_out_0_reg_40;
         end if; 
     end process;
 
@@ -614,68 +607,47 @@ begin
     end process;
 
 
-    ap_return_assign_proc : process(ap_phi_mux_var_i_out_0_phi_fu_56_p4, ap_CS_fsm_state68, ap_return_preg)
+    ap_return_assign_proc : process(ap_phi_mux_var_i_out_0_phi_fu_44_p4, ap_CS_fsm_state68, ap_return_preg)
     begin
         if ((ap_const_logic_1 = ap_CS_fsm_state68)) then 
-            ap_return <= ap_phi_mux_var_i_out_0_phi_fu_56_p4;
+            ap_return <= ap_phi_mux_var_i_out_0_phi_fu_44_p4;
         else 
             ap_return <= ap_return_preg;
         end if; 
     end process;
 
 
-    grp_fu_71_ap_start_assign_proc : process(ap_CS_fsm_state2, icmp_ln23_fu_63_p2)
+    grp_fu_60_ap_start_assign_proc : process(ap_CS_fsm_state2)
     begin
-        if (((ap_const_logic_1 = ap_CS_fsm_state2) and (icmp_ln23_fu_63_p2 = ap_const_lv1_0))) then 
-            grp_fu_71_ap_start <= ap_const_logic_1;
+        if ((ap_const_logic_1 = ap_CS_fsm_state2)) then 
+            grp_fu_60_ap_start <= ap_const_logic_1;
         else 
-            grp_fu_71_ap_start <= ap_const_logic_0;
+            grp_fu_60_ap_start <= ap_const_logic_0;
         end if; 
     end process;
 
-    grp_fu_71_p1 <= grp_fu_71_p10(40 - 1 downto 0);
-    grp_fu_71_p10 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(numDataB_read_reg_82),63));
-    icmp_ln23_fu_63_p2 <= "1" when (numDataB_read_reg_82 = ap_const_lv40_0) else "0";
+    grp_fu_60_p1 <= grp_fu_60_p10(40 - 1 downto 0);
+    grp_fu_60_p10 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(p_read),63));
+    icmp_ln23_fu_51_p2 <= "1" when (p_read = ap_const_lv40_0) else "0";
+    trunc_ln24_fu_65_p1 <= grp_fu_60_p2(23 - 1 downto 0);
 
-    numDataB_blk_n_assign_proc : process(ap_start, ap_done_reg, ap_CS_fsm_state1, numDataB_empty_n)
-    begin
-        if ((not(((ap_done_reg = ap_const_logic_1) or (ap_start = ap_const_logic_0))) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
-            numDataB_blk_n <= numDataB_empty_n;
-        else 
-            numDataB_blk_n <= ap_const_logic_1;
-        end if; 
-    end process;
-
-
-    numDataB_c_blk_n_assign_proc : process(ap_start, ap_done_reg, ap_CS_fsm_state1, numDataB_c_full_n)
+    varSumB_blk_n_assign_proc : process(ap_start, ap_done_reg, ap_CS_fsm_state1, varSumB_empty_n)
     begin
         if ((not(((ap_done_reg = ap_const_logic_1) or (ap_start = ap_const_logic_0))) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
-            numDataB_c_blk_n <= numDataB_c_full_n;
+            varSumB_blk_n <= varSumB_empty_n;
         else 
-            numDataB_c_blk_n <= ap_const_logic_1;
+            varSumB_blk_n <= ap_const_logic_1;
         end if; 
     end process;
 
-    numDataB_c_din <= numDataB_dout;
 
-    numDataB_c_write_assign_proc : process(ap_CS_fsm_state1, ap_block_state1)
+    varSumB_read_assign_proc : process(ap_CS_fsm_state1, ap_block_state1)
     begin
         if (((ap_const_logic_1 = ap_CS_fsm_state1) and (ap_const_boolean_0 = ap_block_state1))) then 
-            numDataB_c_write <= ap_const_logic_1;
+            varSumB_read <= ap_const_logic_1;
         else 
-            numDataB_c_write <= ap_const_logic_0;
+            varSumB_read <= ap_const_logic_0;
         end if; 
     end process;
 
-
-    numDataB_read_assign_proc : process(ap_CS_fsm_state1, ap_block_state1)
-    begin
-        if (((ap_const_logic_1 = ap_CS_fsm_state1) and (ap_const_boolean_0 = ap_block_state1))) then 
-            numDataB_read <= ap_const_logic_1;
-        else 
-            numDataB_read <= ap_const_logic_0;
-        end if; 
-    end process;
-
-    trunc_ln24_fu_77_p1 <= grp_fu_71_p2(23 - 1 downto 0);
 end behav;

@@ -4,8 +4,8 @@ module tTest_hls_deadlock_idx0_monitor ( // for module tTest_tTest_inst
     input wire clock,
     input wire reset,
     input wire [1:0] axis_block_sigs,
-    input wire [19:0] inst_idle_sigs,
-    input wire [16:0] inst_block_sigs,
+    input wire [23:0] inst_idle_sigs,
+    input wire [20:0] inst_block_sigs,
     output wire block
 );
 

@@ -8,7 +8,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity tTest_entry_proc is
+entity tTest_entry_proc37 is
 port (
     ap_clk : IN STD_LOGIC;
     ap_rst : IN STD_LOGIC;
@@ -18,15 +18,15 @@ port (
     ap_idle : OUT STD_LOGIC;
     ap_ready : OUT STD_LOGIC;
     p_read : IN STD_LOGIC_VECTOR (62 downto 0);
-    varSumA_c_din : OUT STD_LOGIC_VECTOR (62 downto 0);
-    varSumA_c_num_data_valid : IN STD_LOGIC_VECTOR (2 downto 0);
-    varSumA_c_fifo_cap : IN STD_LOGIC_VECTOR (2 downto 0);
-    varSumA_c_full_n : IN STD_LOGIC;
-    varSumA_c_write : OUT STD_LOGIC );
+    varSumB_c_din : OUT STD_LOGIC_VECTOR (62 downto 0);
+    varSumB_c_num_data_valid : IN STD_LOGIC_VECTOR (2 downto 0);
+    varSumB_c_fifo_cap : IN STD_LOGIC_VECTOR (2 downto 0);
+    varSumB_c_full_n : IN STD_LOGIC;
+    varSumB_c_write : OUT STD_LOGIC );
 end;
 
 
-architecture behav of tTest_entry_proc is 
+architecture behav of tTest_entry_proc37 is 
     constant ap_const_logic_1 : STD_LOGIC := '1';
     constant ap_const_logic_0 : STD_LOGIC := '0';
     constant ap_ST_fsm_state1 : STD_LOGIC_VECTOR (0 downto 0) := "1";
@@ -41,7 +41,7 @@ attribute shreg_extract : string;
     attribute fsm_encoding of ap_CS_fsm : signal is "none";
     signal ap_CS_fsm_state1 : STD_LOGIC;
     attribute fsm_encoding of ap_CS_fsm_state1 : signal is "none";
-    signal varSumA_c_blk_n : STD_LOGIC;
+    signal varSumB_c_blk_n : STD_LOGIC;
     signal ap_block_state1 : BOOLEAN;
     signal ap_NS_fsm : STD_LOGIC_VECTOR (0 downto 0);
     signal ap_ST_fsm_state1_blk : STD_LOGIC;
@@ -102,9 +102,9 @@ begin
     end process;
 
 
-    ap_block_state1_assign_proc : process(ap_start, ap_done_reg, varSumA_c_full_n)
+    ap_block_state1_assign_proc : process(ap_start, ap_done_reg, varSumB_c_full_n)
     begin
-                ap_block_state1 <= ((ap_start = ap_const_logic_0) or (varSumA_c_full_n = ap_const_logic_0) or (ap_done_reg = ap_const_logic_1));
+                ap_block_state1 <= ((ap_start = ap_const_logic_0) or (varSumB_c_full_n = ap_const_logic_0) or (ap_done_reg = ap_const_logic_1));
     end process;
 
 
@@ -138,23 +138,23 @@ begin
     end process;
 
 
-    varSumA_c_blk_n_assign_proc : process(ap_start, ap_done_reg, ap_CS_fsm_state1, varSumA_c_full_n)
+    varSumB_c_blk_n_assign_proc : process(ap_start, ap_done_reg, ap_CS_fsm_state1, varSumB_c_full_n)
     begin
         if ((not(((ap_start = ap_const_logic_0) or (ap_done_reg = ap_const_logic_1))) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
-            varSumA_c_blk_n <= varSumA_c_full_n;
+            varSumB_c_blk_n <= varSumB_c_full_n;
         else 
-            varSumA_c_blk_n <= ap_const_logic_1;
+            varSumB_c_blk_n <= ap_const_logic_1;
         end if; 
     end process;
 
-    varSumA_c_din <= p_read;
+    varSumB_c_din <= p_read;
 
-    varSumA_c_write_assign_proc : process(ap_CS_fsm_state1, ap_block_state1)
+    varSumB_c_write_assign_proc : process(ap_CS_fsm_state1, ap_block_state1)
     begin
         if (((ap_const_boolean_0 = ap_block_state1) and (ap_const_logic_1 = ap_CS_fsm_state1))) then 
-            varSumA_c_write <= ap_const_logic_1;
+            varSumB_c_write <= ap_const_logic_1;
         else 
-            varSumA_c_write <= ap_const_logic_0;
+            varSumB_c_write <= ap_const_logic_0;
         end if; 
     end process;
 

@@ -5,7 +5,7 @@
 // ==============================================================
 `timescale 1 ns / 1 ps
 
-module tTest_udiv_46ns_40ns_26_50_seq_1_divseq
+module tTest_udiv_23ns_40ns_18_27_seq_1_divseq
 #(parameter
     in0_WIDTH = 32,
     in1_WIDTH = 32,
@@ -80,7 +80,7 @@ end
 
 endmodule
 
-module tTest_udiv_46ns_40ns_26_50_seq_1
+module tTest_udiv_23ns_40ns_18_27_seq_1
 #(parameter
         ID   = 1,
         NUM_STAGE   = 2,
@@ -110,11 +110,11 @@ wire    [dout_WIDTH-1:0] remd_u;
 reg     [dout_WIDTH-1:0] quot;
 reg     [dout_WIDTH-1:0] remd;
 //------------------------Instantiation------------------
-tTest_udiv_46ns_40ns_26_50_seq_1_divseq #(
+tTest_udiv_23ns_40ns_18_27_seq_1_divseq #(
     .in0_WIDTH      ( din0_WIDTH ),
     .in1_WIDTH      ( din1_WIDTH ),
     .out_WIDTH      ( dout_WIDTH )
-) tTest_udiv_46ns_40ns_26_50_seq_1_divseq_u (
+) tTest_udiv_23ns_40ns_18_27_seq_1_divseq_u (
     .clk      ( clk ),
     .reset    ( reset ),
     .ce       ( ce ),

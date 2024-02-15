@@ -47,8 +47,8 @@ void varSum(countType* fam, meanType mean, varSumType* sum) {
 void tCalc1(varSumType varSum, numDataType numData, tCalcResultType* out) {
 #pragma HLS DATAFLOW
 	varType var;
-	divVal(varSum, numData, &var); //in MATLAB: log2(sum(((quantValues(:,:,1) - (ones(1,256) * 8)).^2) .* (ones(1,256) * 2^32)) / sum((ones(1,256) * 2^32))) = 14.2
-	*out = tCalcResultType((var*var)/numData); // out wants to be ap_fixed<40, 32>
+	divVal(varSum, numDataType(numData - 1), &var); //in MATLAB: log2(sum(((quantValues(:,:,1) - (ones(1,256) * 8)).^2) .* (ones(1,256) * 2^32)) / sum((ones(1,256) * 2^32))) = 14.2
+	*out = tCalcResultType(var/numData); // out wants to be ap_fixed<40, 32>
 }
 
 void tCalc2(tCalcResultType tCalc1ResultA, tCalcResultType tCalc1ResultB, meanType meanDiff, tCalcResultType* t) {

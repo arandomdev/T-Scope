@@ -6,7 +6,7 @@
 
 `timescale 1 ns / 1 ps 
 
-module tTest_entry_proc (
+module tTest_tCalc1_2_Block_entry4_proc (
         ap_clk,
         ap_rst,
         ap_start,
@@ -14,12 +14,17 @@ module tTest_entry_proc (
         ap_continue,
         ap_idle,
         ap_ready,
-        p_read,
-        varSumA_c_din,
-        varSumA_c_num_data_valid,
-        varSumA_c_fifo_cap,
-        varSumA_c_full_n,
-        varSumA_c_write
+        numDataA_dout,
+        numDataA_num_data_valid,
+        numDataA_fifo_cap,
+        numDataA_empty_n,
+        numDataA_read,
+        numDataA_c_din,
+        numDataA_c_num_data_valid,
+        numDataA_c_fifo_cap,
+        numDataA_c_full_n,
+        numDataA_c_write,
+        ap_return
 );
 
 parameter    ap_ST_fsm_state1 = 1'd1;
@@ -31,23 +36,33 @@ output   ap_done;
 input   ap_continue;
 output   ap_idle;
 output   ap_ready;
-input  [62:0] p_read;
-output  [62:0] varSumA_c_din;
-input  [2:0] varSumA_c_num_data_valid;
-input  [2:0] varSumA_c_fifo_cap;
-input   varSumA_c_full_n;
-output   varSumA_c_write;
+input  [39:0] numDataA_dout;
+input  [2:0] numDataA_num_data_valid;
+input  [2:0] numDataA_fifo_cap;
+input   numDataA_empty_n;
+output   numDataA_read;
+output  [39:0] numDataA_c_din;
+input  [2:0] numDataA_c_num_data_valid;
+input  [2:0] numDataA_c_fifo_cap;
+input   numDataA_c_full_n;
+output   numDataA_c_write;
+output  [39:0] ap_return;
 
 reg ap_done;
 reg ap_idle;
 reg ap_ready;
-reg varSumA_c_write;
+reg numDataA_read;
+reg numDataA_c_write;
+reg[39:0] ap_return;
 
 reg    ap_done_reg;
 (* fsm_encoding = "none" *) reg   [0:0] ap_CS_fsm;
 wire    ap_CS_fsm_state1;
-reg    varSumA_c_blk_n;
+reg    numDataA_blk_n;
+reg    numDataA_c_blk_n;
 reg    ap_block_state1;
+wire   [39:0] add_ln50_fu_40_p2;
+reg   [39:0] ap_return_preg;
 reg   [0:0] ap_NS_fsm;
 reg    ap_ST_fsm_state1_blk;
 wire    ap_ce_reg;
@@ -56,6 +71,7 @@ wire    ap_ce_reg;
 initial begin
 #0 ap_done_reg = 1'b0;
 #0 ap_CS_fsm = 1'd1;
+#0 ap_return_preg = 40'd0;
 end
 
 always @ (posedge ap_clk) begin
@@ -74,6 +90,16 @@ always @ (posedge ap_clk) begin
             ap_done_reg <= 1'b0;
         end else if (((1'b0 == ap_block_state1) & (1'b1 == ap_CS_fsm_state1))) begin
             ap_done_reg <= 1'b1;
+        end
+    end
+end
+
+always @ (posedge ap_clk) begin
+    if (ap_rst == 1'b1) begin
+        ap_return_preg <= 40'd0;
+    end else begin
+        if (((1'b0 == ap_block_state1) & (1'b1 == ap_CS_fsm_state1))) begin
+            ap_return_preg <= add_ln50_fu_40_p2;
         end
     end
 end
@@ -111,18 +137,42 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if ((~((ap_start == 1'b0) | (ap_done_reg == 1'b1)) & (1'b1 == ap_CS_fsm_state1))) begin
-        varSumA_c_blk_n = varSumA_c_full_n;
+    if (((1'b0 == ap_block_state1) & (1'b1 == ap_CS_fsm_state1))) begin
+        ap_return = add_ln50_fu_40_p2;
     end else begin
-        varSumA_c_blk_n = 1'b1;
+        ap_return = ap_return_preg;
+    end
+end
+
+always @ (*) begin
+    if ((~((ap_start == 1'b0) | (ap_done_reg == 1'b1)) & (1'b1 == ap_CS_fsm_state1))) begin
+        numDataA_blk_n = numDataA_empty_n;
+    end else begin
+        numDataA_blk_n = 1'b1;
+    end
+end
+
+always @ (*) begin
+    if ((~((ap_start == 1'b0) | (ap_done_reg == 1'b1)) & (1'b1 == ap_CS_fsm_state1))) begin
+        numDataA_c_blk_n = numDataA_c_full_n;
+    end else begin
+        numDataA_c_blk_n = 1'b1;
     end
 end
 
 always @ (*) begin
     if (((1'b0 == ap_block_state1) & (1'b1 == ap_CS_fsm_state1))) begin
-        varSumA_c_write = 1'b1;
+        numDataA_c_write = 1'b1;
     end else begin
-        varSumA_c_write = 1'b0;
+        numDataA_c_write = 1'b0;
+    end
+end
+
+always @ (*) begin
+    if (((1'b0 == ap_block_state1) & (1'b1 == ap_CS_fsm_state1))) begin
+        numDataA_read = 1'b1;
+    end else begin
+        numDataA_read = 1'b0;
     end
 end
 
@@ -137,12 +187,14 @@ always @ (*) begin
     endcase
 end
 
+assign add_ln50_fu_40_p2 = ($signed(numDataA_dout) + $signed(40'd1099511627775));
+
 assign ap_CS_fsm_state1 = ap_CS_fsm[32'd0];
 
 always @ (*) begin
-    ap_block_state1 = ((ap_start == 1'b0) | (varSumA_c_full_n == 1'b0) | (ap_done_reg == 1'b1));
+    ap_block_state1 = ((ap_start == 1'b0) | (numDataA_c_full_n == 1'b0) | (numDataA_empty_n == 1'b0) | (ap_done_reg == 1'b1));
 end
 
-assign varSumA_c_din = p_read;
+assign numDataA_c_din = numDataA_dout;
 
-endmodule //tTest_entry_proc
+endmodule //tTest_tCalc1_2_Block_entry4_proc

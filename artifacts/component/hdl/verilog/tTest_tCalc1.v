@@ -39,32 +39,105 @@ output   ap_ready;
 output   ap_idle;
 input   ap_continue;
 
+wire    entry_proc37_U0_ap_start;
+wire    entry_proc37_U0_ap_done;
+wire    entry_proc37_U0_ap_continue;
+wire    entry_proc37_U0_ap_idle;
+wire    entry_proc37_U0_ap_ready;
+wire   [62:0] entry_proc37_U0_varSumB_c_din;
+wire    entry_proc37_U0_varSumB_c_write;
+wire    tCalc1_Block_entry4_proc_U0_ap_start;
+wire    tCalc1_Block_entry4_proc_U0_ap_done;
+wire    tCalc1_Block_entry4_proc_U0_ap_continue;
+wire    tCalc1_Block_entry4_proc_U0_ap_idle;
+wire    tCalc1_Block_entry4_proc_U0_ap_ready;
+wire    tCalc1_Block_entry4_proc_U0_numDataB_read;
+wire   [39:0] tCalc1_Block_entry4_proc_U0_numDataB_c_din;
+wire    tCalc1_Block_entry4_proc_U0_numDataB_c_write;
+wire   [39:0] tCalc1_Block_entry4_proc_U0_ap_return;
+wire    add_ln50_loc_i_channel_full_n;
 wire    divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_start;
 wire    divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_done;
 wire    divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_continue;
 wire    divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_idle;
 wire    divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_ready;
-wire    divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_numDataB_read;
-wire   [39:0] divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_numDataB_c_din;
-wire    divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_numDataB_c_write;
+wire    divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_varSumB_read;
 wire   [22:0] divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_return;
 wire    var_r_s_full_n;
-wire    tCalc1_Block_entry57_proc_U0_ap_start;
-wire    tCalc1_Block_entry57_proc_U0_ap_done;
-wire    tCalc1_Block_entry57_proc_U0_ap_continue;
-wire    tCalc1_Block_entry57_proc_U0_ap_idle;
-wire    tCalc1_Block_entry57_proc_U0_ap_ready;
-wire    tCalc1_Block_entry57_proc_U0_numDataB_read;
-wire   [31:0] tCalc1_Block_entry57_proc_U0_tCalc1ResultB;
+wire    tCalc1_Block_entry46_proc_U0_ap_start;
+wire    tCalc1_Block_entry46_proc_U0_ap_done;
+wire    tCalc1_Block_entry46_proc_U0_ap_continue;
+wire    tCalc1_Block_entry46_proc_U0_ap_idle;
+wire    tCalc1_Block_entry46_proc_U0_ap_ready;
+wire    tCalc1_Block_entry46_proc_U0_numDataB_read;
+wire   [31:0] tCalc1_Block_entry46_proc_U0_tCalc1ResultB;
+wire    varSumB_c_full_n;
+wire   [62:0] varSumB_c_dout;
+wire   [2:0] varSumB_c_num_data_valid;
+wire   [2:0] varSumB_c_fifo_cap;
+wire    varSumB_c_empty_n;
 wire    numDataB_c_full_n;
 wire   [39:0] numDataB_c_dout;
 wire   [2:0] numDataB_c_num_data_valid;
 wire   [2:0] numDataB_c_fifo_cap;
 wire    numDataB_c_empty_n;
+wire   [39:0] add_ln50_loc_i_channel_dout;
+wire   [2:0] add_ln50_loc_i_channel_num_data_valid;
+wire   [2:0] add_ln50_loc_i_channel_fifo_cap;
+wire    add_ln50_loc_i_channel_empty_n;
 wire   [22:0] var_r_s_dout;
 wire   [2:0] var_r_s_num_data_valid;
 wire   [2:0] var_r_s_fifo_cap;
 wire    var_r_s_empty_n;
+wire    ap_sync_ready;
+reg    ap_sync_reg_entry_proc37_U0_ap_ready;
+wire    ap_sync_entry_proc37_U0_ap_ready;
+reg    ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready;
+wire    ap_sync_tCalc1_Block_entry4_proc_U0_ap_ready;
+wire    ap_ce_reg;
+
+// power-on initialization
+initial begin
+#0 ap_sync_reg_entry_proc37_U0_ap_ready = 1'b0;
+#0 ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready = 1'b0;
+end
+
+tTest_entry_proc37 entry_proc37_U0(
+    .ap_clk(ap_clk),
+    .ap_rst(ap_rst),
+    .ap_start(entry_proc37_U0_ap_start),
+    .ap_done(entry_proc37_U0_ap_done),
+    .ap_continue(entry_proc37_U0_ap_continue),
+    .ap_idle(entry_proc37_U0_ap_idle),
+    .ap_ready(entry_proc37_U0_ap_ready),
+    .p_read(p_read),
+    .varSumB_c_din(entry_proc37_U0_varSumB_c_din),
+    .varSumB_c_num_data_valid(varSumB_c_num_data_valid),
+    .varSumB_c_fifo_cap(varSumB_c_fifo_cap),
+    .varSumB_c_full_n(varSumB_c_full_n),
+    .varSumB_c_write(entry_proc37_U0_varSumB_c_write)
+);
+
+tTest_tCalc1_Block_entry4_proc tCalc1_Block_entry4_proc_U0(
+    .ap_clk(ap_clk),
+    .ap_rst(ap_rst),
+    .ap_start(tCalc1_Block_entry4_proc_U0_ap_start),
+    .ap_done(tCalc1_Block_entry4_proc_U0_ap_done),
+    .ap_continue(tCalc1_Block_entry4_proc_U0_ap_continue),
+    .ap_idle(tCalc1_Block_entry4_proc_U0_ap_idle),
+    .ap_ready(tCalc1_Block_entry4_proc_U0_ap_ready),
+    .numDataB_dout(numDataB_dout),
+    .numDataB_num_data_valid(3'd0),
+    .numDataB_fifo_cap(3'd0),
+    .numDataB_empty_n(numDataB_empty_n),
+    .numDataB_read(tCalc1_Block_entry4_proc_U0_numDataB_read),
+    .numDataB_c_din(tCalc1_Block_entry4_proc_U0_numDataB_c_din),
+    .numDataB_c_num_data_valid(numDataB_c_num_data_valid),
+    .numDataB_c_fifo_cap(numDataB_c_fifo_cap),
+    .numDataB_c_full_n(numDataB_c_full_n),
+    .numDataB_c_write(tCalc1_Block_entry4_proc_U0_numDataB_c_write),
+    .ap_return(tCalc1_Block_entry4_proc_U0_ap_return)
+);
 
 tTest_divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_s divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0(
     .ap_clk(ap_clk),
@@ -74,50 +147,75 @@ tTest_divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_s divVal_ap_ufixed_63_5
     .ap_continue(divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_continue),
     .ap_idle(divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_idle),
     .ap_ready(divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_ready),
-    .p_read(p_read),
-    .numDataB_dout(numDataB_dout),
-    .numDataB_num_data_valid(3'd0),
-    .numDataB_fifo_cap(3'd0),
-    .numDataB_empty_n(numDataB_empty_n),
-    .numDataB_read(divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_numDataB_read),
-    .numDataB_c_din(divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_numDataB_c_din),
-    .numDataB_c_num_data_valid(numDataB_c_num_data_valid),
-    .numDataB_c_fifo_cap(numDataB_c_fifo_cap),
-    .numDataB_c_full_n(numDataB_c_full_n),
-    .numDataB_c_write(divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_numDataB_c_write),
+    .varSumB_dout(varSumB_c_dout),
+    .varSumB_num_data_valid(varSumB_c_num_data_valid),
+    .varSumB_fifo_cap(varSumB_c_fifo_cap),
+    .varSumB_empty_n(varSumB_c_empty_n),
+    .varSumB_read(divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_varSumB_read),
+    .p_read(add_ln50_loc_i_channel_dout),
     .ap_return(divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_return)
 );
 
-tTest_tCalc1_Block_entry57_proc tCalc1_Block_entry57_proc_U0(
+tTest_tCalc1_Block_entry46_proc tCalc1_Block_entry46_proc_U0(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst),
-    .ap_start(tCalc1_Block_entry57_proc_U0_ap_start),
-    .ap_done(tCalc1_Block_entry57_proc_U0_ap_done),
-    .ap_continue(tCalc1_Block_entry57_proc_U0_ap_continue),
-    .ap_idle(tCalc1_Block_entry57_proc_U0_ap_idle),
-    .ap_ready(tCalc1_Block_entry57_proc_U0_ap_ready),
+    .ap_start(tCalc1_Block_entry46_proc_U0_ap_start),
+    .ap_done(tCalc1_Block_entry46_proc_U0_ap_done),
+    .ap_continue(tCalc1_Block_entry46_proc_U0_ap_continue),
+    .ap_idle(tCalc1_Block_entry46_proc_U0_ap_idle),
+    .ap_ready(tCalc1_Block_entry46_proc_U0_ap_ready),
     .p_read(var_r_s_dout),
     .numDataB_dout(numDataB_c_dout),
     .numDataB_num_data_valid(numDataB_c_num_data_valid),
     .numDataB_fifo_cap(numDataB_c_fifo_cap),
     .numDataB_empty_n(numDataB_c_empty_n),
-    .numDataB_read(tCalc1_Block_entry57_proc_U0_numDataB_read),
-    .tCalc1ResultB(tCalc1_Block_entry57_proc_U0_tCalc1ResultB)
+    .numDataB_read(tCalc1_Block_entry46_proc_U0_numDataB_read),
+    .tCalc1ResultB(tCalc1_Block_entry46_proc_U0_tCalc1ResultB)
 );
 
-tTest_fifo_w40_d2_S_x numDataB_c_U(
+tTest_fifo_w63_d3_S_x varSumB_c_U(
     .clk(ap_clk),
     .reset(ap_rst),
     .if_read_ce(1'b1),
     .if_write_ce(1'b1),
-    .if_din(divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_numDataB_c_din),
+    .if_din(entry_proc37_U0_varSumB_c_din),
+    .if_full_n(varSumB_c_full_n),
+    .if_write(entry_proc37_U0_varSumB_c_write),
+    .if_dout(varSumB_c_dout),
+    .if_num_data_valid(varSumB_c_num_data_valid),
+    .if_fifo_cap(varSumB_c_fifo_cap),
+    .if_empty_n(varSumB_c_empty_n),
+    .if_read(divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_varSumB_read)
+);
+
+tTest_fifo_w40_d3_S_x numDataB_c_U(
+    .clk(ap_clk),
+    .reset(ap_rst),
+    .if_read_ce(1'b1),
+    .if_write_ce(1'b1),
+    .if_din(tCalc1_Block_entry4_proc_U0_numDataB_c_din),
     .if_full_n(numDataB_c_full_n),
-    .if_write(divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_numDataB_c_write),
+    .if_write(tCalc1_Block_entry4_proc_U0_numDataB_c_write),
     .if_dout(numDataB_c_dout),
     .if_num_data_valid(numDataB_c_num_data_valid),
     .if_fifo_cap(numDataB_c_fifo_cap),
     .if_empty_n(numDataB_c_empty_n),
-    .if_read(tCalc1_Block_entry57_proc_U0_numDataB_read)
+    .if_read(tCalc1_Block_entry46_proc_U0_numDataB_read)
+);
+
+tTest_fifo_w40_d2_S_x add_ln50_loc_i_channel_U(
+    .clk(ap_clk),
+    .reset(ap_rst),
+    .if_read_ce(1'b1),
+    .if_write_ce(1'b1),
+    .if_din(tCalc1_Block_entry4_proc_U0_ap_return),
+    .if_full_n(add_ln50_loc_i_channel_full_n),
+    .if_write(tCalc1_Block_entry4_proc_U0_ap_done),
+    .if_dout(add_ln50_loc_i_channel_dout),
+    .if_num_data_valid(add_ln50_loc_i_channel_num_data_valid),
+    .if_fifo_cap(add_ln50_loc_i_channel_fifo_cap),
+    .if_empty_n(add_ln50_loc_i_channel_empty_n),
+    .if_read(divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_ready)
 );
 
 tTest_fifo_w23_d2_S_x var_r_s_U(
@@ -132,27 +230,65 @@ tTest_fifo_w23_d2_S_x var_r_s_U(
     .if_num_data_valid(var_r_s_num_data_valid),
     .if_fifo_cap(var_r_s_fifo_cap),
     .if_empty_n(var_r_s_empty_n),
-    .if_read(tCalc1_Block_entry57_proc_U0_ap_ready)
+    .if_read(tCalc1_Block_entry46_proc_U0_ap_ready)
 );
 
-assign ap_done = tCalc1_Block_entry57_proc_U0_ap_done;
+always @ (posedge ap_clk) begin
+    if (ap_rst == 1'b1) begin
+        ap_sync_reg_entry_proc37_U0_ap_ready <= 1'b0;
+    end else begin
+        if (((ap_sync_ready & ap_start) == 1'b1)) begin
+            ap_sync_reg_entry_proc37_U0_ap_ready <= 1'b0;
+        end else begin
+            ap_sync_reg_entry_proc37_U0_ap_ready <= ap_sync_entry_proc37_U0_ap_ready;
+        end
+    end
+end
 
-assign ap_idle = (tCalc1_Block_entry57_proc_U0_ap_idle & (var_r_s_empty_n ^ 1'b1) & divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_idle);
+always @ (posedge ap_clk) begin
+    if (ap_rst == 1'b1) begin
+        ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready <= 1'b0;
+    end else begin
+        if (((ap_sync_ready & ap_start) == 1'b1)) begin
+            ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready <= 1'b0;
+        end else begin
+            ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready <= ap_sync_tCalc1_Block_entry4_proc_U0_ap_ready;
+        end
+    end
+end
 
-assign ap_ready = divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_ready;
+assign ap_done = tCalc1_Block_entry46_proc_U0_ap_done;
+
+assign ap_idle = (tCalc1_Block_entry4_proc_U0_ap_idle & tCalc1_Block_entry46_proc_U0_ap_idle & (1'b1 ^ add_ln50_loc_i_channel_empty_n) & (var_r_s_empty_n ^ 1'b1) & entry_proc37_U0_ap_idle & divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_idle);
+
+assign ap_ready = ap_sync_ready;
+
+assign ap_sync_entry_proc37_U0_ap_ready = (entry_proc37_U0_ap_ready | ap_sync_reg_entry_proc37_U0_ap_ready);
+
+assign ap_sync_ready = (ap_sync_tCalc1_Block_entry4_proc_U0_ap_ready & ap_sync_entry_proc37_U0_ap_ready);
+
+assign ap_sync_tCalc1_Block_entry4_proc_U0_ap_ready = (tCalc1_Block_entry4_proc_U0_ap_ready | ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready);
 
 assign divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_continue = var_r_s_full_n;
 
-assign divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_start = ap_start;
+assign divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_start = add_ln50_loc_i_channel_empty_n;
 
-assign numDataB_read = divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_numDataB_read;
+assign entry_proc37_U0_ap_continue = 1'b1;
 
-assign tCalc1ResultB = tCalc1_Block_entry57_proc_U0_tCalc1ResultB;
+assign entry_proc37_U0_ap_start = ((ap_sync_reg_entry_proc37_U0_ap_ready ^ 1'b1) & ap_start);
+
+assign numDataB_read = tCalc1_Block_entry4_proc_U0_numDataB_read;
+
+assign tCalc1ResultB = tCalc1_Block_entry46_proc_U0_tCalc1ResultB;
 
 assign tCalc1ResultB_ap_vld = 1'b1;
 
-assign tCalc1_Block_entry57_proc_U0_ap_continue = ap_continue;
+assign tCalc1_Block_entry46_proc_U0_ap_continue = ap_continue;
 
-assign tCalc1_Block_entry57_proc_U0_ap_start = var_r_s_empty_n;
+assign tCalc1_Block_entry46_proc_U0_ap_start = var_r_s_empty_n;
+
+assign tCalc1_Block_entry4_proc_U0_ap_continue = add_ln50_loc_i_channel_full_n;
+
+assign tCalc1_Block_entry4_proc_U0_ap_start = ((ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready ^ 1'b1) & ap_start);
 
 endmodule //tTest_tCalc1

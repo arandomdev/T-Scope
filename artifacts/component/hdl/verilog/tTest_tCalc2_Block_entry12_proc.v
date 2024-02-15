@@ -423,7 +423,7 @@ tTest_dsqrt_64ns_64ns_64_57_no_dsp_1 #(
     .din0_WIDTH( 64 ),
     .din1_WIDTH( 64 ),
     .dout_WIDTH( 64 ))
-dsqrt_64ns_64ns_64_57_no_dsp_1_U76(
+dsqrt_64ns_64ns_64_57_no_dsp_1_U83(
     .clk(ap_clk),
     .reset(ap_rst),
     .din0(64'd0),
@@ -438,7 +438,7 @@ tTest_udiv_38ns_32ns_18_42_seq_1 #(
     .din0_WIDTH( 38 ),
     .din1_WIDTH( 32 ),
     .dout_WIDTH( 18 ))
-udiv_38ns_32ns_18_42_seq_1_U77(
+udiv_38ns_32ns_18_42_seq_1_U84(
     .clk(ap_clk),
     .reset(ap_rst),
     .start(grp_fu_660_ap_start),

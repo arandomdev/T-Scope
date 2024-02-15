@@ -6,7 +6,7 @@
 
 `timescale 1 ns / 1 ps 
 
-module tTest_entry_proc (
+module tTest_entry_proc37 (
         ap_clk,
         ap_rst,
         ap_start,
@@ -15,11 +15,11 @@ module tTest_entry_proc (
         ap_idle,
         ap_ready,
         p_read,
-        varSumA_c_din,
-        varSumA_c_num_data_valid,
-        varSumA_c_fifo_cap,
-        varSumA_c_full_n,
-        varSumA_c_write
+        varSumB_c_din,
+        varSumB_c_num_data_valid,
+        varSumB_c_fifo_cap,
+        varSumB_c_full_n,
+        varSumB_c_write
 );
 
 parameter    ap_ST_fsm_state1 = 1'd1;
@@ -32,21 +32,21 @@ input   ap_continue;
 output   ap_idle;
 output   ap_ready;
 input  [62:0] p_read;
-output  [62:0] varSumA_c_din;
-input  [2:0] varSumA_c_num_data_valid;
-input  [2:0] varSumA_c_fifo_cap;
-input   varSumA_c_full_n;
-output   varSumA_c_write;
+output  [62:0] varSumB_c_din;
+input  [2:0] varSumB_c_num_data_valid;
+input  [2:0] varSumB_c_fifo_cap;
+input   varSumB_c_full_n;
+output   varSumB_c_write;
 
 reg ap_done;
 reg ap_idle;
 reg ap_ready;
-reg varSumA_c_write;
+reg varSumB_c_write;
 
 reg    ap_done_reg;
 (* fsm_encoding = "none" *) reg   [0:0] ap_CS_fsm;
 wire    ap_CS_fsm_state1;
-reg    varSumA_c_blk_n;
+reg    varSumB_c_blk_n;
 reg    ap_block_state1;
 reg   [0:0] ap_NS_fsm;
 reg    ap_ST_fsm_state1_blk;
@@ -112,17 +112,17 @@ end
 
 always @ (*) begin
     if ((~((ap_start == 1'b0) | (ap_done_reg == 1'b1)) & (1'b1 == ap_CS_fsm_state1))) begin
-        varSumA_c_blk_n = varSumA_c_full_n;
+        varSumB_c_blk_n = varSumB_c_full_n;
     end else begin
-        varSumA_c_blk_n = 1'b1;
+        varSumB_c_blk_n = 1'b1;
     end
 end
 
 always @ (*) begin
     if (((1'b0 == ap_block_state1) & (1'b1 == ap_CS_fsm_state1))) begin
-        varSumA_c_write = 1'b1;
+        varSumB_c_write = 1'b1;
     end else begin
-        varSumA_c_write = 1'b0;
+        varSumB_c_write = 1'b0;
     end
 end
 
@@ -140,9 +140,9 @@ end
 assign ap_CS_fsm_state1 = ap_CS_fsm[32'd0];
 
 always @ (*) begin
-    ap_block_state1 = ((ap_start == 1'b0) | (varSumA_c_full_n == 1'b0) | (ap_done_reg == 1'b1));
+    ap_block_state1 = ((ap_start == 1'b0) | (varSumB_c_full_n == 1'b0) | (ap_done_reg == 1'b1));
 end
 
-assign varSumA_c_din = p_read;
+assign varSumB_c_din = p_read;
 
-endmodule //tTest_entry_proc
+endmodule //tTest_entry_proc37

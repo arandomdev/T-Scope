@@ -6,7 +6,7 @@
 
 `timescale 1 ns / 1 ps 
 
-(* CORE_GENERATION_INFO="tTest_tTest,hls_ip_2023_2,{HLS_INPUT_TYPE=cxx,HLS_INPUT_FLOAT=0,HLS_INPUT_FIXED=0,HLS_INPUT_PART=xc7z020-clg400-1,HLS_INPUT_CLOCK=10.000000,HLS_INPUT_ARCH=dataflow,HLS_SYN_CLOCK=7.300000,HLS_SYN_LAT=-1,HLS_SYN_TPT=-1,HLS_SYN_MEM=6,HLS_SYN_DSP=0,HLS_SYN_FF=10986,HLS_SYN_LUT=10824,HLS_VERSION=2023_2}" *)
+(* CORE_GENERATION_INFO="tTest_tTest,hls_ip_2023_2,{HLS_INPUT_TYPE=cxx,HLS_INPUT_FLOAT=0,HLS_INPUT_FIXED=0,HLS_INPUT_PART=xc7z020-clg400-1,HLS_INPUT_CLOCK=10.000000,HLS_INPUT_ARCH=dataflow,HLS_SYN_CLOCK=7.300000,HLS_SYN_LAT=-1,HLS_SYN_TPT=-1,HLS_SYN_MEM=6,HLS_SYN_DSP=0,HLS_SYN_FF=11204,HLS_SYN_LUT=10998,HLS_VERSION=2023_2}" *)
 
 module tTest (
         ap_clk,
@@ -207,13 +207,13 @@ wire    gmem_BVALID;
 wire   [1:0] gmem_BRESP;
 wire   [0:0] gmem_BID;
 wire   [0:0] gmem_BUSER;
-wire    entry_proc_U0_ap_start;
-wire    entry_proc_U0_ap_done;
-wire    entry_proc_U0_ap_continue;
-wire    entry_proc_U0_ap_idle;
-wire    entry_proc_U0_ap_ready;
-wire   [31:0] entry_proc_U0_C_c_din;
-wire    entry_proc_U0_C_c_write;
+wire    entry_proc38_U0_ap_start;
+wire    entry_proc38_U0_ap_done;
+wire    entry_proc38_U0_ap_continue;
+wire    entry_proc38_U0_ap_idle;
+wire    entry_proc38_U0_ap_ready;
+wire   [31:0] entry_proc38_U0_C_c_din;
+wire    entry_proc38_U0_C_c_write;
 wire    sumStream_U0_ap_start;
 wire    sumStream_U0_ap_done;
 wire    sumStream_U0_ap_continue;
@@ -461,8 +461,8 @@ wire   [2:0] t_num_data_valid;
 wire   [2:0] t_fifo_cap;
 wire    t_empty_n;
 wire    ap_sync_ready;
-reg    ap_sync_reg_entry_proc_U0_ap_ready;
-wire    ap_sync_entry_proc_U0_ap_ready;
+reg    ap_sync_reg_entry_proc38_U0_ap_ready;
+wire    ap_sync_entry_proc38_U0_ap_ready;
 reg    ap_sync_reg_sumStream_U0_ap_ready;
 wire    ap_sync_sumStream_U0_ap_ready;
 reg    ap_sync_reg_sumStream_4_U0_ap_ready;
@@ -481,7 +481,7 @@ initial begin
 #0 ap_sync_reg_channel_write_meanA_c_channel = 1'b0;
 #0 ap_sync_reg_channel_write_meanB_c73_channel = 1'b0;
 #0 ap_sync_reg_channel_write_meanB_c_channel = 1'b0;
-#0 ap_sync_reg_entry_proc_U0_ap_ready = 1'b0;
+#0 ap_sync_reg_entry_proc38_U0_ap_ready = 1'b0;
 #0 ap_sync_reg_sumStream_U0_ap_ready = 1'b0;
 #0 ap_sync_reg_sumStream_4_U0_ap_ready = 1'b0;
 end
@@ -658,20 +658,20 @@ gmem_m_axi_U(
     .I_BREADY(Block_entry2458_proc_U0_m_axi_gmem_BREADY)
 );
 
-tTest_entry_proc entry_proc_U0(
+tTest_entry_proc38 entry_proc38_U0(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst_n_inv),
-    .ap_start(entry_proc_U0_ap_start),
-    .ap_done(entry_proc_U0_ap_done),
-    .ap_continue(entry_proc_U0_ap_continue),
-    .ap_idle(entry_proc_U0_ap_idle),
-    .ap_ready(entry_proc_U0_ap_ready),
+    .ap_start(entry_proc38_U0_ap_start),
+    .ap_done(entry_proc38_U0_ap_done),
+    .ap_continue(entry_proc38_U0_ap_continue),
+    .ap_idle(entry_proc38_U0_ap_idle),
+    .ap_ready(entry_proc38_U0_ap_ready),
     .C(C),
-    .C_c_din(entry_proc_U0_C_c_din),
+    .C_c_din(entry_proc38_U0_C_c_din),
     .C_c_num_data_valid(C_c_num_data_valid),
     .C_c_fifo_cap(C_c_fifo_cap),
     .C_c_full_n(C_c_full_n),
-    .C_c_write(entry_proc_U0_C_c_write)
+    .C_c_write(entry_proc38_U0_C_c_write)
 );
 
 tTest_sumStream sumStream_U0(
@@ -918,9 +918,9 @@ tTest_fifo_w32_d7_S C_c_U(
     .reset(ap_rst_n_inv),
     .if_read_ce(1'b1),
     .if_write_ce(1'b1),
-    .if_din(entry_proc_U0_C_c_din),
+    .if_din(entry_proc38_U0_C_c_din),
     .if_full_n(C_c_full_n),
-    .if_write(entry_proc_U0_C_c_write),
+    .if_write(entry_proc38_U0_C_c_write),
     .if_dout(C_c_dout),
     .if_num_data_valid(C_c_num_data_valid),
     .if_fifo_cap(C_c_fifo_cap),
@@ -988,7 +988,7 @@ tTest_fifo_w40_d2_S_x0 numDataB_c71_channel_U(
     .if_read(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_ready)
 );
 
-tTest_fifo_w40_d3_S numDataA_c_U(
+tTest_fifo_w40_d3_S_x0 numDataA_c_U(
     .clk(ap_clk),
     .reset(ap_rst_n_inv),
     .if_read_ce(1'b1),
@@ -1033,7 +1033,7 @@ tTest_fifo_w16_d2_S meanA_c72_channel_U(
     .if_read(diff_U0_ap_ready)
 );
 
-tTest_fifo_w40_d3_S numDataB_c_U(
+tTest_fifo_w40_d3_S_x0 numDataB_c_U(
     .clk(ap_clk),
     .reset(ap_rst_n_inv),
     .if_read_ce(1'b1),
@@ -1290,12 +1290,12 @@ end
 
 always @ (posedge ap_clk) begin
     if (ap_rst_n_inv == 1'b1) begin
-        ap_sync_reg_entry_proc_U0_ap_ready <= 1'b0;
+        ap_sync_reg_entry_proc38_U0_ap_ready <= 1'b0;
     end else begin
         if (((ap_sync_ready & ap_start) == 1'b1)) begin
-            ap_sync_reg_entry_proc_U0_ap_ready <= 1'b0;
+            ap_sync_reg_entry_proc38_U0_ap_ready <= 1'b0;
         end else begin
-            ap_sync_reg_entry_proc_U0_ap_ready <= ap_sync_entry_proc_U0_ap_ready;
+            ap_sync_reg_entry_proc38_U0_ap_ready <= ap_sync_entry_proc38_U0_ap_ready;
         end
     end
 end
@@ -1354,7 +1354,7 @@ assign ap_channel_done_sumB_channel = (sumStream_4_U0_ap_done & (ap_sync_reg_cha
 
 assign ap_done = Block_entry2458_proc_U0_ap_done;
 
-assign ap_idle = (varSum_U0_ap_idle & varSum_5_U0_ap_idle & tCalc2_U0_ap_idle & tCalc1_U0_ap_idle & tCalc1_2_U0_ap_idle & sumStream_U0_ap_idle & sumStream_4_U0_ap_idle & (t_empty_n ^ 1'b1) & (tCalc1ResultB_empty_n ^ 1'b1) & (tCalc1ResultA_empty_n ^ 1'b1) & (varSumB_channel_empty_n ^ 1'b1) & (varSumA_channel_empty_n ^ 1'b1) & (meanDiff_empty_n ^ 1'b1) & (meanB_c73_channel_empty_n ^ 1'b1) & (meanB_c_channel_empty_n ^ 1'b1) & (meanA_c72_channel_empty_n ^ 1'b1) & (meanA_c_channel_empty_n ^ 1'b1) & (numDataB_c71_channel_empty_n ^ 1'b1) & (sumB_channel_empty_n ^ 1'b1) & (numDataA_c70_channel_empty_n ^ 1'b1) & (sumA_channel_empty_n ^ 1'b1) & (famB_t_empty_n ^ 1'b1) & (famA_t_empty_n ^ 1'b1) & entry_proc_U0_ap_idle & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_idle & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_idle & diff_U0_ap_idle & Block_entry2458_proc_U0_ap_idle);
+assign ap_idle = (varSum_U0_ap_idle & varSum_5_U0_ap_idle & tCalc2_U0_ap_idle & tCalc1_U0_ap_idle & tCalc1_2_U0_ap_idle & sumStream_U0_ap_idle & sumStream_4_U0_ap_idle & (t_empty_n ^ 1'b1) & (tCalc1ResultB_empty_n ^ 1'b1) & (tCalc1ResultA_empty_n ^ 1'b1) & (varSumB_channel_empty_n ^ 1'b1) & (varSumA_channel_empty_n ^ 1'b1) & (meanDiff_empty_n ^ 1'b1) & (meanB_c73_channel_empty_n ^ 1'b1) & (meanB_c_channel_empty_n ^ 1'b1) & (meanA_c72_channel_empty_n ^ 1'b1) & (meanA_c_channel_empty_n ^ 1'b1) & (numDataB_c71_channel_empty_n ^ 1'b1) & (sumB_channel_empty_n ^ 1'b1) & (numDataA_c70_channel_empty_n ^ 1'b1) & (sumA_channel_empty_n ^ 1'b1) & (famB_t_empty_n ^ 1'b1) & (famA_t_empty_n ^ 1'b1) & entry_proc38_U0_ap_idle & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_idle & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_idle & diff_U0_ap_idle & Block_entry2458_proc_U0_ap_idle);
 
 assign ap_ready = ap_sync_ready;
 
@@ -1382,9 +1382,9 @@ assign ap_sync_channel_write_sumA_channel = ((sumA_channel_full_n & ap_channel_d
 
 assign ap_sync_channel_write_sumB_channel = ((sumB_channel_full_n & ap_channel_done_sumB_channel) | ap_sync_reg_channel_write_sumB_channel);
 
-assign ap_sync_entry_proc_U0_ap_ready = (entry_proc_U0_ap_ready | ap_sync_reg_entry_proc_U0_ap_ready);
+assign ap_sync_entry_proc38_U0_ap_ready = (entry_proc38_U0_ap_ready | ap_sync_reg_entry_proc38_U0_ap_ready);
 
-assign ap_sync_ready = (ap_sync_sumStream_U0_ap_ready & ap_sync_sumStream_4_U0_ap_ready & ap_sync_entry_proc_U0_ap_ready);
+assign ap_sync_ready = (ap_sync_sumStream_U0_ap_ready & ap_sync_sumStream_4_U0_ap_ready & ap_sync_entry_proc38_U0_ap_ready);
 
 assign ap_sync_sumStream_4_U0_ap_ready = (sumStream_4_U0_ap_ready | ap_sync_reg_sumStream_4_U0_ap_ready);
 
@@ -1402,9 +1402,9 @@ assign divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_continue = (ap_sync_channel_
 
 assign divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_start = (sumB_channel_empty_n & numDataB_c71_channel_empty_n);
 
-assign entry_proc_U0_ap_continue = 1'b1;
+assign entry_proc38_U0_ap_continue = 1'b1;
 
-assign entry_proc_U0_ap_start = ((ap_sync_reg_entry_proc_U0_ap_ready ^ 1'b1) & ap_start);
+assign entry_proc38_U0_ap_start = ((ap_sync_reg_entry_proc38_U0_ap_ready ^ 1'b1) & ap_start);
 
 assign gmem_BID = 1'd0;
 

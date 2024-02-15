@@ -107,7 +107,7 @@ end;
 architecture behav of tTest is 
     attribute CORE_GENERATION_INFO : STRING;
     attribute CORE_GENERATION_INFO of behav : architecture is
-    "tTest_tTest,hls_ip_2023_2,{HLS_INPUT_TYPE=cxx,HLS_INPUT_FLOAT=0,HLS_INPUT_FIXED=0,HLS_INPUT_PART=xc7z020-clg400-1,HLS_INPUT_CLOCK=10.000000,HLS_INPUT_ARCH=dataflow,HLS_SYN_CLOCK=7.300000,HLS_SYN_LAT=-1,HLS_SYN_TPT=-1,HLS_SYN_MEM=6,HLS_SYN_DSP=0,HLS_SYN_FF=10986,HLS_SYN_LUT=10824,HLS_VERSION=2023_2}";
+    "tTest_tTest,hls_ip_2023_2,{HLS_INPUT_TYPE=cxx,HLS_INPUT_FLOAT=0,HLS_INPUT_FIXED=0,HLS_INPUT_PART=xc7z020-clg400-1,HLS_INPUT_CLOCK=10.000000,HLS_INPUT_ARCH=dataflow,HLS_SYN_CLOCK=7.300000,HLS_SYN_LAT=-1,HLS_SYN_TPT=-1,HLS_SYN_MEM=6,HLS_SYN_DSP=0,HLS_SYN_FF=11204,HLS_SYN_LUT=10998,HLS_VERSION=2023_2}";
     constant ap_const_logic_1 : STD_LOGIC := '1';
     constant C_S_AXI_DATA_WIDTH : INTEGER := 32;
     constant C_M_AXI_DATA_WIDTH : INTEGER := 32;
@@ -137,13 +137,13 @@ architecture behav of tTest is
     signal gmem_BRESP : STD_LOGIC_VECTOR (1 downto 0);
     signal gmem_BID : STD_LOGIC_VECTOR (0 downto 0);
     signal gmem_BUSER : STD_LOGIC_VECTOR (0 downto 0);
-    signal entry_proc_U0_ap_start : STD_LOGIC;
-    signal entry_proc_U0_ap_done : STD_LOGIC;
-    signal entry_proc_U0_ap_continue : STD_LOGIC;
-    signal entry_proc_U0_ap_idle : STD_LOGIC;
-    signal entry_proc_U0_ap_ready : STD_LOGIC;
-    signal entry_proc_U0_C_c_din : STD_LOGIC_VECTOR (31 downto 0);
-    signal entry_proc_U0_C_c_write : STD_LOGIC;
+    signal entry_proc38_U0_ap_start : STD_LOGIC;
+    signal entry_proc38_U0_ap_done : STD_LOGIC;
+    signal entry_proc38_U0_ap_continue : STD_LOGIC;
+    signal entry_proc38_U0_ap_idle : STD_LOGIC;
+    signal entry_proc38_U0_ap_ready : STD_LOGIC;
+    signal entry_proc38_U0_C_c_din : STD_LOGIC_VECTOR (31 downto 0);
+    signal entry_proc38_U0_C_c_write : STD_LOGIC;
     signal sumStream_U0_ap_start : STD_LOGIC;
     signal sumStream_U0_ap_done : STD_LOGIC;
     signal sumStream_U0_ap_continue : STD_LOGIC;
@@ -391,15 +391,15 @@ architecture behav of tTest is
     signal t_fifo_cap : STD_LOGIC_VECTOR (2 downto 0);
     signal t_empty_n : STD_LOGIC;
     signal ap_sync_ready : STD_LOGIC;
-    signal ap_sync_reg_entry_proc_U0_ap_ready : STD_LOGIC := '0';
-    signal ap_sync_entry_proc_U0_ap_ready : STD_LOGIC;
+    signal ap_sync_reg_entry_proc38_U0_ap_ready : STD_LOGIC := '0';
+    signal ap_sync_entry_proc38_U0_ap_ready : STD_LOGIC;
     signal ap_sync_reg_sumStream_U0_ap_ready : STD_LOGIC := '0';
     signal ap_sync_sumStream_U0_ap_ready : STD_LOGIC;
     signal ap_sync_reg_sumStream_4_U0_ap_ready : STD_LOGIC := '0';
     signal ap_sync_sumStream_4_U0_ap_ready : STD_LOGIC;
     signal ap_ce_reg : STD_LOGIC;
 
-    component tTest_entry_proc IS
+    component tTest_entry_proc38 IS
     port (
         ap_clk : IN STD_LOGIC;
         ap_rst : IN STD_LOGIC;
@@ -756,7 +756,7 @@ architecture behav of tTest is
     end component;
 
 
-    component tTest_fifo_w40_d3_S IS
+    component tTest_fifo_w40_d3_S_x0 IS
     port (
         clk : IN STD_LOGIC;
         reset : IN STD_LOGIC;
@@ -1141,21 +1141,21 @@ begin
         I_BVALID => gmem_BVALID,
         I_BREADY => Block_entry2458_proc_U0_m_axi_gmem_BREADY);
 
-    entry_proc_U0 : component tTest_entry_proc
+    entry_proc38_U0 : component tTest_entry_proc38
     port map (
         ap_clk => ap_clk,
         ap_rst => ap_rst_n_inv,
-        ap_start => entry_proc_U0_ap_start,
-        ap_done => entry_proc_U0_ap_done,
-        ap_continue => entry_proc_U0_ap_continue,
-        ap_idle => entry_proc_U0_ap_idle,
-        ap_ready => entry_proc_U0_ap_ready,
+        ap_start => entry_proc38_U0_ap_start,
+        ap_done => entry_proc38_U0_ap_done,
+        ap_continue => entry_proc38_U0_ap_continue,
+        ap_idle => entry_proc38_U0_ap_idle,
+        ap_ready => entry_proc38_U0_ap_ready,
         C => C,
-        C_c_din => entry_proc_U0_C_c_din,
+        C_c_din => entry_proc38_U0_C_c_din,
         C_c_num_data_valid => C_c_num_data_valid,
         C_c_fifo_cap => C_c_fifo_cap,
         C_c_full_n => C_c_full_n,
-        C_c_write => entry_proc_U0_C_c_write);
+        C_c_write => entry_proc38_U0_C_c_write);
 
     sumStream_U0 : component tTest_sumStream
     port map (
@@ -1402,9 +1402,9 @@ begin
         reset => ap_rst_n_inv,
         if_read_ce => ap_const_logic_1,
         if_write_ce => ap_const_logic_1,
-        if_din => entry_proc_U0_C_c_din,
+        if_din => entry_proc38_U0_C_c_din,
         if_full_n => C_c_full_n,
-        if_write => entry_proc_U0_C_c_write,
+        if_write => entry_proc38_U0_C_c_write,
         if_dout => C_c_dout,
         if_num_data_valid => C_c_num_data_valid,
         if_fifo_cap => C_c_fifo_cap,
@@ -1471,7 +1471,7 @@ begin
         if_empty_n => numDataB_c71_channel_empty_n,
         if_read => divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_ready);
 
-    numDataA_c_U : component tTest_fifo_w40_d3_S
+    numDataA_c_U : component tTest_fifo_w40_d3_S_x0
     port map (
         clk => ap_clk,
         reset => ap_rst_n_inv,
@@ -1516,7 +1516,7 @@ begin
         if_empty_n => meanA_c72_channel_empty_n,
         if_read => diff_U0_ap_ready);
 
-    numDataB_c_U : component tTest_fifo_w40_d3_S
+    numDataB_c_U : component tTest_fifo_w40_d3_S_x0
     port map (
         clk => ap_clk,
         reset => ap_rst_n_inv,
@@ -1815,16 +1815,16 @@ begin
     end process;
 
 
-    ap_sync_reg_entry_proc_U0_ap_ready_assign_proc : process(ap_clk)
+    ap_sync_reg_entry_proc38_U0_ap_ready_assign_proc : process(ap_clk)
     begin
         if (ap_clk'event and ap_clk =  '1') then
             if (ap_rst_n_inv = '1') then
-                ap_sync_reg_entry_proc_U0_ap_ready <= ap_const_logic_0;
+                ap_sync_reg_entry_proc38_U0_ap_ready <= ap_const_logic_0;
             else
                 if (((ap_sync_ready and ap_start) = ap_const_logic_1)) then 
-                    ap_sync_reg_entry_proc_U0_ap_ready <= ap_const_logic_0;
+                    ap_sync_reg_entry_proc38_U0_ap_ready <= ap_const_logic_0;
                 else 
-                    ap_sync_reg_entry_proc_U0_ap_ready <= ap_sync_entry_proc_U0_ap_ready;
+                    ap_sync_reg_entry_proc38_U0_ap_ready <= ap_sync_entry_proc38_U0_ap_ready;
                 end if; 
             end if;
         end if;
@@ -1877,8 +1877,8 @@ begin
     ap_channel_done_sumA_channel <= (sumStream_U0_ap_done and (ap_sync_reg_channel_write_sumA_channel xor ap_const_logic_1));
     ap_channel_done_sumB_channel <= (sumStream_4_U0_ap_done and (ap_sync_reg_channel_write_sumB_channel xor ap_const_logic_1));
     ap_done <= Block_entry2458_proc_U0_ap_done;
-    ap_idle <= (varSum_U0_ap_idle and varSum_5_U0_ap_idle and tCalc2_U0_ap_idle and tCalc1_U0_ap_idle and tCalc1_2_U0_ap_idle and sumStream_U0_ap_idle and sumStream_4_U0_ap_idle and (t_empty_n xor ap_const_logic_1) and (tCalc1ResultB_empty_n xor ap_const_logic_1) and (tCalc1ResultA_empty_n xor ap_const_logic_1) and (varSumB_channel_empty_n xor ap_const_logic_1) and (varSumA_channel_empty_n xor ap_const_logic_1) and (meanDiff_empty_n xor ap_const_logic_1) and (meanB_c73_channel_empty_n xor ap_const_logic_1) and (meanB_c_channel_empty_n xor ap_const_logic_1) and (meanA_c72_channel_empty_n xor ap_const_logic_1) and (meanA_c_channel_empty_n xor ap_const_logic_1) and (numDataB_c71_channel_empty_n xor ap_const_logic_1) and (sumB_channel_empty_n xor ap_const_logic_1) and (numDataA_c70_channel_empty_n xor ap_const_logic_1) and (sumA_channel_empty_n xor ap_const_logic_1) and (famB_t_empty_n xor ap_const_logic_1) and (famA_t_empty_n xor ap_const_logic_1) and entry_proc_U0_ap_idle and divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_idle and 
-    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_idle and diff_U0_ap_idle and Block_entry2458_proc_U0_ap_idle);
+    ap_idle <= (varSum_U0_ap_idle and varSum_5_U0_ap_idle and tCalc2_U0_ap_idle and tCalc1_U0_ap_idle and tCalc1_2_U0_ap_idle and sumStream_U0_ap_idle and sumStream_4_U0_ap_idle and (t_empty_n xor ap_const_logic_1) and (tCalc1ResultB_empty_n xor ap_const_logic_1) and (tCalc1ResultA_empty_n xor ap_const_logic_1) and (varSumB_channel_empty_n xor ap_const_logic_1) and (varSumA_channel_empty_n xor ap_const_logic_1) and (meanDiff_empty_n xor ap_const_logic_1) and (meanB_c73_channel_empty_n xor ap_const_logic_1) and (meanB_c_channel_empty_n xor ap_const_logic_1) and (meanA_c72_channel_empty_n xor ap_const_logic_1) and (meanA_c_channel_empty_n xor ap_const_logic_1) and (numDataB_c71_channel_empty_n xor ap_const_logic_1) and (sumB_channel_empty_n xor ap_const_logic_1) and (numDataA_c70_channel_empty_n xor ap_const_logic_1) and (sumA_channel_empty_n xor ap_const_logic_1) and (famB_t_empty_n xor ap_const_logic_1) and (famA_t_empty_n xor ap_const_logic_1) and entry_proc38_U0_ap_idle and divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_idle 
+    and divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_idle and diff_U0_ap_idle and Block_entry2458_proc_U0_ap_idle);
     ap_ready <= ap_sync_ready;
 
     ap_rst_n_inv_assign_proc : process(ap_rst_n)
@@ -1896,8 +1896,8 @@ begin
     ap_sync_channel_write_numDataB_c71_channel <= ((numDataB_c71_channel_full_n and ap_channel_done_numDataB_c71_channel) or ap_sync_reg_channel_write_numDataB_c71_channel);
     ap_sync_channel_write_sumA_channel <= ((sumA_channel_full_n and ap_channel_done_sumA_channel) or ap_sync_reg_channel_write_sumA_channel);
     ap_sync_channel_write_sumB_channel <= ((sumB_channel_full_n and ap_channel_done_sumB_channel) or ap_sync_reg_channel_write_sumB_channel);
-    ap_sync_entry_proc_U0_ap_ready <= (entry_proc_U0_ap_ready or ap_sync_reg_entry_proc_U0_ap_ready);
-    ap_sync_ready <= (ap_sync_sumStream_U0_ap_ready and ap_sync_sumStream_4_U0_ap_ready and ap_sync_entry_proc_U0_ap_ready);
+    ap_sync_entry_proc38_U0_ap_ready <= (entry_proc38_U0_ap_ready or ap_sync_reg_entry_proc38_U0_ap_ready);
+    ap_sync_ready <= (ap_sync_sumStream_U0_ap_ready and ap_sync_sumStream_4_U0_ap_ready and ap_sync_entry_proc38_U0_ap_ready);
     ap_sync_sumStream_4_U0_ap_ready <= (sumStream_4_U0_ap_ready or ap_sync_reg_sumStream_4_U0_ap_ready);
     ap_sync_sumStream_U0_ap_ready <= (sumStream_U0_ap_ready or ap_sync_reg_sumStream_U0_ap_ready);
     diff_U0_ap_continue <= meanDiff_full_n;
@@ -1906,8 +1906,8 @@ begin
     divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_start <= (sumA_channel_empty_n and numDataA_c70_channel_empty_n);
     divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_continue <= (ap_sync_channel_write_meanB_c_channel and ap_sync_channel_write_meanB_c73_channel);
     divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_start <= (sumB_channel_empty_n and numDataB_c71_channel_empty_n);
-    entry_proc_U0_ap_continue <= ap_const_logic_1;
-    entry_proc_U0_ap_start <= ((ap_sync_reg_entry_proc_U0_ap_ready xor ap_const_logic_1) and ap_start);
+    entry_proc38_U0_ap_continue <= ap_const_logic_1;
+    entry_proc38_U0_ap_start <= ((ap_sync_reg_entry_proc38_U0_ap_ready xor ap_const_logic_1) and ap_start);
     gmem_BID <= ap_const_lv1_0;
     gmem_BRESP <= ap_const_lv2_0;
     gmem_BUSER <= ap_const_lv1_0;
