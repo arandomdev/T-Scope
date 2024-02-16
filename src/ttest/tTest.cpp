@@ -19,9 +19,8 @@ void sumStream(hls::stream<streamPkt>& in_stream, countType* fam, sumType* sum, 
     }
 }
 
-template <typename sType, typename qType> void divVal(sType sum, numDataType numData, qType* quotient) {
-	if (numData != 0)
-		*quotient = qType(sum/numData);
+void divVal(sumType sum, numDataType numData, meanType* quotient) {
+	*quotient = meanType(ap_ufixed<71,47>(sum)/numData);
 }
 
 void diff(meanType meanA, meanType meanB, meanType* meanDiff) {
@@ -44,23 +43,23 @@ void varSum(countType* fam, meanType mean, varSumType* sum) {
 	}
 }
 
-void tCalc1(varSumType varSum, numDataType numData, tCalcResultType* out) {
+void tCalc1(varSumType varSum, numDataType numData, tCalcResultType1* out) {
 #pragma HLS DATAFLOW
-	varType var;
-	divVal(varSum, numDataType(numData - 1), &var); //in MATLAB: log2(sum(((quantValues(:,:,1) - (ones(1,256) * 8)).^2) .* (ones(1,256) * 2^32)) / sum((ones(1,256) * 2^32))) = 14.2
-	*out = tCalcResultType(var/numData); // out wants to be ap_fixed<40, 32>
+	ap_ufixed<64,23> num = varSum/(numDataType(numData - 1));
+	*out = tCalcResultType1(num/numData);
 }
 
-void tCalc2(tCalcResultType tCalc1ResultA, tCalcResultType tCalc1ResultB, meanType meanDiff, tCalcResultType* t) {
+void tCalc2(tCalcResultType1 tCalc1ResultA, tCalcResultType1 tCalc1ResultB, meanType meanDiff, tResult* t) {
 #pragma HLS DATAFLOW
-	ap_ufixed<32,10> denom;
-	denom = sqrt(double(tCalc1ResultA + tCalc1ResultB));
-	*t = tCalcResultType(meanDiff/denom); // t wants to be ap_ufixed<38, 30>
+	tCalcResultType2 denom;
+	tCalcResultType1 sum = tCalc1ResultA + tCalc1ResultB;
+	fxp_sqrt(denom, sum);
+	*t = tResult(meanDiff/denom);
 }
 
 void tTest(hls::stream<streamPkt>&A,
 	     hls::stream<streamPkt>&B,
-		 tCalcResultType* C) {
+		 float* C) {
 #pragma HLS INTERFACE mode=axis port=A,B
 #pragma HLS INTERFACE mode=m_axi port=C depth=1 num_read_outstanding=1 max_read_burst_length=1 num_write_outstanding=1 max_write_burst_length=1 offset=slave
 #pragma HLS interface mode=s_axilite port=C
@@ -73,20 +72,25 @@ void tTest(hls::stream<streamPkt>&A,
 
 	sumType sumA = 0, sumB = 0;
 	numDataType numDataA = 0, numDataB = 0;
-	meanType meanA, meanB, meanDiff; // 8 int, 8 decimal bits, unsigned
-	varSumType varSumA = 0, varSumB = 0; // in MATLAB: log2(sum(((quantValues - (ones(1,256) * 8)).^2) .* (ones(1,BINNUMS) * 2^32))) = 55
-	tCalcResultType tCalc1ResultA, tCalc1ResultB, t;
+	meanType meanA, meanB, meanDiff;
+	varSumType varSumA = 0, varSumB = 0;
+	tCalcResultType1 tCalc1ResultA, tCalc1ResultB;
+	tResult t;
 
 // data-driven task parallelism
     sumStream(A, famA, &sumA, &numDataA);
 	sumStream(B, famB, &sumB, &numDataB);
-	divVal(sumA, numDataA, &meanA);
-	divVal(sumB, numDataB, &meanB);
-	diff(meanA, meanB, &meanDiff);
-	varSum(famA, meanA, &varSumA);
-	varSum(famB, meanB, &varSumB);
-	tCalc1(varSumA, numDataA, &tCalc1ResultA);
-	tCalc1(varSumB, numDataB, &tCalc1ResultB);
-	tCalc2(tCalc1ResultA, tCalc1ResultB, meanDiff, &t);
-	*C = t;
+	if ((numDataA != 0) && (numDataB != 0)) {
+		divVal(sumA, numDataA, &meanA);
+		divVal(sumB, numDataB, &meanB);
+		diff(meanA, meanB, &meanDiff);
+		varSum(famA, meanA, &varSumA);
+		varSum(famB, meanB, &varSumB);
+		tCalc1(varSumA, numDataA, &tCalc1ResultA);
+		tCalc1(varSumB, numDataB, &tCalc1ResultB);
+		tCalc2(tCalc1ResultA, tCalc1ResultB, meanDiff, &t);
+	} else {
+		t = 0;
+	}
+	*C = float(t);
 }

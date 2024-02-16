@@ -6,7 +6,7 @@
 
 `timescale 1 ns / 1 ps 
 
-module tTest_sumStream (
+module tTest_sumStream_1 (
         ap_clk,
         ap_rst,
         ap_start,
@@ -14,12 +14,12 @@ module tTest_sumStream (
         ap_continue,
         ap_idle,
         ap_ready,
-        A_TVALID,
-        A_TDATA,
-        A_TREADY,
-        A_TKEEP,
-        A_TSTRB,
-        A_TLAST,
+        B_TVALID,
+        B_TDATA,
+        B_TREADY,
+        B_TKEEP,
+        B_TSTRB,
+        B_TLAST,
         fam_address0,
         fam_ce0,
         fam_we0,
@@ -37,12 +37,12 @@ output   ap_done;
 input   ap_continue;
 output   ap_idle;
 output   ap_ready;
-input   A_TVALID;
-input  [31:0] A_TDATA;
-output   A_TREADY;
-input  [3:0] A_TKEEP;
-input  [3:0] A_TSTRB;
-input  [0:0] A_TLAST;
+input   B_TVALID;
+input  [31:0] B_TDATA;
+output   B_TREADY;
+input  [3:0] B_TKEEP;
+input  [3:0] B_TSTRB;
+input  [0:0] B_TLAST;
 output  [7:0] fam_address0;
 output   fam_ce0;
 output   fam_we0;
@@ -75,9 +75,9 @@ reg    ap_block_pp0_stage0_11001;
 reg    ap_condition_exit_pp0_iter0_stage0_pp0_iter2_reg;
 reg    ap_condition_exit_pp0_iter0_stage0_pp0_iter3_reg;
 reg    ap_loop_exit_ready_delayed;
-reg    A_TDATA_blk_n;
+reg    B_TDATA_blk_n;
 wire    ap_block_pp0_stage0;
-reg   [7:0] i_4_reg_211;
+reg   [7:0] i_2_reg_211;
 reg   [31:0] in_val_data_reg_216;
 reg   [0:0] in_val_last_reg_221;
 reg   [0:0] in_val_last_reg_221_pp0_iter1_reg;
@@ -89,21 +89,21 @@ wire   [39:0] grp_fu_93_p2;
 reg   [39:0] mul_ln11_reg_236;
 wire   [31:0] zext_ln13_fu_124_p1;
 reg   [39:0] tempNumData_fu_56;
-wire   [39:0] tempNumData_5_fu_163_p2;
+wire   [39:0] tempNumData_3_fu_163_p2;
 wire    ap_loop_init;
 reg    ap_loop_init_pp0_iter1_reg;
 reg    ap_loop_init_pp0_iter2_reg;
 reg    ap_loop_init_pp0_iter3_reg;
-reg   [39:0] ap_sig_allocacmp_tempNumData_4;
+reg   [39:0] ap_sig_allocacmp_tempNumData_2;
 reg   [46:0] tempSum_fu_60;
-wire   [46:0] tempSum_5_fu_157_p2;
-reg   [46:0] ap_sig_allocacmp_tempSum_4;
+wire   [46:0] tempSum_3_fu_157_p2;
+reg   [46:0] ap_sig_allocacmp_tempSum_2;
 reg   [7:0] i_fu_64;
-wire   [7:0] i_5_fu_129_p2;
-reg   [7:0] ap_sig_allocacmp_i_4;
+wire   [7:0] i_3_fu_129_p2;
+reg   [7:0] ap_sig_allocacmp_i_2;
 wire   [31:0] grp_fu_93_p0;
 wire   [7:0] grp_fu_93_p1;
-wire   [46:0] zext_ln11_4_fu_154_p1;
+wire   [46:0] zext_ln11_2_fu_154_p1;
 reg    grp_fu_93_ce;
 reg   [46:0] ap_return_0_preg;
 reg   [39:0] ap_return_1_preg;
@@ -115,23 +115,23 @@ reg    ap_loop_exit_ready_pp0_iter3_reg;
 reg   [0:0] ap_NS_fsm;
 wire    ap_enable_pp0;
 wire    ap_start_int;
-wire    regslice_both_A_V_data_V_U_apdone_blk;
-wire   [31:0] A_TDATA_int_regslice;
-wire    A_TVALID_int_regslice;
-reg    A_TREADY_int_regslice;
-wire    regslice_both_A_V_data_V_U_ack_in;
-wire    regslice_both_A_V_keep_V_U_apdone_blk;
-wire   [3:0] A_TKEEP_int_regslice;
-wire    regslice_both_A_V_keep_V_U_vld_out;
-wire    regslice_both_A_V_keep_V_U_ack_in;
-wire    regslice_both_A_V_strb_V_U_apdone_blk;
-wire   [3:0] A_TSTRB_int_regslice;
-wire    regslice_both_A_V_strb_V_U_vld_out;
-wire    regslice_both_A_V_strb_V_U_ack_in;
-wire    regslice_both_A_V_last_V_U_apdone_blk;
-wire   [0:0] A_TLAST_int_regslice;
-wire    regslice_both_A_V_last_V_U_vld_out;
-wire    regslice_both_A_V_last_V_U_ack_in;
+wire    regslice_both_B_V_data_V_U_apdone_blk;
+wire   [31:0] B_TDATA_int_regslice;
+wire    B_TVALID_int_regslice;
+reg    B_TREADY_int_regslice;
+wire    regslice_both_B_V_data_V_U_ack_in;
+wire    regslice_both_B_V_keep_V_U_apdone_blk;
+wire   [3:0] B_TKEEP_int_regslice;
+wire    regslice_both_B_V_keep_V_U_vld_out;
+wire    regslice_both_B_V_keep_V_U_ack_in;
+wire    regslice_both_B_V_strb_V_U_apdone_blk;
+wire   [3:0] B_TSTRB_int_regslice;
+wire    regslice_both_B_V_strb_V_U_vld_out;
+wire    regslice_both_B_V_strb_V_U_ack_in;
+wire    regslice_both_B_V_last_V_U_apdone_blk;
+wire   [0:0] B_TLAST_int_regslice;
+wire    regslice_both_B_V_last_V_U_vld_out;
+wire    regslice_both_B_V_last_V_U_ack_in;
 wire   [39:0] grp_fu_93_p00;
 wire   [39:0] grp_fu_93_p10;
 reg    ap_condition_160;
@@ -147,7 +147,7 @@ initial begin
 #0 ap_condition_exit_pp0_iter0_stage0_pp0_iter1_reg = 1'b0;
 #0 ap_condition_exit_pp0_iter0_stage0_pp0_iter2_reg = 1'b0;
 #0 ap_condition_exit_pp0_iter0_stage0_pp0_iter3_reg = 1'b0;
-#0 i_4_reg_211 = 8'd0;
+#0 i_2_reg_211 = 8'd0;
 #0 in_val_data_reg_216 = 32'd0;
 #0 in_val_last_reg_221 = 1'd0;
 #0 in_val_last_reg_221_pp0_iter1_reg = 1'd0;
@@ -174,7 +174,7 @@ tTest_mul_32ns_8ns_40_2_1 #(
     .din0_WIDTH( 32 ),
     .din1_WIDTH( 8 ),
     .dout_WIDTH( 40 ))
-mul_32ns_8ns_40_2_1_U3(
+mul_32ns_8ns_40_2_1_U14(
     .clk(ap_clk),
     .reset(ap_rst),
     .din0(grp_fu_93_p0),
@@ -202,58 +202,58 @@ tTest_flow_control_loop_delay_pipe flow_control_loop_delay_pipe_U(
 
 tTest_regslice_both #(
     .DataWidth( 32 ))
-regslice_both_A_V_data_V_U(
+regslice_both_B_V_data_V_U(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst),
-    .data_in(A_TDATA),
-    .vld_in(A_TVALID),
-    .ack_in(regslice_both_A_V_data_V_U_ack_in),
-    .data_out(A_TDATA_int_regslice),
-    .vld_out(A_TVALID_int_regslice),
-    .ack_out(A_TREADY_int_regslice),
-    .apdone_blk(regslice_both_A_V_data_V_U_apdone_blk)
+    .data_in(B_TDATA),
+    .vld_in(B_TVALID),
+    .ack_in(regslice_both_B_V_data_V_U_ack_in),
+    .data_out(B_TDATA_int_regslice),
+    .vld_out(B_TVALID_int_regslice),
+    .ack_out(B_TREADY_int_regslice),
+    .apdone_blk(regslice_both_B_V_data_V_U_apdone_blk)
 );
 
 tTest_regslice_both #(
     .DataWidth( 4 ))
-regslice_both_A_V_keep_V_U(
+regslice_both_B_V_keep_V_U(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst),
-    .data_in(A_TKEEP),
-    .vld_in(A_TVALID),
-    .ack_in(regslice_both_A_V_keep_V_U_ack_in),
-    .data_out(A_TKEEP_int_regslice),
-    .vld_out(regslice_both_A_V_keep_V_U_vld_out),
-    .ack_out(A_TREADY_int_regslice),
-    .apdone_blk(regslice_both_A_V_keep_V_U_apdone_blk)
+    .data_in(B_TKEEP),
+    .vld_in(B_TVALID),
+    .ack_in(regslice_both_B_V_keep_V_U_ack_in),
+    .data_out(B_TKEEP_int_regslice),
+    .vld_out(regslice_both_B_V_keep_V_U_vld_out),
+    .ack_out(B_TREADY_int_regslice),
+    .apdone_blk(regslice_both_B_V_keep_V_U_apdone_blk)
 );
 
 tTest_regslice_both #(
     .DataWidth( 4 ))
-regslice_both_A_V_strb_V_U(
+regslice_both_B_V_strb_V_U(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst),
-    .data_in(A_TSTRB),
-    .vld_in(A_TVALID),
-    .ack_in(regslice_both_A_V_strb_V_U_ack_in),
-    .data_out(A_TSTRB_int_regslice),
-    .vld_out(regslice_both_A_V_strb_V_U_vld_out),
-    .ack_out(A_TREADY_int_regslice),
-    .apdone_blk(regslice_both_A_V_strb_V_U_apdone_blk)
+    .data_in(B_TSTRB),
+    .vld_in(B_TVALID),
+    .ack_in(regslice_both_B_V_strb_V_U_ack_in),
+    .data_out(B_TSTRB_int_regslice),
+    .vld_out(regslice_both_B_V_strb_V_U_vld_out),
+    .ack_out(B_TREADY_int_regslice),
+    .apdone_blk(regslice_both_B_V_strb_V_U_apdone_blk)
 );
 
 tTest_regslice_both #(
     .DataWidth( 1 ))
-regslice_both_A_V_last_V_U(
+regslice_both_B_V_last_V_U(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst),
-    .data_in(A_TLAST),
-    .vld_in(A_TVALID),
-    .ack_in(regslice_both_A_V_last_V_U_ack_in),
-    .data_out(A_TLAST_int_regslice),
-    .vld_out(regslice_both_A_V_last_V_U_vld_out),
-    .ack_out(A_TREADY_int_regslice),
-    .apdone_blk(regslice_both_A_V_last_V_U_apdone_blk)
+    .data_in(B_TLAST),
+    .vld_in(B_TVALID),
+    .ack_in(regslice_both_B_V_last_V_U_ack_in),
+    .data_out(B_TLAST_int_regslice),
+    .vld_out(regslice_both_B_V_last_V_U_vld_out),
+    .ack_out(B_TREADY_int_regslice),
+    .apdone_blk(regslice_both_B_V_last_V_U_apdone_blk)
 );
 
 always @ (posedge ap_clk) begin
@@ -403,7 +403,7 @@ always @ (posedge ap_clk) begin
         ap_return_0_preg <= 47'd0;
     end else begin
         if (((1'b0 == ap_block_pp0_stage0_11001) & (in_val_last_reg_221_pp0_iter2_reg == 1'd1))) begin
-            ap_return_0_preg <= tempSum_5_fu_157_p2;
+            ap_return_0_preg <= tempSum_3_fu_157_p2;
         end
     end
 end
@@ -413,17 +413,17 @@ always @ (posedge ap_clk) begin
         ap_return_1_preg <= 40'd0;
     end else begin
         if (((1'b0 == ap_block_pp0_stage0_11001) & (in_val_last_reg_221_pp0_iter2_reg == 1'd1))) begin
-            ap_return_1_preg <= tempNumData_5_fu_163_p2;
+            ap_return_1_preg <= tempNumData_3_fu_163_p2;
         end
     end
 end
 
 always @ (posedge ap_clk) begin
     if (ap_rst == 1'b1) begin
-        i_4_reg_211 <= 8'd0;
+        i_2_reg_211 <= 8'd0;
     end else begin
         if (((1'b0 == ap_block_pp0_stage0_11001) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
-            i_4_reg_211 <= ap_sig_allocacmp_i_4;
+            i_2_reg_211 <= ap_sig_allocacmp_i_2;
         end
     end
 end
@@ -433,7 +433,7 @@ always @ (posedge ap_clk) begin
         i_fu_64 <= 8'd0;
     end else begin
         if ((1'b1 == ap_condition_160)) begin
-            i_fu_64 <= i_5_fu_129_p2;
+            i_fu_64 <= i_3_fu_129_p2;
         end
 end
 end
@@ -443,7 +443,7 @@ always @ (posedge ap_clk) begin
         in_val_data_reg_216 <= 32'd0;
     end else begin
         if (((1'b0 == ap_block_pp0_stage0_11001) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
-            in_val_data_reg_216 <= A_TDATA_int_regslice;
+            in_val_data_reg_216 <= B_TDATA_int_regslice;
         end
     end
 end
@@ -453,7 +453,7 @@ always @ (posedge ap_clk) begin
         in_val_last_reg_221 <= 1'd0;
     end else begin
         if (((1'b0 == ap_block_pp0_stage0_11001) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
-            in_val_last_reg_221 <= A_TLAST_int_regslice;
+            in_val_last_reg_221 <= B_TLAST_int_regslice;
         end
     end
 end
@@ -493,7 +493,7 @@ always @ (posedge ap_clk) begin
         tempNumData_fu_56 <= 40'd0;
     end else begin
         if (((1'b0 == ap_block_pp0_stage0_11001) & (ap_enable_reg_pp0_iter3 == 1'b1))) begin
-            tempNumData_fu_56 <= tempNumData_5_fu_163_p2;
+            tempNumData_fu_56 <= tempNumData_3_fu_163_p2;
         end
 end
 end
@@ -503,7 +503,7 @@ always @ (posedge ap_clk) begin
         tempSum_fu_60 <= 47'd0;
     end else begin
         if (((1'b0 == ap_block_pp0_stage0_11001) & (ap_enable_reg_pp0_iter3 == 1'b1))) begin
-            tempSum_fu_60 <= tempSum_5_fu_157_p2;
+            tempSum_fu_60 <= tempSum_3_fu_157_p2;
         end
 end
 end
@@ -592,17 +592,17 @@ end
 
 always @ (*) begin
     if (((1'b0 == ap_block_pp0_stage0) & (ap_done_reg == 1'b0) & (ap_start_int == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
-        A_TDATA_blk_n = A_TVALID_int_regslice;
+        B_TDATA_blk_n = B_TVALID_int_regslice;
     end else begin
-        A_TDATA_blk_n = 1'b1;
+        B_TDATA_blk_n = 1'b1;
     end
 end
 
 always @ (*) begin
     if (((1'b0 == ap_block_pp0_stage0_11001) & (ap_start_int == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0))) begin
-        A_TREADY_int_regslice = 1'b1;
+        B_TREADY_int_regslice = 1'b1;
     end else begin
-        A_TREADY_int_regslice = 1'b0;
+        B_TREADY_int_regslice = 1'b0;
     end
 end
 
@@ -656,7 +656,7 @@ end
 
 always @ (*) begin
     if (((1'b0 == ap_block_pp0_stage0_11001) & (in_val_last_reg_221_pp0_iter2_reg == 1'd1))) begin
-        ap_return_0 = tempSum_5_fu_157_p2;
+        ap_return_0 = tempSum_3_fu_157_p2;
     end else begin
         ap_return_0 = ap_return_0_preg;
     end
@@ -664,7 +664,7 @@ end
 
 always @ (*) begin
     if (((1'b0 == ap_block_pp0_stage0_11001) & (in_val_last_reg_221_pp0_iter2_reg == 1'd1))) begin
-        ap_return_1 = tempNumData_5_fu_163_p2;
+        ap_return_1 = tempNumData_3_fu_163_p2;
     end else begin
         ap_return_1 = ap_return_1_preg;
     end
@@ -672,25 +672,25 @@ end
 
 always @ (*) begin
     if (((1'b0 == ap_block_pp0_stage0) & (ap_start_int == 1'b1) & (1'b1 == ap_CS_fsm_pp0_stage0) & (ap_loop_init == 1'b1))) begin
-        ap_sig_allocacmp_i_4 = 8'd0;
+        ap_sig_allocacmp_i_2 = 8'd0;
     end else begin
-        ap_sig_allocacmp_i_4 = i_fu_64;
+        ap_sig_allocacmp_i_2 = i_fu_64;
     end
 end
 
 always @ (*) begin
     if (((1'b0 == ap_block_pp0_stage0) & (ap_enable_reg_pp0_iter3 == 1'b1) & (ap_loop_init_pp0_iter3_reg == 1'b1))) begin
-        ap_sig_allocacmp_tempNumData_4 = 40'd0;
+        ap_sig_allocacmp_tempNumData_2 = 40'd0;
     end else begin
-        ap_sig_allocacmp_tempNumData_4 = tempNumData_fu_56;
+        ap_sig_allocacmp_tempNumData_2 = tempNumData_fu_56;
     end
 end
 
 always @ (*) begin
     if (((1'b0 == ap_block_pp0_stage0) & (ap_enable_reg_pp0_iter3 == 1'b1) & (ap_loop_init_pp0_iter3_reg == 1'b1))) begin
-        ap_sig_allocacmp_tempSum_4 = 47'd0;
+        ap_sig_allocacmp_tempSum_2 = 47'd0;
     end else begin
-        ap_sig_allocacmp_tempSum_4 = tempSum_fu_60;
+        ap_sig_allocacmp_tempSum_2 = tempSum_fu_60;
     end
 end
 
@@ -729,7 +729,7 @@ always @ (*) begin
     endcase
 end
 
-assign A_TREADY = regslice_both_A_V_data_V_U_ack_in;
+assign B_TREADY = regslice_both_B_V_data_V_U_ack_in;
 
 assign ap_CS_fsm_pp0_stage0 = ap_CS_fsm[32'd0];
 
@@ -744,7 +744,7 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    ap_block_state1_pp0_stage0_iter0 = ((ap_done_reg == 1'b1) | (1'b0 == A_TVALID_int_regslice));
+    ap_block_state1_pp0_stage0_iter0 = ((ap_done_reg == 1'b1) | (1'b0 == B_TVALID_int_regslice));
 end
 
 always @ (*) begin
@@ -759,7 +759,7 @@ assign ap_loop_exit_ready = ap_condition_exit_pp0_iter0_stage0;
 
 assign fam_address0 = zext_ln13_fu_124_p1;
 
-assign fam_d0 = A_TDATA_int_regslice;
+assign fam_d0 = B_TDATA_int_regslice;
 
 assign grp_fu_93_p0 = grp_fu_93_p00;
 
@@ -767,25 +767,25 @@ assign grp_fu_93_p00 = in_val_data_reg_216;
 
 assign grp_fu_93_p1 = grp_fu_93_p10;
 
-assign grp_fu_93_p10 = i_4_reg_211;
+assign grp_fu_93_p10 = i_2_reg_211;
 
-assign i_5_fu_129_p2 = (ap_sig_allocacmp_i_4 + 8'd1);
+assign i_3_fu_129_p2 = (ap_sig_allocacmp_i_2 + 8'd1);
 
-assign in_val_last_fu_120_p1 = A_TLAST_int_regslice;
+assign in_val_last_fu_120_p1 = B_TLAST_int_regslice;
 
-assign tempNumData_5_fu_163_p2 = (zext_ln11_reg_225_pp0_iter2_reg + ap_sig_allocacmp_tempNumData_4);
+assign tempNumData_3_fu_163_p2 = (zext_ln11_reg_225_pp0_iter2_reg + ap_sig_allocacmp_tempNumData_2);
 
-assign tempSum_5_fu_157_p2 = (zext_ln11_4_fu_154_p1 + ap_sig_allocacmp_tempSum_4);
+assign tempSum_3_fu_157_p2 = (zext_ln11_2_fu_154_p1 + ap_sig_allocacmp_tempSum_2);
 
-assign zext_ln11_4_fu_154_p1 = mul_ln11_reg_236;
+assign zext_ln11_2_fu_154_p1 = mul_ln11_reg_236;
 
 assign zext_ln11_fu_140_p1 = in_val_data_reg_216;
 
-assign zext_ln13_fu_124_p1 = ap_sig_allocacmp_i_4;
+assign zext_ln13_fu_124_p1 = ap_sig_allocacmp_i_2;
 
 always @ (posedge ap_clk) begin
     zext_ln11_reg_225[39:32] <= 8'b00000000;
     zext_ln11_reg_225_pp0_iter2_reg[39:32] <= 8'b00000000;
 end
 
-endmodule //tTest_sumStream
+endmodule //tTest_sumStream_1

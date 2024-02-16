@@ -131,9 +131,9 @@ set bCheckIPs 1
 if { $bCheckIPs == 1 } {
    set list_check_ips "\ 
 xilinx.com:ip:processing_system7:5.5\
+amalnciof:hls:tTest:1.2\
 xilinx.com:ip:axi_dma:7.1\
 xilinx.com:ip:proc_sys_reset:5.0\
-amalnciof:hls:tTest:1.1\
 "
 
    set list_ips_missing ""
@@ -246,10 +246,6 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_CLK1_FREQ {10000000} \
     CONFIG.PCW_CLK2_FREQ {10000000} \
     CONFIG.PCW_CLK3_FREQ {10000000} \
-    CONFIG.PCW_CORE0_FIQ_INTR {0} \
-    CONFIG.PCW_CORE0_IRQ_INTR {0} \
-    CONFIG.PCW_CORE1_FIQ_INTR {0} \
-    CONFIG.PCW_CORE1_IRQ_INTR {0} \
     CONFIG.PCW_CPU_CPU_6X4X_MAX_RANGE {667} \
     CONFIG.PCW_CPU_PERIPHERAL_CLKSRC {ARM PLL} \
     CONFIG.PCW_CRYSTAL_PERIPHERAL_FREQMHZ {50} \
@@ -357,12 +353,10 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_GPIO_MIO_GPIO_ENABLE {1} \
     CONFIG.PCW_GPIO_MIO_GPIO_IO {MIO} \
     CONFIG.PCW_GPIO_PERIPHERAL_ENABLE {0} \
-    CONFIG.PCW_I2C_RESET_ENABLE {1} \
+    CONFIG.PCW_I2C_RESET_ENABLE {0} \
     CONFIG.PCW_I2C_RESET_POLARITY {Active Low} \
     CONFIG.PCW_IMPORT_BOARD_PRESET {None} \
     CONFIG.PCW_INCLUDE_ACP_TRANS_CHECK {0} \
-    CONFIG.PCW_IRQ_F2P_INTR {1} \
-    CONFIG.PCW_IRQ_F2P_MODE {DIRECT} \
     CONFIG.PCW_MIO_0_IOTYPE {LVCMOS 3.3V} \
     CONFIG.PCW_MIO_0_PULLUP {enabled} \
     CONFIG.PCW_MIO_0_SLEW {slow} \
@@ -564,12 +558,6 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_NOR_SRAM_CS1_T_WP {1} \
     CONFIG.PCW_NOR_SRAM_CS1_WE_TIME {0} \
     CONFIG.PCW_OVERRIDE_BASIC_CLOCK {0} \
-    CONFIG.PCW_P2F_ENET0_INTR {0} \
-    CONFIG.PCW_P2F_GPIO_INTR {0} \
-    CONFIG.PCW_P2F_QSPI_INTR {0} \
-    CONFIG.PCW_P2F_SDIO0_INTR {0} \
-    CONFIG.PCW_P2F_UART0_INTR {0} \
-    CONFIG.PCW_P2F_USB0_INTR {0} \
     CONFIG.PCW_PACKAGE_DDR_BOARD_DELAY0 {0.223} \
     CONFIG.PCW_PACKAGE_DDR_BOARD_DELAY1 {0.212} \
     CONFIG.PCW_PACKAGE_DDR_BOARD_DELAY2 {0.085} \
@@ -735,7 +723,7 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_USE_DMA2 {0} \
     CONFIG.PCW_USE_DMA3 {0} \
     CONFIG.PCW_USE_EXPANDED_IOP {0} \
-    CONFIG.PCW_USE_FABRIC_INTERRUPT {1} \
+    CONFIG.PCW_USE_FABRIC_INTERRUPT {0} \
     CONFIG.PCW_USE_HIGH_OCM {0} \
     CONFIG.PCW_USE_M_AXI_GP0 {1} \
     CONFIG.PCW_USE_M_AXI_GP1 {0} \
@@ -755,27 +743,36 @@ proc create_root_design { parentCell } {
   ] $ps
 
 
-  # Create instance: dma0, and set properties
-  set dma0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 dma0 ]
+  # Create instance: tTestCore, and set properties
+  set tTestCore [ create_bd_cell -type ip -vlnv amalnciof:hls:tTest:1.2 tTestCore ]
+
+  # Create instance: dmaA, and set properties
+  set dmaA [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 dmaA ]
   set_property -dict [list \
     CONFIG.c_include_s2mm {0} \
     CONFIG.c_include_sg {0} \
+    CONFIG.c_m_axi_mm2s_data_width {32} \
+    CONFIG.c_m_axis_mm2s_tdata_width {32} \
+    CONFIG.c_mm2s_burst_size {16} \
     CONFIG.c_sg_length_width {26} \
-  ] $dma0
+  ] $dmaA
 
 
-  # Create instance: dma1, and set properties
-  set dma1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 dma1 ]
+  # Create instance: dmaB, and set properties
+  set dmaB [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 dmaB ]
   set_property -dict [list \
     CONFIG.c_include_s2mm {0} \
     CONFIG.c_include_sg {0} \
+    CONFIG.c_m_axi_mm2s_data_width {32} \
+    CONFIG.c_m_axis_mm2s_tdata_width {32} \
+    CONFIG.c_mm2s_burst_size {16} \
     CONFIG.c_sg_length_width {26} \
-  ] $dma1
+  ] $dmaB
 
 
   # Create instance: ps_axi_periph, and set properties
   set ps_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 ps_axi_periph ]
-  set_property CONFIG.NUM_MI {4} $ps_axi_periph
+  set_property CONFIG.NUM_MI {3} $ps_axi_periph
 
 
   # Create instance: rst_ps_100M, and set properties
@@ -796,36 +793,34 @@ proc create_root_design { parentCell } {
   set_property CONFIG.NUM_MI {1} $axi_mem_intercon_2
 
 
-  # Create instance: tTestCore, and set properties
-  set tTestCore [ create_bd_cell -type ip -vlnv amalnciof:hls:tTest:1.1 tTestCore ]
-
   # Create interface connections
-  connect_bd_intf_net -intf_net S00_AXI_1 [get_bd_intf_pins axi_mem_intercon_1/S00_AXI] [get_bd_intf_pins tTestCore/m_axi_gmem]
   connect_bd_intf_net -intf_net axi_mem_intercon_1_M00_AXI [get_bd_intf_pins axi_mem_intercon_1/M00_AXI] [get_bd_intf_pins ps/S_AXI_HP1]
   connect_bd_intf_net -intf_net axi_mem_intercon_2_M00_AXI [get_bd_intf_pins axi_mem_intercon_2/M00_AXI] [get_bd_intf_pins ps/S_AXI_HP2]
   connect_bd_intf_net -intf_net axi_mem_intercon_M00_AXI [get_bd_intf_pins axi_mem_intercon/M00_AXI] [get_bd_intf_pins ps/S_AXI_HP0]
-  connect_bd_intf_net -intf_net dma0_M_AXIS_MM2S [get_bd_intf_pins dma0/M_AXIS_MM2S] [get_bd_intf_pins tTestCore/A]
-  connect_bd_intf_net -intf_net dma0_M_AXI_MM2S [get_bd_intf_pins dma0/M_AXI_MM2S] [get_bd_intf_pins axi_mem_intercon/S00_AXI]
-  connect_bd_intf_net -intf_net dma1_M_AXIS_MM2S [get_bd_intf_pins dma1/M_AXIS_MM2S] [get_bd_intf_pins tTestCore/B]
-  connect_bd_intf_net -intf_net dma1_M_AXI_MM2S [get_bd_intf_pins dma1/M_AXI_MM2S] [get_bd_intf_pins axi_mem_intercon_2/S00_AXI]
+  connect_bd_intf_net -intf_net dmaA_M_AXIS_MM2S [get_bd_intf_pins dmaA/M_AXIS_MM2S] [get_bd_intf_pins tTestCore/A]
+  connect_bd_intf_net -intf_net dmaA_M_AXI_MM2S [get_bd_intf_pins dmaA/M_AXI_MM2S] [get_bd_intf_pins axi_mem_intercon/S00_AXI]
+  connect_bd_intf_net -intf_net dmaB_M_AXIS_MM2S [get_bd_intf_pins dmaB/M_AXIS_MM2S] [get_bd_intf_pins tTestCore/B]
+  connect_bd_intf_net -intf_net dmaB_M_AXI_MM2S [get_bd_intf_pins dmaB/M_AXI_MM2S] [get_bd_intf_pins axi_mem_intercon_2/S00_AXI]
   connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins ps/DDR]
   connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins ps/FIXED_IO]
   connect_bd_intf_net -intf_net ps_M_AXI_GP0 [get_bd_intf_pins ps/M_AXI_GP0] [get_bd_intf_pins ps_axi_periph/S00_AXI]
-  connect_bd_intf_net -intf_net ps_axi_periph_M00_AXI [get_bd_intf_pins ps_axi_periph/M00_AXI] [get_bd_intf_pins dma0/S_AXI_LITE]
-  connect_bd_intf_net -intf_net ps_axi_periph_M01_AXI [get_bd_intf_pins ps_axi_periph/M01_AXI] [get_bd_intf_pins dma1/S_AXI_LITE]
-  connect_bd_intf_net -intf_net ps_axi_periph_M03_AXI [get_bd_intf_pins ps_axi_periph/M03_AXI] [get_bd_intf_pins tTestCore/s_axi_control]
+  connect_bd_intf_net -intf_net ps_axi_periph_M00_AXI [get_bd_intf_pins ps_axi_periph/M00_AXI] [get_bd_intf_pins dmaA/S_AXI_LITE]
+  connect_bd_intf_net -intf_net ps_axi_periph_M01_AXI [get_bd_intf_pins ps_axi_periph/M01_AXI] [get_bd_intf_pins dmaB/S_AXI_LITE]
+  connect_bd_intf_net -intf_net ps_axi_periph_M02_AXI [get_bd_intf_pins ps_axi_periph/M02_AXI] [get_bd_intf_pins tTestCore/s_axi_control]
+  connect_bd_intf_net -intf_net tTestCore_m_axi_gmem [get_bd_intf_pins tTestCore/m_axi_gmem] [get_bd_intf_pins axi_mem_intercon_1/S00_AXI]
 
   # Create port connections
-  connect_bd_net -net ps_FCLK_CLK0 [get_bd_pins ps/FCLK_CLK0] [get_bd_pins ps/M_AXI_GP0_ACLK] [get_bd_pins ps_axi_periph/S00_ACLK] [get_bd_pins rst_ps_100M/slowest_sync_clk] [get_bd_pins dma0/s_axi_lite_aclk] [get_bd_pins ps_axi_periph/M00_ACLK] [get_bd_pins ps_axi_periph/ACLK] [get_bd_pins dma1/s_axi_lite_aclk] [get_bd_pins ps_axi_periph/M01_ACLK] [get_bd_pins dma0/m_axi_mm2s_aclk] [get_bd_pins axi_mem_intercon/S00_ACLK] [get_bd_pins ps/S_AXI_HP0_ACLK] [get_bd_pins axi_mem_intercon/M00_ACLK] [get_bd_pins axi_mem_intercon/ACLK] [get_bd_pins axi_mem_intercon_1/S00_ACLK] [get_bd_pins ps/S_AXI_HP1_ACLK] [get_bd_pins axi_mem_intercon_1/M00_ACLK] [get_bd_pins axi_mem_intercon_1/ACLK] [get_bd_pins dma1/m_axi_mm2s_aclk] [get_bd_pins axi_mem_intercon_2/S00_ACLK] [get_bd_pins ps/S_AXI_HP2_ACLK] [get_bd_pins axi_mem_intercon_2/M00_ACLK] [get_bd_pins axi_mem_intercon_2/ACLK] [get_bd_pins ps_axi_periph/M02_ACLK] [get_bd_pins ps_axi_periph/M03_ACLK] [get_bd_pins tTestCore/ap_clk]
+  connect_bd_net -net ps_FCLK_CLK0 [get_bd_pins ps/FCLK_CLK0] [get_bd_pins ps/M_AXI_GP0_ACLK] [get_bd_pins ps_axi_periph/S00_ACLK] [get_bd_pins rst_ps_100M/slowest_sync_clk] [get_bd_pins dmaA/s_axi_lite_aclk] [get_bd_pins ps_axi_periph/M00_ACLK] [get_bd_pins ps_axi_periph/ACLK] [get_bd_pins dmaB/s_axi_lite_aclk] [get_bd_pins ps_axi_periph/M01_ACLK] [get_bd_pins dmaA/m_axi_mm2s_aclk] [get_bd_pins axi_mem_intercon/S00_ACLK] [get_bd_pins ps/S_AXI_HP0_ACLK] [get_bd_pins axi_mem_intercon/M00_ACLK] [get_bd_pins axi_mem_intercon/ACLK] [get_bd_pins axi_mem_intercon_1/S00_ACLK] [get_bd_pins ps/S_AXI_HP1_ACLK] [get_bd_pins axi_mem_intercon_1/M00_ACLK] [get_bd_pins axi_mem_intercon_1/ACLK] [get_bd_pins dmaB/m_axi_mm2s_aclk] [get_bd_pins axi_mem_intercon_2/S00_ACLK] [get_bd_pins ps/S_AXI_HP2_ACLK] [get_bd_pins axi_mem_intercon_2/M00_ACLK] [get_bd_pins axi_mem_intercon_2/ACLK] [get_bd_pins ps_axi_periph/M02_ACLK] [get_bd_pins tTestCore/ap_clk]
   connect_bd_net -net ps_FCLK_RESET0_N [get_bd_pins ps/FCLK_RESET0_N] [get_bd_pins rst_ps_100M/ext_reset_in]
-  connect_bd_net -net rst_ps_100M_peripheral_aresetn [get_bd_pins rst_ps_100M/peripheral_aresetn] [get_bd_pins ps_axi_periph/S00_ARESETN] [get_bd_pins dma0/axi_resetn] [get_bd_pins ps_axi_periph/M00_ARESETN] [get_bd_pins ps_axi_periph/ARESETN] [get_bd_pins dma1/axi_resetn] [get_bd_pins ps_axi_periph/M01_ARESETN] [get_bd_pins axi_mem_intercon/S00_ARESETN] [get_bd_pins axi_mem_intercon/M00_ARESETN] [get_bd_pins axi_mem_intercon/ARESETN] [get_bd_pins axi_mem_intercon_1/S00_ARESETN] [get_bd_pins axi_mem_intercon_1/M00_ARESETN] [get_bd_pins axi_mem_intercon_1/ARESETN] [get_bd_pins axi_mem_intercon_2/S00_ARESETN] [get_bd_pins axi_mem_intercon_2/M00_ARESETN] [get_bd_pins axi_mem_intercon_2/ARESETN] [get_bd_pins ps_axi_periph/M02_ARESETN] [get_bd_pins ps_axi_periph/M03_ARESETN] [get_bd_pins tTestCore/ap_rst_n]
-  connect_bd_net -net tTestCore_interrupt [get_bd_pins tTestCore/interrupt] [get_bd_pins ps/IRQ_F2P]
+  connect_bd_net -net rst_ps_100M_peripheral_aresetn [get_bd_pins rst_ps_100M/peripheral_aresetn] [get_bd_pins ps_axi_periph/S00_ARESETN] [get_bd_pins dmaA/axi_resetn] [get_bd_pins ps_axi_periph/M00_ARESETN] [get_bd_pins ps_axi_periph/ARESETN] [get_bd_pins dmaB/axi_resetn] [get_bd_pins ps_axi_periph/M01_ARESETN] [get_bd_pins axi_mem_intercon/S00_ARESETN] [get_bd_pins axi_mem_intercon/M00_ARESETN] [get_bd_pins axi_mem_intercon/ARESETN] [get_bd_pins axi_mem_intercon_1/S00_ARESETN] [get_bd_pins axi_mem_intercon_1/M00_ARESETN] [get_bd_pins axi_mem_intercon_1/ARESETN] [get_bd_pins axi_mem_intercon_2/S00_ARESETN] [get_bd_pins axi_mem_intercon_2/M00_ARESETN] [get_bd_pins axi_mem_intercon_2/ARESETN] [get_bd_pins ps_axi_periph/M02_ARESETN] [get_bd_pins tTestCore/ap_rst_n]
 
   # Create address segments
-  assign_bd_address -offset 0x41E00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ps/Data] [get_bd_addr_segs dma0/S_AXI_LITE/Reg] -force
-  assign_bd_address -offset 0x41E10000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ps/Data] [get_bd_addr_segs dma1/S_AXI_LITE/Reg] -force
-  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces dma0/Data_MM2S] [get_bd_addr_segs ps/S_AXI_HP0/HP0_DDR_LOWOCM] -force
-  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces dma1/Data_MM2S] [get_bd_addr_segs ps/S_AXI_HP2/HP2_DDR_LOWOCM] -force
+  assign_bd_address -offset 0x41E00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ps/Data] [get_bd_addr_segs dmaA/S_AXI_LITE/Reg] -force
+  assign_bd_address -offset 0x41E10000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ps/Data] [get_bd_addr_segs dmaB/S_AXI_LITE/Reg] -force
+  assign_bd_address -offset 0x40000000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ps/Data] [get_bd_addr_segs tTestCore/s_axi_control/Reg] -force
+  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces tTestCore/Data_m_axi_gmem] [get_bd_addr_segs ps/S_AXI_HP1/HP1_DDR_LOWOCM] -force
+  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces dmaA/Data_MM2S] [get_bd_addr_segs ps/S_AXI_HP0/HP0_DDR_LOWOCM] -force
+  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces dmaB/Data_MM2S] [get_bd_addr_segs ps/S_AXI_HP2/HP2_DDR_LOWOCM] -force
 
 
   # Restore current instance

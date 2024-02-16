@@ -14,12 +14,12 @@ module tTest_entry_proc (
         ap_continue,
         ap_idle,
         ap_ready,
-        p_read,
-        varSumA_c_din,
-        varSumA_c_num_data_valid,
-        varSumA_c_fifo_cap,
-        varSumA_c_full_n,
-        varSumA_c_write
+        C,
+        C_c_din,
+        C_c_num_data_valid,
+        C_c_fifo_cap,
+        C_c_full_n,
+        C_c_write
 );
 
 parameter    ap_ST_fsm_state1 = 1'd1;
@@ -31,22 +31,22 @@ output   ap_done;
 input   ap_continue;
 output   ap_idle;
 output   ap_ready;
-input  [62:0] p_read;
-output  [62:0] varSumA_c_din;
-input  [2:0] varSumA_c_num_data_valid;
-input  [2:0] varSumA_c_fifo_cap;
-input   varSumA_c_full_n;
-output   varSumA_c_write;
+input  [31:0] C;
+output  [31:0] C_c_din;
+input  [2:0] C_c_num_data_valid;
+input  [2:0] C_c_fifo_cap;
+input   C_c_full_n;
+output   C_c_write;
 
 reg ap_done;
 reg ap_idle;
 reg ap_ready;
-reg varSumA_c_write;
+reg C_c_write;
 
 reg    ap_done_reg;
 (* fsm_encoding = "none" *) reg   [0:0] ap_CS_fsm;
 wire    ap_CS_fsm_state1;
-reg    varSumA_c_blk_n;
+reg    C_c_blk_n;
 reg    ap_block_state1;
 reg   [0:0] ap_NS_fsm;
 reg    ap_ST_fsm_state1_blk;
@@ -75,6 +75,22 @@ always @ (posedge ap_clk) begin
         end else if (((1'b0 == ap_block_state1) & (1'b1 == ap_CS_fsm_state1))) begin
             ap_done_reg <= 1'b1;
         end
+    end
+end
+
+always @ (*) begin
+    if ((~((ap_start == 1'b0) | (ap_done_reg == 1'b1)) & (1'b1 == ap_CS_fsm_state1))) begin
+        C_c_blk_n = C_c_full_n;
+    end else begin
+        C_c_blk_n = 1'b1;
+    end
+end
+
+always @ (*) begin
+    if (((1'b0 == ap_block_state1) & (1'b1 == ap_CS_fsm_state1))) begin
+        C_c_write = 1'b1;
+    end else begin
+        C_c_write = 1'b0;
     end
 end
 
@@ -111,22 +127,6 @@ always @ (*) begin
 end
 
 always @ (*) begin
-    if ((~((ap_start == 1'b0) | (ap_done_reg == 1'b1)) & (1'b1 == ap_CS_fsm_state1))) begin
-        varSumA_c_blk_n = varSumA_c_full_n;
-    end else begin
-        varSumA_c_blk_n = 1'b1;
-    end
-end
-
-always @ (*) begin
-    if (((1'b0 == ap_block_state1) & (1'b1 == ap_CS_fsm_state1))) begin
-        varSumA_c_write = 1'b1;
-    end else begin
-        varSumA_c_write = 1'b0;
-    end
-end
-
-always @ (*) begin
     case (ap_CS_fsm)
         ap_ST_fsm_state1 : begin
             ap_NS_fsm = ap_ST_fsm_state1;
@@ -137,12 +137,12 @@ always @ (*) begin
     endcase
 end
 
+assign C_c_din = C;
+
 assign ap_CS_fsm_state1 = ap_CS_fsm[32'd0];
 
 always @ (*) begin
-    ap_block_state1 = ((ap_start == 1'b0) | (varSumA_c_full_n == 1'b0) | (ap_done_reg == 1'b1));
+    ap_block_state1 = ((ap_start == 1'b0) | (1'b0 == C_c_full_n) | (ap_done_reg == 1'b1));
 end
-
-assign varSumA_c_din = p_read;
 
 endmodule //tTest_entry_proc

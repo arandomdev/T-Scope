@@ -10,15 +10,15 @@ use IEEE.numeric_std.all;
 
 entity tTest_tCalc2 is
 port (
-    tCalc1ResultA : IN STD_LOGIC_VECTOR (31 downto 0);
-    tCalc1ResultB : IN STD_LOGIC_VECTOR (31 downto 0);
-    p_read : IN STD_LOGIC_VECTOR (15 downto 0);
+    tCalc1ResultA : IN STD_LOGIC_VECTOR (63 downto 0);
+    tCalc1ResultB : IN STD_LOGIC_VECTOR (63 downto 0);
+    meanDiff : IN STD_LOGIC_VECTOR (31 downto 0);
     t : OUT STD_LOGIC_VECTOR (31 downto 0);
     ap_clk : IN STD_LOGIC;
     ap_rst : IN STD_LOGIC;
     tCalc1ResultB_ap_vld : IN STD_LOGIC;
     tCalc1ResultA_ap_vld : IN STD_LOGIC;
-    p_read_ap_vld : IN STD_LOGIC;
+    meanDiff_ap_vld : IN STD_LOGIC;
     t_ap_vld : OUT STD_LOGIC;
     ap_start : IN STD_LOGIC;
     ap_done : OUT STD_LOGIC;
@@ -33,14 +33,15 @@ architecture behav of tTest_tCalc2 is
     constant ap_const_logic_0 : STD_LOGIC := '0';
 
 attribute shreg_extract : string;
-    signal tCalc2_Block_entry12_proc_U0_ap_start : STD_LOGIC;
-    signal tCalc2_Block_entry12_proc_U0_ap_done : STD_LOGIC;
-    signal tCalc2_Block_entry12_proc_U0_ap_continue : STD_LOGIC;
-    signal tCalc2_Block_entry12_proc_U0_ap_idle : STD_LOGIC;
-    signal tCalc2_Block_entry12_proc_U0_ap_ready : STD_LOGIC;
-    signal tCalc2_Block_entry12_proc_U0_t : STD_LOGIC_VECTOR (31 downto 0);
+    signal tCalc2_Block_entry21_proc_U0_ap_start : STD_LOGIC;
+    signal tCalc2_Block_entry21_proc_U0_ap_done : STD_LOGIC;
+    signal tCalc2_Block_entry21_proc_U0_ap_continue : STD_LOGIC;
+    signal tCalc2_Block_entry21_proc_U0_ap_idle : STD_LOGIC;
+    signal tCalc2_Block_entry21_proc_U0_ap_ready : STD_LOGIC;
+    signal tCalc2_Block_entry21_proc_U0_t : STD_LOGIC_VECTOR (31 downto 0);
+    signal tCalc2_Block_entry21_proc_U0_t_ap_vld : STD_LOGIC;
 
-    component tTest_tCalc2_Block_entry12_proc IS
+    component tTest_tCalc2_Block_entry21_proc IS
     port (
         ap_clk : IN STD_LOGIC;
         ap_rst : IN STD_LOGIC;
@@ -49,37 +50,39 @@ attribute shreg_extract : string;
         ap_continue : IN STD_LOGIC;
         ap_idle : OUT STD_LOGIC;
         ap_ready : OUT STD_LOGIC;
-        tCalc1ResultB : IN STD_LOGIC_VECTOR (31 downto 0);
-        tCalc1ResultA : IN STD_LOGIC_VECTOR (31 downto 0);
-        p_read : IN STD_LOGIC_VECTOR (15 downto 0);
-        t : OUT STD_LOGIC_VECTOR (31 downto 0) );
+        tCalc1ResultB : IN STD_LOGIC_VECTOR (63 downto 0);
+        tCalc1ResultA : IN STD_LOGIC_VECTOR (63 downto 0);
+        meanDiff : IN STD_LOGIC_VECTOR (31 downto 0);
+        t : OUT STD_LOGIC_VECTOR (31 downto 0);
+        t_ap_vld : OUT STD_LOGIC );
     end component;
 
 
 
 begin
-    tCalc2_Block_entry12_proc_U0 : component tTest_tCalc2_Block_entry12_proc
+    tCalc2_Block_entry21_proc_U0 : component tTest_tCalc2_Block_entry21_proc
     port map (
         ap_clk => ap_clk,
         ap_rst => ap_rst,
-        ap_start => tCalc2_Block_entry12_proc_U0_ap_start,
-        ap_done => tCalc2_Block_entry12_proc_U0_ap_done,
-        ap_continue => tCalc2_Block_entry12_proc_U0_ap_continue,
-        ap_idle => tCalc2_Block_entry12_proc_U0_ap_idle,
-        ap_ready => tCalc2_Block_entry12_proc_U0_ap_ready,
+        ap_start => tCalc2_Block_entry21_proc_U0_ap_start,
+        ap_done => tCalc2_Block_entry21_proc_U0_ap_done,
+        ap_continue => tCalc2_Block_entry21_proc_U0_ap_continue,
+        ap_idle => tCalc2_Block_entry21_proc_U0_ap_idle,
+        ap_ready => tCalc2_Block_entry21_proc_U0_ap_ready,
         tCalc1ResultB => tCalc1ResultB,
         tCalc1ResultA => tCalc1ResultA,
-        p_read => p_read,
-        t => tCalc2_Block_entry12_proc_U0_t);
+        meanDiff => meanDiff,
+        t => tCalc2_Block_entry21_proc_U0_t,
+        t_ap_vld => tCalc2_Block_entry21_proc_U0_t_ap_vld);
 
 
 
 
-    ap_done <= tCalc2_Block_entry12_proc_U0_ap_done;
-    ap_idle <= tCalc2_Block_entry12_proc_U0_ap_idle;
-    ap_ready <= tCalc2_Block_entry12_proc_U0_ap_ready;
-    t <= tCalc2_Block_entry12_proc_U0_t;
-    tCalc2_Block_entry12_proc_U0_ap_continue <= ap_continue;
-    tCalc2_Block_entry12_proc_U0_ap_start <= ap_start;
-    t_ap_vld <= ap_const_logic_1;
+    ap_done <= tCalc2_Block_entry21_proc_U0_ap_done;
+    ap_idle <= tCalc2_Block_entry21_proc_U0_ap_idle;
+    ap_ready <= tCalc2_Block_entry21_proc_U0_ap_ready;
+    t <= tCalc2_Block_entry21_proc_U0_t;
+    tCalc2_Block_entry21_proc_U0_ap_continue <= ap_continue;
+    tCalc2_Block_entry21_proc_U0_ap_start <= ap_start;
+    t_ap_vld <= tCalc2_Block_entry21_proc_U0_t_ap_vld;
 end behav;

@@ -10,16 +10,15 @@ use IEEE.numeric_std.all;
 
 entity tTest_tCalc1 is
 port (
-    p_read : IN STD_LOGIC_VECTOR (62 downto 0);
-    numDataB_dout : IN STD_LOGIC_VECTOR (39 downto 0);
-    numDataB_empty_n : IN STD_LOGIC;
-    numDataB_read : OUT STD_LOGIC;
-    tCalc1ResultB : OUT STD_LOGIC_VECTOR (31 downto 0);
+    varSum : IN STD_LOGIC_VECTOR (62 downto 0);
+    numData : IN STD_LOGIC_VECTOR (39 downto 0);
+    out_r : OUT STD_LOGIC_VECTOR (63 downto 0);
     ap_clk : IN STD_LOGIC;
     ap_rst : IN STD_LOGIC;
-    p_read_ap_vld : IN STD_LOGIC;
+    numData_ap_vld : IN STD_LOGIC;
+    varSum_ap_vld : IN STD_LOGIC;
+    out_r_ap_vld : OUT STD_LOGIC;
     ap_start : IN STD_LOGIC;
-    tCalc1ResultB_ap_vld : OUT STD_LOGIC;
     ap_done : OUT STD_LOGIC;
     ap_ready : OUT STD_LOGIC;
     ap_idle : OUT STD_LOGIC;
@@ -28,70 +27,19 @@ end;
 
 
 architecture behav of tTest_tCalc1 is 
-    constant ap_const_logic_0 : STD_LOGIC := '0';
     constant ap_const_logic_1 : STD_LOGIC := '1';
-    constant ap_const_lv3_0 : STD_LOGIC_VECTOR (2 downto 0) := "000";
-    constant ap_const_boolean_1 : BOOLEAN := true;
+    constant ap_const_logic_0 : STD_LOGIC := '0';
 
 attribute shreg_extract : string;
-    signal entry_proc37_U0_ap_start : STD_LOGIC;
-    signal entry_proc37_U0_ap_done : STD_LOGIC;
-    signal entry_proc37_U0_ap_continue : STD_LOGIC;
-    signal entry_proc37_U0_ap_idle : STD_LOGIC;
-    signal entry_proc37_U0_ap_ready : STD_LOGIC;
-    signal entry_proc37_U0_varSumB_c_din : STD_LOGIC_VECTOR (62 downto 0);
-    signal entry_proc37_U0_varSumB_c_write : STD_LOGIC;
-    signal tCalc1_Block_entry4_proc_U0_ap_start : STD_LOGIC;
-    signal tCalc1_Block_entry4_proc_U0_ap_done : STD_LOGIC;
-    signal tCalc1_Block_entry4_proc_U0_ap_continue : STD_LOGIC;
-    signal tCalc1_Block_entry4_proc_U0_ap_idle : STD_LOGIC;
-    signal tCalc1_Block_entry4_proc_U0_ap_ready : STD_LOGIC;
-    signal tCalc1_Block_entry4_proc_U0_numDataB_read : STD_LOGIC;
-    signal tCalc1_Block_entry4_proc_U0_numDataB_c_din : STD_LOGIC_VECTOR (39 downto 0);
-    signal tCalc1_Block_entry4_proc_U0_numDataB_c_write : STD_LOGIC;
-    signal tCalc1_Block_entry4_proc_U0_ap_return : STD_LOGIC_VECTOR (39 downto 0);
-    signal add_ln50_loc_i_channel_full_n : STD_LOGIC;
-    signal divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_start : STD_LOGIC;
-    signal divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_done : STD_LOGIC;
-    signal divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_continue : STD_LOGIC;
-    signal divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_idle : STD_LOGIC;
-    signal divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_ready : STD_LOGIC;
-    signal divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_varSumB_read : STD_LOGIC;
-    signal divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_return : STD_LOGIC_VECTOR (22 downto 0);
-    signal var_r_s_full_n : STD_LOGIC;
-    signal tCalc1_Block_entry46_proc_U0_ap_start : STD_LOGIC;
-    signal tCalc1_Block_entry46_proc_U0_ap_done : STD_LOGIC;
-    signal tCalc1_Block_entry46_proc_U0_ap_continue : STD_LOGIC;
-    signal tCalc1_Block_entry46_proc_U0_ap_idle : STD_LOGIC;
-    signal tCalc1_Block_entry46_proc_U0_ap_ready : STD_LOGIC;
-    signal tCalc1_Block_entry46_proc_U0_numDataB_read : STD_LOGIC;
-    signal tCalc1_Block_entry46_proc_U0_tCalc1ResultB : STD_LOGIC_VECTOR (31 downto 0);
-    signal varSumB_c_full_n : STD_LOGIC;
-    signal varSumB_c_dout : STD_LOGIC_VECTOR (62 downto 0);
-    signal varSumB_c_num_data_valid : STD_LOGIC_VECTOR (2 downto 0);
-    signal varSumB_c_fifo_cap : STD_LOGIC_VECTOR (2 downto 0);
-    signal varSumB_c_empty_n : STD_LOGIC;
-    signal numDataB_c_full_n : STD_LOGIC;
-    signal numDataB_c_dout : STD_LOGIC_VECTOR (39 downto 0);
-    signal numDataB_c_num_data_valid : STD_LOGIC_VECTOR (2 downto 0);
-    signal numDataB_c_fifo_cap : STD_LOGIC_VECTOR (2 downto 0);
-    signal numDataB_c_empty_n : STD_LOGIC;
-    signal add_ln50_loc_i_channel_dout : STD_LOGIC_VECTOR (39 downto 0);
-    signal add_ln50_loc_i_channel_num_data_valid : STD_LOGIC_VECTOR (2 downto 0);
-    signal add_ln50_loc_i_channel_fifo_cap : STD_LOGIC_VECTOR (2 downto 0);
-    signal add_ln50_loc_i_channel_empty_n : STD_LOGIC;
-    signal var_r_s_dout : STD_LOGIC_VECTOR (22 downto 0);
-    signal var_r_s_num_data_valid : STD_LOGIC_VECTOR (2 downto 0);
-    signal var_r_s_fifo_cap : STD_LOGIC_VECTOR (2 downto 0);
-    signal var_r_s_empty_n : STD_LOGIC;
-    signal ap_sync_ready : STD_LOGIC;
-    signal ap_sync_reg_entry_proc37_U0_ap_ready : STD_LOGIC := '0';
-    signal ap_sync_entry_proc37_U0_ap_ready : STD_LOGIC;
-    signal ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready : STD_LOGIC := '0';
-    signal ap_sync_tCalc1_Block_entry4_proc_U0_ap_ready : STD_LOGIC;
-    signal ap_ce_reg : STD_LOGIC;
+    signal tCalc1_Block_entry5_proc_U0_ap_start : STD_LOGIC;
+    signal tCalc1_Block_entry5_proc_U0_ap_done : STD_LOGIC;
+    signal tCalc1_Block_entry5_proc_U0_ap_continue : STD_LOGIC;
+    signal tCalc1_Block_entry5_proc_U0_ap_idle : STD_LOGIC;
+    signal tCalc1_Block_entry5_proc_U0_ap_ready : STD_LOGIC;
+    signal tCalc1_Block_entry5_proc_U0_out_r : STD_LOGIC_VECTOR (63 downto 0);
+    signal tCalc1_Block_entry5_proc_U0_out_r_ap_vld : STD_LOGIC;
 
-    component tTest_entry_proc37 IS
+    component tTest_tCalc1_Block_entry5_proc IS
     port (
         ap_clk : IN STD_LOGIC;
         ap_rst : IN STD_LOGIC;
@@ -100,327 +48,37 @@ attribute shreg_extract : string;
         ap_continue : IN STD_LOGIC;
         ap_idle : OUT STD_LOGIC;
         ap_ready : OUT STD_LOGIC;
-        p_read : IN STD_LOGIC_VECTOR (62 downto 0);
-        varSumB_c_din : OUT STD_LOGIC_VECTOR (62 downto 0);
-        varSumB_c_num_data_valid : IN STD_LOGIC_VECTOR (2 downto 0);
-        varSumB_c_fifo_cap : IN STD_LOGIC_VECTOR (2 downto 0);
-        varSumB_c_full_n : IN STD_LOGIC;
-        varSumB_c_write : OUT STD_LOGIC );
-    end component;
-
-
-    component tTest_tCalc1_Block_entry4_proc IS
-    port (
-        ap_clk : IN STD_LOGIC;
-        ap_rst : IN STD_LOGIC;
-        ap_start : IN STD_LOGIC;
-        ap_done : OUT STD_LOGIC;
-        ap_continue : IN STD_LOGIC;
-        ap_idle : OUT STD_LOGIC;
-        ap_ready : OUT STD_LOGIC;
-        numDataB_dout : IN STD_LOGIC_VECTOR (39 downto 0);
-        numDataB_num_data_valid : IN STD_LOGIC_VECTOR (2 downto 0);
-        numDataB_fifo_cap : IN STD_LOGIC_VECTOR (2 downto 0);
-        numDataB_empty_n : IN STD_LOGIC;
-        numDataB_read : OUT STD_LOGIC;
-        numDataB_c_din : OUT STD_LOGIC_VECTOR (39 downto 0);
-        numDataB_c_num_data_valid : IN STD_LOGIC_VECTOR (2 downto 0);
-        numDataB_c_fifo_cap : IN STD_LOGIC_VECTOR (2 downto 0);
-        numDataB_c_full_n : IN STD_LOGIC;
-        numDataB_c_write : OUT STD_LOGIC;
-        ap_return : OUT STD_LOGIC_VECTOR (39 downto 0) );
-    end component;
-
-
-    component tTest_divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_s IS
-    port (
-        ap_clk : IN STD_LOGIC;
-        ap_rst : IN STD_LOGIC;
-        ap_start : IN STD_LOGIC;
-        ap_done : OUT STD_LOGIC;
-        ap_continue : IN STD_LOGIC;
-        ap_idle : OUT STD_LOGIC;
-        ap_ready : OUT STD_LOGIC;
-        varSumB_dout : IN STD_LOGIC_VECTOR (62 downto 0);
-        varSumB_num_data_valid : IN STD_LOGIC_VECTOR (2 downto 0);
-        varSumB_fifo_cap : IN STD_LOGIC_VECTOR (2 downto 0);
-        varSumB_empty_n : IN STD_LOGIC;
-        varSumB_read : OUT STD_LOGIC;
-        p_read : IN STD_LOGIC_VECTOR (39 downto 0);
-        ap_return : OUT STD_LOGIC_VECTOR (22 downto 0) );
-    end component;
-
-
-    component tTest_tCalc1_Block_entry46_proc IS
-    port (
-        ap_clk : IN STD_LOGIC;
-        ap_rst : IN STD_LOGIC;
-        ap_start : IN STD_LOGIC;
-        ap_done : OUT STD_LOGIC;
-        ap_continue : IN STD_LOGIC;
-        ap_idle : OUT STD_LOGIC;
-        ap_ready : OUT STD_LOGIC;
-        p_read : IN STD_LOGIC_VECTOR (22 downto 0);
-        numDataB_dout : IN STD_LOGIC_VECTOR (39 downto 0);
-        numDataB_num_data_valid : IN STD_LOGIC_VECTOR (2 downto 0);
-        numDataB_fifo_cap : IN STD_LOGIC_VECTOR (2 downto 0);
-        numDataB_empty_n : IN STD_LOGIC;
-        numDataB_read : OUT STD_LOGIC;
-        tCalc1ResultB : OUT STD_LOGIC_VECTOR (31 downto 0) );
-    end component;
-
-
-    component tTest_fifo_w63_d3_S_x IS
-    port (
-        clk : IN STD_LOGIC;
-        reset : IN STD_LOGIC;
-        if_read_ce : IN STD_LOGIC;
-        if_write_ce : IN STD_LOGIC;
-        if_din : IN STD_LOGIC_VECTOR (62 downto 0);
-        if_full_n : OUT STD_LOGIC;
-        if_write : IN STD_LOGIC;
-        if_dout : OUT STD_LOGIC_VECTOR (62 downto 0);
-        if_num_data_valid : OUT STD_LOGIC_VECTOR (2 downto 0);
-        if_fifo_cap : OUT STD_LOGIC_VECTOR (2 downto 0);
-        if_empty_n : OUT STD_LOGIC;
-        if_read : IN STD_LOGIC );
-    end component;
-
-
-    component tTest_fifo_w40_d3_S_x IS
-    port (
-        clk : IN STD_LOGIC;
-        reset : IN STD_LOGIC;
-        if_read_ce : IN STD_LOGIC;
-        if_write_ce : IN STD_LOGIC;
-        if_din : IN STD_LOGIC_VECTOR (39 downto 0);
-        if_full_n : OUT STD_LOGIC;
-        if_write : IN STD_LOGIC;
-        if_dout : OUT STD_LOGIC_VECTOR (39 downto 0);
-        if_num_data_valid : OUT STD_LOGIC_VECTOR (2 downto 0);
-        if_fifo_cap : OUT STD_LOGIC_VECTOR (2 downto 0);
-        if_empty_n : OUT STD_LOGIC;
-        if_read : IN STD_LOGIC );
-    end component;
-
-
-    component tTest_fifo_w40_d2_S_x IS
-    port (
-        clk : IN STD_LOGIC;
-        reset : IN STD_LOGIC;
-        if_read_ce : IN STD_LOGIC;
-        if_write_ce : IN STD_LOGIC;
-        if_din : IN STD_LOGIC_VECTOR (39 downto 0);
-        if_full_n : OUT STD_LOGIC;
-        if_write : IN STD_LOGIC;
-        if_dout : OUT STD_LOGIC_VECTOR (39 downto 0);
-        if_num_data_valid : OUT STD_LOGIC_VECTOR (2 downto 0);
-        if_fifo_cap : OUT STD_LOGIC_VECTOR (2 downto 0);
-        if_empty_n : OUT STD_LOGIC;
-        if_read : IN STD_LOGIC );
-    end component;
-
-
-    component tTest_fifo_w23_d2_S_x IS
-    port (
-        clk : IN STD_LOGIC;
-        reset : IN STD_LOGIC;
-        if_read_ce : IN STD_LOGIC;
-        if_write_ce : IN STD_LOGIC;
-        if_din : IN STD_LOGIC_VECTOR (22 downto 0);
-        if_full_n : OUT STD_LOGIC;
-        if_write : IN STD_LOGIC;
-        if_dout : OUT STD_LOGIC_VECTOR (22 downto 0);
-        if_num_data_valid : OUT STD_LOGIC_VECTOR (2 downto 0);
-        if_fifo_cap : OUT STD_LOGIC_VECTOR (2 downto 0);
-        if_empty_n : OUT STD_LOGIC;
-        if_read : IN STD_LOGIC );
+        numData : IN STD_LOGIC_VECTOR (39 downto 0);
+        varSum : IN STD_LOGIC_VECTOR (62 downto 0);
+        out_r : OUT STD_LOGIC_VECTOR (63 downto 0);
+        out_r_ap_vld : OUT STD_LOGIC );
     end component;
 
 
 
 begin
-    entry_proc37_U0 : component tTest_entry_proc37
+    tCalc1_Block_entry5_proc_U0 : component tTest_tCalc1_Block_entry5_proc
     port map (
         ap_clk => ap_clk,
         ap_rst => ap_rst,
-        ap_start => entry_proc37_U0_ap_start,
-        ap_done => entry_proc37_U0_ap_done,
-        ap_continue => entry_proc37_U0_ap_continue,
-        ap_idle => entry_proc37_U0_ap_idle,
-        ap_ready => entry_proc37_U0_ap_ready,
-        p_read => p_read,
-        varSumB_c_din => entry_proc37_U0_varSumB_c_din,
-        varSumB_c_num_data_valid => varSumB_c_num_data_valid,
-        varSumB_c_fifo_cap => varSumB_c_fifo_cap,
-        varSumB_c_full_n => varSumB_c_full_n,
-        varSumB_c_write => entry_proc37_U0_varSumB_c_write);
-
-    tCalc1_Block_entry4_proc_U0 : component tTest_tCalc1_Block_entry4_proc
-    port map (
-        ap_clk => ap_clk,
-        ap_rst => ap_rst,
-        ap_start => tCalc1_Block_entry4_proc_U0_ap_start,
-        ap_done => tCalc1_Block_entry4_proc_U0_ap_done,
-        ap_continue => tCalc1_Block_entry4_proc_U0_ap_continue,
-        ap_idle => tCalc1_Block_entry4_proc_U0_ap_idle,
-        ap_ready => tCalc1_Block_entry4_proc_U0_ap_ready,
-        numDataB_dout => numDataB_dout,
-        numDataB_num_data_valid => ap_const_lv3_0,
-        numDataB_fifo_cap => ap_const_lv3_0,
-        numDataB_empty_n => numDataB_empty_n,
-        numDataB_read => tCalc1_Block_entry4_proc_U0_numDataB_read,
-        numDataB_c_din => tCalc1_Block_entry4_proc_U0_numDataB_c_din,
-        numDataB_c_num_data_valid => numDataB_c_num_data_valid,
-        numDataB_c_fifo_cap => numDataB_c_fifo_cap,
-        numDataB_c_full_n => numDataB_c_full_n,
-        numDataB_c_write => tCalc1_Block_entry4_proc_U0_numDataB_c_write,
-        ap_return => tCalc1_Block_entry4_proc_U0_ap_return);
-
-    divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0 : component tTest_divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_s
-    port map (
-        ap_clk => ap_clk,
-        ap_rst => ap_rst,
-        ap_start => divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_start,
-        ap_done => divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_done,
-        ap_continue => divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_continue,
-        ap_idle => divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_idle,
-        ap_ready => divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_ready,
-        varSumB_dout => varSumB_c_dout,
-        varSumB_num_data_valid => varSumB_c_num_data_valid,
-        varSumB_fifo_cap => varSumB_c_fifo_cap,
-        varSumB_empty_n => varSumB_c_empty_n,
-        varSumB_read => divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_varSumB_read,
-        p_read => add_ln50_loc_i_channel_dout,
-        ap_return => divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_return);
-
-    tCalc1_Block_entry46_proc_U0 : component tTest_tCalc1_Block_entry46_proc
-    port map (
-        ap_clk => ap_clk,
-        ap_rst => ap_rst,
-        ap_start => tCalc1_Block_entry46_proc_U0_ap_start,
-        ap_done => tCalc1_Block_entry46_proc_U0_ap_done,
-        ap_continue => tCalc1_Block_entry46_proc_U0_ap_continue,
-        ap_idle => tCalc1_Block_entry46_proc_U0_ap_idle,
-        ap_ready => tCalc1_Block_entry46_proc_U0_ap_ready,
-        p_read => var_r_s_dout,
-        numDataB_dout => numDataB_c_dout,
-        numDataB_num_data_valid => numDataB_c_num_data_valid,
-        numDataB_fifo_cap => numDataB_c_fifo_cap,
-        numDataB_empty_n => numDataB_c_empty_n,
-        numDataB_read => tCalc1_Block_entry46_proc_U0_numDataB_read,
-        tCalc1ResultB => tCalc1_Block_entry46_proc_U0_tCalc1ResultB);
-
-    varSumB_c_U : component tTest_fifo_w63_d3_S_x
-    port map (
-        clk => ap_clk,
-        reset => ap_rst,
-        if_read_ce => ap_const_logic_1,
-        if_write_ce => ap_const_logic_1,
-        if_din => entry_proc37_U0_varSumB_c_din,
-        if_full_n => varSumB_c_full_n,
-        if_write => entry_proc37_U0_varSumB_c_write,
-        if_dout => varSumB_c_dout,
-        if_num_data_valid => varSumB_c_num_data_valid,
-        if_fifo_cap => varSumB_c_fifo_cap,
-        if_empty_n => varSumB_c_empty_n,
-        if_read => divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_varSumB_read);
-
-    numDataB_c_U : component tTest_fifo_w40_d3_S_x
-    port map (
-        clk => ap_clk,
-        reset => ap_rst,
-        if_read_ce => ap_const_logic_1,
-        if_write_ce => ap_const_logic_1,
-        if_din => tCalc1_Block_entry4_proc_U0_numDataB_c_din,
-        if_full_n => numDataB_c_full_n,
-        if_write => tCalc1_Block_entry4_proc_U0_numDataB_c_write,
-        if_dout => numDataB_c_dout,
-        if_num_data_valid => numDataB_c_num_data_valid,
-        if_fifo_cap => numDataB_c_fifo_cap,
-        if_empty_n => numDataB_c_empty_n,
-        if_read => tCalc1_Block_entry46_proc_U0_numDataB_read);
-
-    add_ln50_loc_i_channel_U : component tTest_fifo_w40_d2_S_x
-    port map (
-        clk => ap_clk,
-        reset => ap_rst,
-        if_read_ce => ap_const_logic_1,
-        if_write_ce => ap_const_logic_1,
-        if_din => tCalc1_Block_entry4_proc_U0_ap_return,
-        if_full_n => add_ln50_loc_i_channel_full_n,
-        if_write => tCalc1_Block_entry4_proc_U0_ap_done,
-        if_dout => add_ln50_loc_i_channel_dout,
-        if_num_data_valid => add_ln50_loc_i_channel_num_data_valid,
-        if_fifo_cap => add_ln50_loc_i_channel_fifo_cap,
-        if_empty_n => add_ln50_loc_i_channel_empty_n,
-        if_read => divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_ready);
-
-    var_r_s_U : component tTest_fifo_w23_d2_S_x
-    port map (
-        clk => ap_clk,
-        reset => ap_rst,
-        if_read_ce => ap_const_logic_1,
-        if_write_ce => ap_const_logic_1,
-        if_din => divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_return,
-        if_full_n => var_r_s_full_n,
-        if_write => divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_done,
-        if_dout => var_r_s_dout,
-        if_num_data_valid => var_r_s_num_data_valid,
-        if_fifo_cap => var_r_s_fifo_cap,
-        if_empty_n => var_r_s_empty_n,
-        if_read => tCalc1_Block_entry46_proc_U0_ap_ready);
+        ap_start => tCalc1_Block_entry5_proc_U0_ap_start,
+        ap_done => tCalc1_Block_entry5_proc_U0_ap_done,
+        ap_continue => tCalc1_Block_entry5_proc_U0_ap_continue,
+        ap_idle => tCalc1_Block_entry5_proc_U0_ap_idle,
+        ap_ready => tCalc1_Block_entry5_proc_U0_ap_ready,
+        numData => numData,
+        varSum => varSum,
+        out_r => tCalc1_Block_entry5_proc_U0_out_r,
+        out_r_ap_vld => tCalc1_Block_entry5_proc_U0_out_r_ap_vld);
 
 
 
 
-
-    ap_sync_reg_entry_proc37_U0_ap_ready_assign_proc : process(ap_clk)
-    begin
-        if (ap_clk'event and ap_clk =  '1') then
-            if (ap_rst = '1') then
-                ap_sync_reg_entry_proc37_U0_ap_ready <= ap_const_logic_0;
-            else
-                if (((ap_sync_ready and ap_start) = ap_const_logic_1)) then 
-                    ap_sync_reg_entry_proc37_U0_ap_ready <= ap_const_logic_0;
-                else 
-                    ap_sync_reg_entry_proc37_U0_ap_ready <= ap_sync_entry_proc37_U0_ap_ready;
-                end if; 
-            end if;
-        end if;
-    end process;
-
-
-    ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready_assign_proc : process(ap_clk)
-    begin
-        if (ap_clk'event and ap_clk =  '1') then
-            if (ap_rst = '1') then
-                ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready <= ap_const_logic_0;
-            else
-                if (((ap_sync_ready and ap_start) = ap_const_logic_1)) then 
-                    ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready <= ap_const_logic_0;
-                else 
-                    ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready <= ap_sync_tCalc1_Block_entry4_proc_U0_ap_ready;
-                end if; 
-            end if;
-        end if;
-    end process;
-
-    ap_done <= tCalc1_Block_entry46_proc_U0_ap_done;
-    ap_idle <= (tCalc1_Block_entry4_proc_U0_ap_idle and tCalc1_Block_entry46_proc_U0_ap_idle and (ap_const_logic_1 xor add_ln50_loc_i_channel_empty_n) and (var_r_s_empty_n xor ap_const_logic_1) and entry_proc37_U0_ap_idle and divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_idle);
-    ap_ready <= ap_sync_ready;
-    ap_sync_entry_proc37_U0_ap_ready <= (entry_proc37_U0_ap_ready or ap_sync_reg_entry_proc37_U0_ap_ready);
-    ap_sync_ready <= (ap_sync_tCalc1_Block_entry4_proc_U0_ap_ready and ap_sync_entry_proc37_U0_ap_ready);
-    ap_sync_tCalc1_Block_entry4_proc_U0_ap_ready <= (tCalc1_Block_entry4_proc_U0_ap_ready or ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready);
-    divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_continue <= var_r_s_full_n;
-    divVal_ap_ufixed_63_55_5_3_0_ap_ufixed_23_15_5_3_0_U0_ap_start <= add_ln50_loc_i_channel_empty_n;
-    entry_proc37_U0_ap_continue <= ap_const_logic_1;
-    entry_proc37_U0_ap_start <= ((ap_sync_reg_entry_proc37_U0_ap_ready xor ap_const_logic_1) and ap_start);
-    numDataB_read <= tCalc1_Block_entry4_proc_U0_numDataB_read;
-    tCalc1ResultB <= tCalc1_Block_entry46_proc_U0_tCalc1ResultB;
-    tCalc1ResultB_ap_vld <= ap_const_logic_1;
-    tCalc1_Block_entry46_proc_U0_ap_continue <= ap_continue;
-    tCalc1_Block_entry46_proc_U0_ap_start <= var_r_s_empty_n;
-    tCalc1_Block_entry4_proc_U0_ap_continue <= add_ln50_loc_i_channel_full_n;
-    tCalc1_Block_entry4_proc_U0_ap_start <= ((ap_sync_reg_tCalc1_Block_entry4_proc_U0_ap_ready xor ap_const_logic_1) and ap_start);
+    ap_done <= tCalc1_Block_entry5_proc_U0_ap_done;
+    ap_idle <= tCalc1_Block_entry5_proc_U0_ap_idle;
+    ap_ready <= tCalc1_Block_entry5_proc_U0_ap_ready;
+    out_r <= tCalc1_Block_entry5_proc_U0_out_r;
+    out_r_ap_vld <= tCalc1_Block_entry5_proc_U0_out_r_ap_vld;
+    tCalc1_Block_entry5_proc_U0_ap_continue <= ap_continue;
+    tCalc1_Block_entry5_proc_U0_ap_start <= ap_start;
 end behav;
