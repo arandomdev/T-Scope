@@ -7,11 +7,11 @@ import numpy as np
 import numpy.typing as npt
 
 from .scheduler import Scheduler
-from .types import DT, DT_HARDWARE, T, TraceType
+from .types import HardwareScalarType, ScalarType, T, TraceType
 
 
-class DataSource(ABC, Generic[DT]):
-    def next(self) -> tuple[TraceType, npt.NDArray[DT]]:
+class DataSource(ABC, Generic[ScalarType]):
+    def next(self) -> tuple[TraceType, npt.NDArray[ScalarType]]:
         ...
 
     def __enter__(self: T) -> T:
@@ -26,8 +26,8 @@ class DataSource(ABC, Generic[DT]):
         ...
 
 
-class RandomDataSource(Generic[DT_HARDWARE]):
-    def __init__(self, traceLength: int, dtype: Type[DT_HARDWARE]) -> None:
+class RandomDataSource(Generic[HardwareScalarType]):
+    def __init__(self, traceLength: int, dtype: Type[HardwareScalarType]) -> None:
         """Uniform random data source.
         Args:
             traceLength: The trace length.
@@ -47,7 +47,7 @@ class RandomDataSource(Generic[DT_HARDWARE]):
 
         self.traceType = TraceType.A
 
-    def next(self) -> tuple[TraceType, npt.NDArray[DT_HARDWARE]]:
+    def next(self) -> tuple[TraceType, npt.NDArray[HardwareScalarType]]:
         """Get the next random trace, same distribution for all trace types.
 
         Args:
@@ -66,7 +66,7 @@ class RandomDataSource(Generic[DT_HARDWARE]):
         )
         return self.traceType, trace
 
-    def __enter__(self: T) -> T:
+    def __enter__(self):
         return self
 
     def __exit__(
@@ -78,9 +78,9 @@ class RandomDataSource(Generic[DT_HARDWARE]):
         pass
 
 
-class ChipWhispererDataSource(Generic[DT_HARDWARE]):
+class ChipWhispererDataSource(Generic[HardwareScalarType]):
     def __init__(
-        self, traceLength: int, scheduler: Scheduler, dtype: type[DT_HARDWARE]
+        self, traceLength: int, scheduler: Scheduler, dtype: type[HardwareScalarType]
     ) -> None:
         """DataSource using a ChipWhisperer scope and target.
             Expects the target to already be programmed with a SimpleSerial compatible
@@ -96,7 +96,7 @@ class ChipWhispererDataSource(Generic[DT_HARDWARE]):
         self._scheduler = scheduler
         self._dtype = dtype
 
-    def next(self) -> tuple[TraceType, npt.NDArray[DT_HARDWARE]]:
+    def next(self) -> tuple[TraceType, npt.NDArray[HardwareScalarType]]:
         tType, ktp = self._scheduler.next()
         trace = cw.capture_trace(
             self._scope,
@@ -110,7 +110,7 @@ class ChipWhispererDataSource(Generic[DT_HARDWARE]):
             raise RuntimeError("Timeout when capture trace")
         return tType, trace.wave.astype(self._dtype)  # type: ignore
 
-    def __enter__(self: T) -> T:
+    def __enter__(self):
         # Create scope
         self._scope = cw.scope()  # type: ignore
         self._scope.default_setup(verbose=False)  # type: ignore

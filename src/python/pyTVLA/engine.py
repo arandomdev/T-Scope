@@ -1,10 +1,9 @@
 from abc import ABC
-from types import TracebackType
 
 import numpy as np
-import numpy.typing as npt
 
-from .types import T
+from .memory import SoftwareMemoryManager
+from .types import MemoryType
 
 
 class Engine(ABC):
@@ -15,29 +14,12 @@ class Engine(ABC):
             A continuous index range of the t-values updated."""
         ...
 
-    def __enter__(self: T) -> T:
-        ...
-
-    def __exit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
-    ) -> None:
-        ...
-
 
 class SoftwareEngine(Engine):
-    def __init__(
-        self,
-        histA: npt.NDArray[np.uint32],
-        histB: npt.NDArray[np.uint32],
-        tVals: npt.NDArray[np.float64],
-    ) -> None:
-        self._histA = histA
-        self._histB = histB
-        self._tVals = tVals
-
+    def __init__(self, memManager: SoftwareMemoryManager) -> None:
+        self._histA = memManager.getArray(MemoryType.histA, np.uint32)
+        self._histB = memManager.getArray(MemoryType.histB, np.uint32)
+        self._tvals = memManager.getArray(MemoryType.tvals, np.float64)
         self._histBinWeights = np.arange(start=0, stop=256, step=1)  # type: ignore
 
     def calculate(self) -> tuple[int, int]:
@@ -61,16 +43,5 @@ class SoftwareEngine(Engine):
 
             # Calculate t-test
             t = np.abs((meanA - meanB) / np.sqrt((varA / cardA) + (varB / cardB)))  # type: ignore
-            self._tVals[:] = t
+            self._tvals[:] = t  # type: ignore
             return 0, len(t)
-
-    def __enter__(self: T) -> T:
-        return self
-
-    def __exit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
-    ) -> None:
-        pass

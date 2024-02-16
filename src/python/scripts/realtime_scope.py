@@ -1,28 +1,21 @@
 #!/usr/bin/env python3
 
-import enum
 import multiprocessing as mp
 import socket
 import struct
+import threading
 import time
 from dataclasses import dataclass
-from types import TracebackType
 from typing import Any, Literal
 
 import click
 import numpy as np
 from pyTVLA.datasource import ChipWhispererDataSource, RandomDataSource
 from pyTVLA.engine import SoftwareEngine
-from pyTVLA.pynq_engine import PynqEngine
+from pyTVLA.memory import HistogramStorage, MemoryManager, SoftwareMemoryManager
+from pyTVLA.pynq import PynqEngine, PynqMemoryManager
 from pyTVLA.scheduler import FixedRandomScheduler
-from pyTVLA.storage import HistogramStorage
-
-try:
-    import pynq
-
-    _pynq_available = True
-except ImportError:
-    _pynq_available = False
+from pyTVLA.types import MemoryType
 
 KEY = b"1234567812345678"
 TEXTS = (
@@ -33,71 +26,10 @@ TEXTS = (
 )
 
 
-class MemoryType(enum.Enum):
-    histA = 0
-    histB = 1
-    tvals = 2
-
-
 @dataclass
-class SharedMemory(object):
-    __array_interface__: Any
-    memoryObj: Any
-
-    def asArray(self) -> Any:
-        return np.array(self, copy=False)  # type: ignore
-
-
-class MemoryManager(object):
-    """Storage class of all shared memory."""
-
-    def __init__(self, traceLen: int) -> None:
-        self._traceLen = traceLen
-        self._mems: dict[MemoryType, SharedMemory] = {}
-
-    def _createMem(
-        self, memType: MemoryType, byteSize: int, shape: tuple[int, ...], dtype: Any
-    ) -> None:
-        if memType in self._mems:
-            raise RuntimeError(f"Memory type already created: {memType}")
-
-        if _pynq_available:
-            buf = pynq.allocate(shape=shape, dtype=dtype)  # type:ignore
-            interface = buf.__array_interface__  # type:ignore
-            self._mems[memType] = SharedMemory(interface, buf)
-        else:
-            buf = mp.RawArray("b", byteSize)
-            arr = np.frombuffer(buf, dtype=dtype)  # type:ignore
-            arr.shape = shape
-            interface = arr.__array_interface__  # type:ignore
-            self._mems[memType] = SharedMemory(interface, buf)
-        pass
-
-    def __enter__(self):
-        self._createMem(
-            MemoryType.histA, self._traceLen * 256 * 4, (self._traceLen, 256), np.uint32
-        )
-        self._createMem(
-            MemoryType.histB, self._traceLen * 256 * 4, (self._traceLen, 256), np.uint32
-        )
-        self._createMem(
-            MemoryType.tvals, self._traceLen * 8, (self._traceLen,), np.float64
-        )
-
-        return self
-
-    def __exit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
-    ) -> None:
-        if _pynq_available:
-            for b in self._mems.values():
-                b.memoryObj.freebuffer()
-
-    def getConfig(self, memType: MemoryType) -> SharedMemory:
-        return self._mems[memType]
+class SharedState(object):
+    stop: threading.Event
+    memoryManager: MemoryManager
 
 
 @dataclass
@@ -127,11 +59,11 @@ class ProgramArguments(object):
         )
 
 
-def ingestProcess(args: ProgramArguments, mem: MemoryManager) -> None:
+def ingestProcess(args: ProgramArguments, state: SharedState) -> None:
     """Gets new traces and stores them in histograms."""
 
-    histMemA = mem.getConfig(MemoryType.histA).asArray()
-    histMemB = mem.getConfig(MemoryType.histB).asArray()
+    histMemA = state.memoryManager.getArray(MemoryType.histA, np.uint32)
+    histMemB = state.memoryManager.getArray(MemoryType.histB, np.uint32)
     store = HistogramStorage(args.traceLength, histMemA, histMemB, np.uint16)
 
     if args.datasource == "random":
@@ -146,6 +78,11 @@ def ingestProcess(args: ProgramArguments, mem: MemoryManager) -> None:
         decimationPhase = 0
 
         while True:
+            # Check stop flag
+            if state.stop.is_set():
+                return
+
+            # Get next trace
             tType, trace = ds.next()
             store.ingest(trace, tType)
 
@@ -156,34 +93,30 @@ def ingestProcess(args: ProgramArguments, mem: MemoryManager) -> None:
             time.sleep(args.datasourceDelay)
 
 
-def computeProcess(args: ProgramArguments, mem: MemoryManager) -> None:
+def computeProcess(args: ProgramArguments, state: SharedState) -> None:
     """Calculates the t values."""
-
-    histMemA = mem.getConfig(MemoryType.histA)
-    histMemB = mem.getConfig(MemoryType.histB)
-    tvals = mem.getConfig(MemoryType.tvals)
-
-    tvalsBuf = mem.getConfig(MemoryType.tvals).asArray()
 
     # create engine
     if args.engine == "software":
-        engine = SoftwareEngine(histMemA.asArray(), histMemB.asArray(), tvals.asArray())
+        assert type(state.memoryManager) is SoftwareMemoryManager
+        engine = SoftwareEngine(state.memoryManager)
+        dtype = np.float64
     elif args.engine == "pynq":
-        if _pynq_available:
-            engine = PynqEngine(
-                args.traceLength,
-                histMemA.memoryObj,
-                histMemB.memoryObj,
-                tvals.memoryObj,
-            )
-        else:
-            raise RuntimeError("Unable to use PynqEngine without pynq module.")
+        assert type(state.memoryManager) is PynqMemoryManager
+        engine = PynqEngine(state.memoryManager)
+        dtype = np.float64
     else:
         raise NotImplementedError
 
-    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as clientSocket, engine:
+    tvals = state.memoryManager.getArray(MemoryType.tvals, dtype)
+
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as clientSocket:
         addr = (args.viewerAddress, args.port)
         while True:
+            # Check stop flag
+            if state.stop.is_set():
+                return
+
             # Calculate entire trace
             nSamples = 0
             while nSamples < args.samplesPerUpdate:
@@ -192,7 +125,7 @@ def computeProcess(args: ProgramArguments, mem: MemoryManager) -> None:
 
             # Send in chunks
             for i in range(0, args.traceLength, args.samplesPerUpdate):
-                chunk = tvalsBuf[i : i + args.samplesPerUpdate]
+                chunk = tvals[i : i + args.samplesPerUpdate]
                 data = struct.pack("<II", i, len(chunk))
                 data += struct.pack(
                     f"<{len(chunk)}d",
@@ -247,10 +180,22 @@ def computeProcess(args: ProgramArguments, mem: MemoryManager) -> None:
 )
 def main(**kwargs: dict[str, Any]) -> None:
     args = ProgramArguments.fromDict(kwargs)
-    with MemoryManager(args.traceLength) as mem:
+
+    if args.engine == "software":
+        memManType = SoftwareMemoryManager
+    elif args.engine == "pynq":
+        memManType = PynqMemoryManager
+    else:
+        raise NotImplementedError
+
+    with mp.Manager() as manager, memManType(args.traceLength) as memManager:
+        state = SharedState(manager.Event(), memManager)
+
         # Create and start processes
         procDefs = (ingestProcess, computeProcess)
-        processes = [mp.Process(target=p, args=(args, mem)) for p in procDefs]
+        processes = [
+            mp.Process(target=p, args=(args, state), name=p.__name__) for p in procDefs
+        ]
 
         for p in processes:
             p.start()
@@ -259,13 +204,22 @@ def main(**kwargs: dict[str, Any]) -> None:
             while True:
                 if any(not p.is_alive() for p in processes):
                     break
+
                 time.sleep(1)
         except KeyboardInterrupt:
-            print("Terminating processes.")
+            pass
+
+        # Stop processes
+        print("Stopping processes.")
+        state.stop.set()
+        for p in processes:
+            p.join(2)
 
         # Terminate processes
         for p in processes:
-            p.terminate()
+            if p.is_alive():
+                p.terminate()
+                print(f"Needed to terminating {p.name}")
         for p in processes:
             p.join()
 

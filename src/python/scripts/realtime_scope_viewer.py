@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 
 import multiprocessing as mp
+import multiprocessing.managers
+import multiprocessing.synchronize
+import select
 import socket
 import struct
+import threading
+import time
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -29,6 +34,12 @@ class ProgramArguments(object):
             statisticalValue=options["statistical_value"],
             yBound=options["y_bound"],
         )
+
+
+@dataclass
+class SharedState(object):
+    stop: threading.Event
+    mem: Any
 
 
 class Scope(object):
@@ -69,13 +80,20 @@ class Scope(object):
         return (self.stem,)
 
 
-def serverProcess(args: ProgramArguments, mem: Any) -> None:
-    tvals = np.frombuffer(mem, dtype=np.float64)  # type: ignore
+def serverProcess(args: ProgramArguments, state: SharedState) -> None:
+    tvals = np.frombuffer(state.mem, dtype=np.float64)  # type: ignore
 
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as serverSock:
         serverSock.bind(("0.0.0.0", args.port))
 
         while True:
+            if state.stop.is_set():
+                return
+
+            ready = select.select([serverSock], [], [], 0.5)
+            if not ready[0]:
+                continue
+
             message = serverSock.recv(2048)
 
             # Format is: start index, number of samples, values...
@@ -91,8 +109,8 @@ def serverProcess(args: ProgramArguments, mem: Any) -> None:
                 tvals[0 : nSamples - firstChunkSize] = values[firstChunkSize:]
 
 
-def plotProcess(args: ProgramArguments, mem: Any) -> None:
-    tvals = cast(npt.NDArray[np.float64], np.frombuffer(mem, dtype=np.float64))  # type: ignore
+def plotProcess(args: ProgramArguments, state: SharedState) -> None:
+    tvals = cast(npt.NDArray[np.float64], np.frombuffer(state.mem, dtype=np.float64))  # type: ignore
 
     fig, axs = plt.subplots()  # type: ignore
     scope = Scope(axs, tvals, args.statisticalValue, args.yBound)
@@ -121,28 +139,40 @@ def plotProcess(args: ProgramArguments, mem: Any) -> None:
 def main(**kwargs: dict[str, Any]) -> None:
     args = ProgramArguments.fromDict(kwargs)
 
-    # Create shared mem
-    mem = mp.RawArray("b", args.traceLength * 8)
+    with multiprocessing.Manager() as manager:
+        state = SharedState(manager.Event(), mp.RawArray("b", args.traceLength * 8))
 
-    # Create and start processes
-    procDefs = (serverProcess, plotProcess)
-    processes = [mp.Process(target=p, args=(args, mem)) for p in procDefs]
+        # Create and start processes
+        procDefs = (serverProcess, plotProcess)
+        processes = [
+            mp.Process(target=p, args=(args, state), name=p.__name__) for p in procDefs
+        ]
 
-    for p in processes:
-        p.start()
+        for p in processes:
+            p.start()
 
-    try:
-        while True:
-            if any(not p.is_alive() for p in processes):
-                break
-    except KeyboardInterrupt:
-        print("Terminating processes.")
+        try:
+            while True:
+                if any(not p.is_alive() for p in processes):
+                    break
 
-    # Terminate processes
-    for p in processes:
-        p.terminate()
-    for p in processes:
-        p.join()
+                time.sleep(1)
+        except KeyboardInterrupt:
+            pass
+
+        # Stop processes
+        print("Stopping processes.")
+        state.stop.set()
+        for p in processes:
+            p.join(2)
+
+        # Terminate processes
+        for p in processes:
+            if p.is_alive():
+                p.terminate()
+                print(f"Needed to terminating {p.name}")
+        for p in processes:
+            p.join()
 
 
 if __name__ == "__main__":

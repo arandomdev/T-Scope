@@ -1,13 +1,21 @@
 from enum import Enum
-from typing import TypeVar
+from typing import Any, TypeVar
 
 import numpy as np
 
 T = TypeVar("T")
-DT = TypeVar("DT", bound=np.generic)  # Any generic numpy type
-DT_HARDWARE = TypeVar("DT_HARDWARE", np.uint8, np.uint16)  # Hardware supported types
+ScalarType = TypeVar("ScalarType", bound=np.generic)
+HardwareScalarType = TypeVar("HardwareScalarType", np.uint8, np.uint16)
+ArrayInterface = dict[str, Any]
 
 
 class TraceType(Enum):
     A = 0  # Trace of type A
     B = 1  # Trace of type B
+
+
+class MemoryType(Enum):
+    histA = 0
+    histB = 1
+    tvals = 2
+    temp = 3
