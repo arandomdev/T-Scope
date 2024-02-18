@@ -6,7 +6,7 @@
 
 `timescale 1 ns / 1 ps 
 
-(* CORE_GENERATION_INFO="tTest_tTest,hls_ip_2023_2,{HLS_INPUT_TYPE=cxx,HLS_INPUT_FLOAT=0,HLS_INPUT_FIXED=0,HLS_INPUT_PART=xc7z020-clg400-1,HLS_INPUT_CLOCK=10.000000,HLS_INPUT_ARCH=dataflow,HLS_SYN_CLOCK=7.300000,HLS_SYN_LAT=-1,HLS_SYN_TPT=-1,HLS_SYN_MEM=6,HLS_SYN_DSP=0,HLS_SYN_FF=10986,HLS_SYN_LUT=10824,HLS_VERSION=2023_2}" *)
+(* CORE_GENERATION_INFO="tTest_tTest,hls_ip_2023_2,{HLS_INPUT_TYPE=cxx,HLS_INPUT_FLOAT=0,HLS_INPUT_FIXED=0,HLS_INPUT_PART=xc7z020-clg400-1,HLS_INPUT_CLOCK=10.000000,HLS_INPUT_ARCH=dataflow,HLS_SYN_CLOCK=7.300000,HLS_SYN_LAT=-1,HLS_SYN_TPT=-1,HLS_SYN_MEM=6,HLS_SYN_DSP=0,HLS_SYN_FF=10693,HLS_SYN_LUT=11307,HLS_VERSION=2023_2}" *)
 
 module tTest (
         ap_clk,
@@ -226,10 +226,10 @@ wire    sumStream_U0_fam_we0;
 wire   [31:0] sumStream_U0_fam_d0;
 wire   [46:0] sumStream_U0_ap_return_0;
 wire   [39:0] sumStream_U0_ap_return_1;
-wire    ap_channel_done_numDataA_c70_channel;
-wire    numDataA_c70_channel_full_n;
-reg    ap_sync_reg_channel_write_numDataA_c70_channel;
-wire    ap_sync_channel_write_numDataA_c70_channel;
+wire    ap_channel_done_numDataA_channel;
+wire    numDataA_channel_full_n;
+reg    ap_sync_reg_channel_write_numDataA_channel;
+wire    ap_sync_channel_write_numDataA_channel;
 wire    ap_channel_done_sumA_channel;
 wire    sumA_channel_full_n;
 reg    ap_sync_reg_channel_write_sumA_channel;
@@ -238,252 +238,117 @@ wire    ap_channel_done_famA;
 wire    sumStream_U0_fam_full_n;
 reg    ap_sync_reg_channel_write_famA;
 wire    ap_sync_channel_write_famA;
-wire    sumStream_4_U0_ap_start;
-wire    sumStream_4_U0_ap_done;
-wire    sumStream_4_U0_ap_continue;
-wire    sumStream_4_U0_ap_idle;
-wire    sumStream_4_U0_ap_ready;
-wire    sumStream_4_U0_B_TREADY;
-wire   [7:0] sumStream_4_U0_fam_address0;
-wire    sumStream_4_U0_fam_ce0;
-wire    sumStream_4_U0_fam_we0;
-wire   [31:0] sumStream_4_U0_fam_d0;
-wire   [46:0] sumStream_4_U0_ap_return_0;
-wire   [39:0] sumStream_4_U0_ap_return_1;
-wire    ap_channel_done_numDataB_c71_channel;
-wire    numDataB_c71_channel_full_n;
-reg    ap_sync_reg_channel_write_numDataB_c71_channel;
-wire    ap_sync_channel_write_numDataB_c71_channel;
+wire    sumStream_1_U0_ap_start;
+wire    sumStream_1_U0_ap_done;
+wire    sumStream_1_U0_ap_continue;
+wire    sumStream_1_U0_ap_idle;
+wire    sumStream_1_U0_ap_ready;
+wire    sumStream_1_U0_B_TREADY;
+wire   [7:0] sumStream_1_U0_fam_address0;
+wire    sumStream_1_U0_fam_ce0;
+wire    sumStream_1_U0_fam_we0;
+wire   [31:0] sumStream_1_U0_fam_d0;
+wire   [46:0] sumStream_1_U0_ap_return_0;
+wire   [39:0] sumStream_1_U0_ap_return_1;
+wire    ap_channel_done_numDataB_channel;
+wire    numDataB_channel_full_n;
+reg    ap_sync_reg_channel_write_numDataB_channel;
+wire    ap_sync_channel_write_numDataB_channel;
 wire    ap_channel_done_sumB_channel;
 wire    sumB_channel_full_n;
 reg    ap_sync_reg_channel_write_sumB_channel;
 wire    ap_sync_channel_write_sumB_channel;
 wire    ap_channel_done_famB;
-wire    sumStream_4_U0_fam_full_n;
+wire    sumStream_1_U0_fam_full_n;
 reg    ap_sync_reg_channel_write_famB;
 wire    ap_sync_channel_write_famB;
-wire    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_start;
-wire    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_done;
-wire    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_continue;
-wire    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_idle;
-wire    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_ready;
-wire   [39:0] divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_numDataA_c_din;
-wire    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_numDataA_c_write;
-wire   [15:0] divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_return_0;
-wire   [15:0] divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_return_1;
-wire    ap_channel_done_meanA_c72_channel;
-wire    meanA_c72_channel_full_n;
-reg    ap_sync_reg_channel_write_meanA_c72_channel;
-wire    ap_sync_channel_write_meanA_c72_channel;
-wire    ap_channel_done_meanA_c_channel;
-wire    meanA_c_channel_full_n;
-reg    ap_sync_reg_channel_write_meanA_c_channel;
-wire    ap_sync_channel_write_meanA_c_channel;
-wire    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_start;
-wire    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_done;
-wire    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_continue;
-wire    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_idle;
-wire    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_ready;
-wire   [39:0] divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_numDataB_c_din;
-wire    divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_numDataB_c_write;
-wire   [15:0] divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_return_0;
-wire   [15:0] divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_return_1;
-wire    ap_channel_done_meanB_c73_channel;
-wire    meanB_c73_channel_full_n;
-reg    ap_sync_reg_channel_write_meanB_c73_channel;
-wire    ap_sync_channel_write_meanB_c73_channel;
-wire    ap_channel_done_meanB_c_channel;
-wire    meanB_c_channel_full_n;
-reg    ap_sync_reg_channel_write_meanB_c_channel;
-wire    ap_sync_channel_write_meanB_c_channel;
-wire    diff_U0_ap_start;
-wire    diff_U0_ap_done;
-wire    diff_U0_ap_continue;
-wire    diff_U0_ap_idle;
-wire    diff_U0_ap_ready;
-wire   [15:0] diff_U0_ap_return;
-wire    meanDiff_full_n;
-wire    varSum_U0_ap_start;
-wire    varSum_U0_ap_done;
-wire    varSum_U0_ap_continue;
-wire    varSum_U0_ap_idle;
-wire    varSum_U0_ap_ready;
-wire   [7:0] varSum_U0_famA_address0;
-wire    varSum_U0_famA_ce0;
-wire   [62:0] varSum_U0_ap_return;
-wire    varSumA_channel_full_n;
-wire    varSum_5_U0_ap_start;
-wire    varSum_5_U0_ap_done;
-wire    varSum_5_U0_ap_continue;
-wire    varSum_5_U0_ap_idle;
-wire    varSum_5_U0_ap_ready;
-wire   [7:0] varSum_5_U0_famB_address0;
-wire    varSum_5_U0_famB_ce0;
-wire   [62:0] varSum_5_U0_ap_return;
-wire    varSumB_channel_full_n;
-wire    tCalc1_2_U0_numDataA_read;
-wire   [31:0] tCalc1_2_U0_tCalc1ResultA;
-wire    tCalc1_2_U0_ap_start;
-wire    tCalc1_2_U0_tCalc1ResultA_ap_vld;
-wire    tCalc1_2_U0_ap_done;
-wire    tCalc1_2_U0_ap_ready;
-wire    tCalc1_2_U0_ap_idle;
-wire    tCalc1_2_U0_ap_continue;
-wire    tCalc1ResultA_full_n;
-wire    tCalc1_U0_numDataB_read;
-wire   [31:0] tCalc1_U0_tCalc1ResultB;
-wire    tCalc1_U0_ap_start;
-wire    tCalc1_U0_tCalc1ResultB_ap_vld;
-wire    tCalc1_U0_ap_done;
-wire    tCalc1_U0_ap_ready;
-wire    tCalc1_U0_ap_idle;
-wire    tCalc1_U0_ap_continue;
-wire    tCalc1ResultB_full_n;
-wire   [31:0] tCalc2_U0_t;
-wire    tCalc2_U0_t_ap_vld;
-wire    tCalc2_U0_ap_start;
-wire    tCalc2_U0_ap_done;
-wire    tCalc2_U0_ap_ready;
-wire    tCalc2_U0_ap_idle;
-wire    tCalc2_U0_ap_continue;
-wire    t_full_n;
-wire    Block_entry2458_proc_U0_ap_start;
-wire    Block_entry2458_proc_U0_ap_done;
-wire    Block_entry2458_proc_U0_ap_continue;
-wire    Block_entry2458_proc_U0_ap_idle;
-wire    Block_entry2458_proc_U0_ap_ready;
-wire    Block_entry2458_proc_U0_C_read;
-wire    Block_entry2458_proc_U0_m_axi_gmem_AWVALID;
-wire   [31:0] Block_entry2458_proc_U0_m_axi_gmem_AWADDR;
-wire   [0:0] Block_entry2458_proc_U0_m_axi_gmem_AWID;
-wire   [31:0] Block_entry2458_proc_U0_m_axi_gmem_AWLEN;
-wire   [2:0] Block_entry2458_proc_U0_m_axi_gmem_AWSIZE;
-wire   [1:0] Block_entry2458_proc_U0_m_axi_gmem_AWBURST;
-wire   [1:0] Block_entry2458_proc_U0_m_axi_gmem_AWLOCK;
-wire   [3:0] Block_entry2458_proc_U0_m_axi_gmem_AWCACHE;
-wire   [2:0] Block_entry2458_proc_U0_m_axi_gmem_AWPROT;
-wire   [3:0] Block_entry2458_proc_U0_m_axi_gmem_AWQOS;
-wire   [3:0] Block_entry2458_proc_U0_m_axi_gmem_AWREGION;
-wire   [0:0] Block_entry2458_proc_U0_m_axi_gmem_AWUSER;
-wire    Block_entry2458_proc_U0_m_axi_gmem_WVALID;
-wire   [31:0] Block_entry2458_proc_U0_m_axi_gmem_WDATA;
-wire   [3:0] Block_entry2458_proc_U0_m_axi_gmem_WSTRB;
-wire    Block_entry2458_proc_U0_m_axi_gmem_WLAST;
-wire   [0:0] Block_entry2458_proc_U0_m_axi_gmem_WID;
-wire   [0:0] Block_entry2458_proc_U0_m_axi_gmem_WUSER;
-wire    Block_entry2458_proc_U0_m_axi_gmem_ARVALID;
-wire   [31:0] Block_entry2458_proc_U0_m_axi_gmem_ARADDR;
-wire   [0:0] Block_entry2458_proc_U0_m_axi_gmem_ARID;
-wire   [31:0] Block_entry2458_proc_U0_m_axi_gmem_ARLEN;
-wire   [2:0] Block_entry2458_proc_U0_m_axi_gmem_ARSIZE;
-wire   [1:0] Block_entry2458_proc_U0_m_axi_gmem_ARBURST;
-wire   [1:0] Block_entry2458_proc_U0_m_axi_gmem_ARLOCK;
-wire   [3:0] Block_entry2458_proc_U0_m_axi_gmem_ARCACHE;
-wire   [2:0] Block_entry2458_proc_U0_m_axi_gmem_ARPROT;
-wire   [3:0] Block_entry2458_proc_U0_m_axi_gmem_ARQOS;
-wire   [3:0] Block_entry2458_proc_U0_m_axi_gmem_ARREGION;
-wire   [0:0] Block_entry2458_proc_U0_m_axi_gmem_ARUSER;
-wire    Block_entry2458_proc_U0_m_axi_gmem_RREADY;
-wire    Block_entry2458_proc_U0_m_axi_gmem_BREADY;
+wire    Block_entry2347_proc6_U0_ap_start;
+wire    Block_entry2347_proc6_U0_ap_done;
+wire    Block_entry2347_proc6_U0_ap_continue;
+wire    Block_entry2347_proc6_U0_ap_idle;
+wire    Block_entry2347_proc6_U0_ap_ready;
+wire    Block_entry2347_proc6_U0_C_read;
+wire    Block_entry2347_proc6_U0_m_axi_gmem_AWVALID;
+wire   [31:0] Block_entry2347_proc6_U0_m_axi_gmem_AWADDR;
+wire   [0:0] Block_entry2347_proc6_U0_m_axi_gmem_AWID;
+wire   [31:0] Block_entry2347_proc6_U0_m_axi_gmem_AWLEN;
+wire   [2:0] Block_entry2347_proc6_U0_m_axi_gmem_AWSIZE;
+wire   [1:0] Block_entry2347_proc6_U0_m_axi_gmem_AWBURST;
+wire   [1:0] Block_entry2347_proc6_U0_m_axi_gmem_AWLOCK;
+wire   [3:0] Block_entry2347_proc6_U0_m_axi_gmem_AWCACHE;
+wire   [2:0] Block_entry2347_proc6_U0_m_axi_gmem_AWPROT;
+wire   [3:0] Block_entry2347_proc6_U0_m_axi_gmem_AWQOS;
+wire   [3:0] Block_entry2347_proc6_U0_m_axi_gmem_AWREGION;
+wire   [0:0] Block_entry2347_proc6_U0_m_axi_gmem_AWUSER;
+wire    Block_entry2347_proc6_U0_m_axi_gmem_WVALID;
+wire   [31:0] Block_entry2347_proc6_U0_m_axi_gmem_WDATA;
+wire   [3:0] Block_entry2347_proc6_U0_m_axi_gmem_WSTRB;
+wire    Block_entry2347_proc6_U0_m_axi_gmem_WLAST;
+wire   [0:0] Block_entry2347_proc6_U0_m_axi_gmem_WID;
+wire   [0:0] Block_entry2347_proc6_U0_m_axi_gmem_WUSER;
+wire    Block_entry2347_proc6_U0_m_axi_gmem_ARVALID;
+wire   [31:0] Block_entry2347_proc6_U0_m_axi_gmem_ARADDR;
+wire   [0:0] Block_entry2347_proc6_U0_m_axi_gmem_ARID;
+wire   [31:0] Block_entry2347_proc6_U0_m_axi_gmem_ARLEN;
+wire   [2:0] Block_entry2347_proc6_U0_m_axi_gmem_ARSIZE;
+wire   [1:0] Block_entry2347_proc6_U0_m_axi_gmem_ARBURST;
+wire   [1:0] Block_entry2347_proc6_U0_m_axi_gmem_ARLOCK;
+wire   [3:0] Block_entry2347_proc6_U0_m_axi_gmem_ARCACHE;
+wire   [2:0] Block_entry2347_proc6_U0_m_axi_gmem_ARPROT;
+wire   [3:0] Block_entry2347_proc6_U0_m_axi_gmem_ARQOS;
+wire   [3:0] Block_entry2347_proc6_U0_m_axi_gmem_ARREGION;
+wire   [0:0] Block_entry2347_proc6_U0_m_axi_gmem_ARUSER;
+wire    Block_entry2347_proc6_U0_m_axi_gmem_RREADY;
+wire    Block_entry2347_proc6_U0_m_axi_gmem_BREADY;
+wire   [7:0] Block_entry2347_proc6_U0_famA_address0;
+wire    Block_entry2347_proc6_U0_famA_ce0;
+wire   [7:0] Block_entry2347_proc6_U0_famB_address0;
+wire    Block_entry2347_proc6_U0_famB_ce0;
 wire    famA_i_full_n;
 wire    famA_t_empty_n;
 wire    famB_i_full_n;
 wire    famB_t_empty_n;
 wire    C_c_full_n;
 wire   [31:0] C_c_dout;
-wire   [3:0] C_c_num_data_valid;
-wire   [3:0] C_c_fifo_cap;
+wire   [2:0] C_c_num_data_valid;
+wire   [2:0] C_c_fifo_cap;
 wire    C_c_empty_n;
 wire   [46:0] sumA_channel_dout;
 wire   [2:0] sumA_channel_num_data_valid;
 wire   [2:0] sumA_channel_fifo_cap;
 wire    sumA_channel_empty_n;
-wire   [39:0] numDataA_c70_channel_dout;
-wire   [2:0] numDataA_c70_channel_num_data_valid;
-wire   [2:0] numDataA_c70_channel_fifo_cap;
-wire    numDataA_c70_channel_empty_n;
+wire   [39:0] numDataA_channel_dout;
+wire   [2:0] numDataA_channel_num_data_valid;
+wire   [2:0] numDataA_channel_fifo_cap;
+wire    numDataA_channel_empty_n;
 wire   [46:0] sumB_channel_dout;
 wire   [2:0] sumB_channel_num_data_valid;
 wire   [2:0] sumB_channel_fifo_cap;
 wire    sumB_channel_empty_n;
-wire   [39:0] numDataB_c71_channel_dout;
-wire   [2:0] numDataB_c71_channel_num_data_valid;
-wire   [2:0] numDataB_c71_channel_fifo_cap;
-wire    numDataB_c71_channel_empty_n;
-wire    numDataA_c_full_n;
-wire   [39:0] numDataA_c_dout;
-wire   [2:0] numDataA_c_num_data_valid;
-wire   [2:0] numDataA_c_fifo_cap;
-wire    numDataA_c_empty_n;
-wire   [15:0] meanA_c_channel_dout;
-wire   [2:0] meanA_c_channel_num_data_valid;
-wire   [2:0] meanA_c_channel_fifo_cap;
-wire    meanA_c_channel_empty_n;
-wire   [15:0] meanA_c72_channel_dout;
-wire   [2:0] meanA_c72_channel_num_data_valid;
-wire   [2:0] meanA_c72_channel_fifo_cap;
-wire    meanA_c72_channel_empty_n;
-wire    numDataB_c_full_n;
-wire   [39:0] numDataB_c_dout;
-wire   [2:0] numDataB_c_num_data_valid;
-wire   [2:0] numDataB_c_fifo_cap;
-wire    numDataB_c_empty_n;
-wire   [15:0] meanB_c_channel_dout;
-wire   [2:0] meanB_c_channel_num_data_valid;
-wire   [2:0] meanB_c_channel_fifo_cap;
-wire    meanB_c_channel_empty_n;
-wire   [15:0] meanB_c73_channel_dout;
-wire   [2:0] meanB_c73_channel_num_data_valid;
-wire   [2:0] meanB_c73_channel_fifo_cap;
-wire    meanB_c73_channel_empty_n;
-wire   [15:0] meanDiff_dout;
-wire   [2:0] meanDiff_num_data_valid;
-wire   [2:0] meanDiff_fifo_cap;
-wire    meanDiff_empty_n;
-wire   [62:0] varSumA_channel_dout;
-wire   [2:0] varSumA_channel_num_data_valid;
-wire   [2:0] varSumA_channel_fifo_cap;
-wire    varSumA_channel_empty_n;
-wire   [62:0] varSumB_channel_dout;
-wire   [2:0] varSumB_channel_num_data_valid;
-wire   [2:0] varSumB_channel_fifo_cap;
-wire    varSumB_channel_empty_n;
-wire   [31:0] tCalc1ResultA_dout;
-wire   [2:0] tCalc1ResultA_num_data_valid;
-wire   [2:0] tCalc1ResultA_fifo_cap;
-wire    tCalc1ResultA_empty_n;
-wire   [31:0] tCalc1ResultB_dout;
-wire   [2:0] tCalc1ResultB_num_data_valid;
-wire   [2:0] tCalc1ResultB_fifo_cap;
-wire    tCalc1ResultB_empty_n;
-wire   [31:0] t_dout;
-wire   [2:0] t_num_data_valid;
-wire   [2:0] t_fifo_cap;
-wire    t_empty_n;
+wire   [39:0] numDataB_channel_dout;
+wire   [2:0] numDataB_channel_num_data_valid;
+wire   [2:0] numDataB_channel_fifo_cap;
+wire    numDataB_channel_empty_n;
 wire    ap_sync_ready;
 reg    ap_sync_reg_entry_proc_U0_ap_ready;
 wire    ap_sync_entry_proc_U0_ap_ready;
 reg    ap_sync_reg_sumStream_U0_ap_ready;
 wire    ap_sync_sumStream_U0_ap_ready;
-reg    ap_sync_reg_sumStream_4_U0_ap_ready;
-wire    ap_sync_sumStream_4_U0_ap_ready;
+reg    ap_sync_reg_sumStream_1_U0_ap_ready;
+wire    ap_sync_sumStream_1_U0_ap_ready;
 wire    ap_ce_reg;
 
 // power-on initialization
 initial begin
-#0 ap_sync_reg_channel_write_numDataA_c70_channel = 1'b0;
+#0 ap_sync_reg_channel_write_numDataA_channel = 1'b0;
 #0 ap_sync_reg_channel_write_sumA_channel = 1'b0;
 #0 ap_sync_reg_channel_write_famA = 1'b0;
-#0 ap_sync_reg_channel_write_numDataB_c71_channel = 1'b0;
+#0 ap_sync_reg_channel_write_numDataB_channel = 1'b0;
 #0 ap_sync_reg_channel_write_sumB_channel = 1'b0;
 #0 ap_sync_reg_channel_write_famB = 1'b0;
-#0 ap_sync_reg_channel_write_meanA_c72_channel = 1'b0;
-#0 ap_sync_reg_channel_write_meanA_c_channel = 1'b0;
-#0 ap_sync_reg_channel_write_meanB_c73_channel = 1'b0;
-#0 ap_sync_reg_channel_write_meanB_c_channel = 1'b0;
 #0 ap_sync_reg_entry_proc_U0_ap_ready = 1'b0;
 #0 ap_sync_reg_sumStream_U0_ap_ready = 1'b0;
-#0 ap_sync_reg_sumStream_4_U0_ap_ready = 1'b0;
+#0 ap_sync_reg_sumStream_1_U0_ap_ready = 1'b0;
 end
 
 tTest_famA_RAM_1WNR_BRAM_1R1W #(
@@ -498,8 +363,8 @@ famA_U(
     .i_we0(sumStream_U0_fam_we0),
     .i_d0(sumStream_U0_fam_d0),
     .i_q0(famA_i_q0),
-    .t_address0(varSum_U0_famA_address0),
-    .t_ce0(varSum_U0_famA_ce0),
+    .t_address0(Block_entry2347_proc6_U0_famA_address0),
+    .t_ce0(Block_entry2347_proc6_U0_famA_ce0),
     .t_we0(1'b0),
     .t_d0(32'd0),
     .t_q0(famA_t_q0),
@@ -508,7 +373,7 @@ famA_U(
     .i_full_n(famA_i_full_n),
     .i_write(ap_channel_done_famA),
     .t_empty_n(famA_t_empty_n),
-    .t_read(varSum_U0_ap_ready)
+    .t_read(Block_entry2347_proc6_U0_ap_ready)
 );
 
 tTest_famA_RAM_1WNR_BRAM_1R1W #(
@@ -518,13 +383,13 @@ tTest_famA_RAM_1WNR_BRAM_1R1W #(
 famB_U(
     .clk(ap_clk),
     .reset(ap_rst_n_inv),
-    .i_address0(sumStream_4_U0_fam_address0),
-    .i_ce0(sumStream_4_U0_fam_ce0),
-    .i_we0(sumStream_4_U0_fam_we0),
-    .i_d0(sumStream_4_U0_fam_d0),
+    .i_address0(sumStream_1_U0_fam_address0),
+    .i_ce0(sumStream_1_U0_fam_ce0),
+    .i_we0(sumStream_1_U0_fam_we0),
+    .i_d0(sumStream_1_U0_fam_d0),
     .i_q0(famB_i_q0),
-    .t_address0(varSum_5_U0_famB_address0),
-    .t_ce0(varSum_5_U0_famB_ce0),
+    .t_address0(Block_entry2347_proc6_U0_famB_address0),
+    .t_ce0(Block_entry2347_proc6_U0_famB_ce0),
     .t_we0(1'b0),
     .t_d0(32'd0),
     .t_q0(famB_t_q0),
@@ -533,7 +398,7 @@ famB_U(
     .i_full_n(famB_i_full_n),
     .i_write(ap_channel_done_famB),
     .t_empty_n(famB_t_empty_n),
-    .t_read(varSum_5_U0_ap_ready)
+    .t_read(Block_entry2347_proc6_U0_ap_ready)
 );
 
 tTest_control_s_axi #(
@@ -646,16 +511,16 @@ gmem_m_axi_U(
     .I_RREADY(1'b0),
     .I_RDATA(gmem_RDATA),
     .I_RFIFONUM(gmem_RFIFONUM),
-    .I_AWVALID(Block_entry2458_proc_U0_m_axi_gmem_AWVALID),
+    .I_AWVALID(Block_entry2347_proc6_U0_m_axi_gmem_AWVALID),
     .I_AWREADY(gmem_AWREADY),
-    .I_AWADDR(Block_entry2458_proc_U0_m_axi_gmem_AWADDR),
-    .I_AWLEN(Block_entry2458_proc_U0_m_axi_gmem_AWLEN),
-    .I_WVALID(Block_entry2458_proc_U0_m_axi_gmem_WVALID),
+    .I_AWADDR(Block_entry2347_proc6_U0_m_axi_gmem_AWADDR),
+    .I_AWLEN(Block_entry2347_proc6_U0_m_axi_gmem_AWLEN),
+    .I_WVALID(Block_entry2347_proc6_U0_m_axi_gmem_WVALID),
     .I_WREADY(gmem_WREADY),
-    .I_WDATA(Block_entry2458_proc_U0_m_axi_gmem_WDATA),
-    .I_WSTRB(Block_entry2458_proc_U0_m_axi_gmem_WSTRB),
+    .I_WDATA(Block_entry2347_proc6_U0_m_axi_gmem_WDATA),
+    .I_WSTRB(Block_entry2347_proc6_U0_m_axi_gmem_WSTRB),
     .I_BVALID(gmem_BVALID),
-    .I_BREADY(Block_entry2458_proc_U0_m_axi_gmem_BREADY)
+    .I_BREADY(Block_entry2347_proc6_U0_m_axi_gmem_BREADY)
 );
 
 tTest_entry_proc entry_proc_U0(
@@ -696,210 +561,78 @@ tTest_sumStream sumStream_U0(
     .ap_return_1(sumStream_U0_ap_return_1)
 );
 
-tTest_sumStream_4 sumStream_4_U0(
+tTest_sumStream_1 sumStream_1_U0(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst_n_inv),
-    .ap_start(sumStream_4_U0_ap_start),
-    .ap_done(sumStream_4_U0_ap_done),
-    .ap_continue(sumStream_4_U0_ap_continue),
-    .ap_idle(sumStream_4_U0_ap_idle),
-    .ap_ready(sumStream_4_U0_ap_ready),
+    .ap_start(sumStream_1_U0_ap_start),
+    .ap_done(sumStream_1_U0_ap_done),
+    .ap_continue(sumStream_1_U0_ap_continue),
+    .ap_idle(sumStream_1_U0_ap_idle),
+    .ap_ready(sumStream_1_U0_ap_ready),
     .B_TVALID(B_TVALID),
     .B_TDATA(B_TDATA),
-    .B_TREADY(sumStream_4_U0_B_TREADY),
+    .B_TREADY(sumStream_1_U0_B_TREADY),
     .B_TKEEP(B_TKEEP),
     .B_TSTRB(B_TSTRB),
     .B_TLAST(B_TLAST),
-    .fam_address0(sumStream_4_U0_fam_address0),
-    .fam_ce0(sumStream_4_U0_fam_ce0),
-    .fam_we0(sumStream_4_U0_fam_we0),
-    .fam_d0(sumStream_4_U0_fam_d0),
-    .ap_return_0(sumStream_4_U0_ap_return_0),
-    .ap_return_1(sumStream_4_U0_ap_return_1)
+    .fam_address0(sumStream_1_U0_fam_address0),
+    .fam_ce0(sumStream_1_U0_fam_ce0),
+    .fam_we0(sumStream_1_U0_fam_we0),
+    .fam_d0(sumStream_1_U0_fam_d0),
+    .ap_return_0(sumStream_1_U0_ap_return_0),
+    .ap_return_1(sumStream_1_U0_ap_return_1)
 );
 
-tTest_divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1 divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0(
+tTest_Block_entry2347_proc6 Block_entry2347_proc6_U0(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst_n_inv),
-    .ap_start(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_start),
-    .ap_done(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_done),
-    .ap_continue(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_continue),
-    .ap_idle(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_idle),
-    .ap_ready(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_ready),
-    .p_read(sumA_channel_dout),
-    .p_read1(numDataA_c70_channel_dout),
-    .numDataA_c_din(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_numDataA_c_din),
-    .numDataA_c_num_data_valid(numDataA_c_num_data_valid),
-    .numDataA_c_fifo_cap(numDataA_c_fifo_cap),
-    .numDataA_c_full_n(numDataA_c_full_n),
-    .numDataA_c_write(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_numDataA_c_write),
-    .ap_return_0(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_return_0),
-    .ap_return_1(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_return_1)
-);
-
-tTest_divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_s divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0(
-    .ap_clk(ap_clk),
-    .ap_rst(ap_rst_n_inv),
-    .ap_start(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_start),
-    .ap_done(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_done),
-    .ap_continue(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_continue),
-    .ap_idle(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_idle),
-    .ap_ready(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_ready),
-    .p_read(sumB_channel_dout),
-    .p_read1(numDataB_c71_channel_dout),
-    .numDataB_c_din(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_numDataB_c_din),
-    .numDataB_c_num_data_valid(numDataB_c_num_data_valid),
-    .numDataB_c_fifo_cap(numDataB_c_fifo_cap),
-    .numDataB_c_full_n(numDataB_c_full_n),
-    .numDataB_c_write(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_numDataB_c_write),
-    .ap_return_0(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_return_0),
-    .ap_return_1(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_return_1)
-);
-
-tTest_diff diff_U0(
-    .ap_clk(ap_clk),
-    .ap_rst(ap_rst_n_inv),
-    .ap_start(diff_U0_ap_start),
-    .ap_done(diff_U0_ap_done),
-    .ap_continue(diff_U0_ap_continue),
-    .ap_idle(diff_U0_ap_idle),
-    .ap_ready(diff_U0_ap_ready),
-    .p_read(meanA_c72_channel_dout),
-    .p_read1(meanB_c73_channel_dout),
-    .ap_return(diff_U0_ap_return)
-);
-
-tTest_varSum varSum_U0(
-    .ap_clk(ap_clk),
-    .ap_rst(ap_rst_n_inv),
-    .ap_start(varSum_U0_ap_start),
-    .ap_done(varSum_U0_ap_done),
-    .ap_continue(varSum_U0_ap_continue),
-    .ap_idle(varSum_U0_ap_idle),
-    .ap_ready(varSum_U0_ap_ready),
-    .famA_address0(varSum_U0_famA_address0),
-    .famA_ce0(varSum_U0_famA_ce0),
-    .famA_q0(famA_t_q0),
-    .p_read(meanA_c_channel_dout),
-    .ap_return(varSum_U0_ap_return)
-);
-
-tTest_varSum_5 varSum_5_U0(
-    .ap_clk(ap_clk),
-    .ap_rst(ap_rst_n_inv),
-    .ap_start(varSum_5_U0_ap_start),
-    .ap_done(varSum_5_U0_ap_done),
-    .ap_continue(varSum_5_U0_ap_continue),
-    .ap_idle(varSum_5_U0_ap_idle),
-    .ap_ready(varSum_5_U0_ap_ready),
-    .famB_address0(varSum_5_U0_famB_address0),
-    .famB_ce0(varSum_5_U0_famB_ce0),
-    .famB_q0(famB_t_q0),
-    .p_read(meanB_c_channel_dout),
-    .ap_return(varSum_5_U0_ap_return)
-);
-
-tTest_tCalc1_2 tCalc1_2_U0(
-    .p_read(varSumA_channel_dout),
-    .numDataA_dout(numDataA_c_dout),
-    .numDataA_empty_n(numDataA_c_empty_n),
-    .numDataA_read(tCalc1_2_U0_numDataA_read),
-    .tCalc1ResultA(tCalc1_2_U0_tCalc1ResultA),
-    .ap_clk(ap_clk),
-    .ap_rst(ap_rst_n_inv),
-    .p_read_ap_vld(1'b0),
-    .ap_start(tCalc1_2_U0_ap_start),
-    .tCalc1ResultA_ap_vld(tCalc1_2_U0_tCalc1ResultA_ap_vld),
-    .ap_done(tCalc1_2_U0_ap_done),
-    .ap_ready(tCalc1_2_U0_ap_ready),
-    .ap_idle(tCalc1_2_U0_ap_idle),
-    .ap_continue(tCalc1_2_U0_ap_continue)
-);
-
-tTest_tCalc1 tCalc1_U0(
-    .p_read(varSumB_channel_dout),
-    .numDataB_dout(numDataB_c_dout),
-    .numDataB_empty_n(numDataB_c_empty_n),
-    .numDataB_read(tCalc1_U0_numDataB_read),
-    .tCalc1ResultB(tCalc1_U0_tCalc1ResultB),
-    .ap_clk(ap_clk),
-    .ap_rst(ap_rst_n_inv),
-    .p_read_ap_vld(1'b0),
-    .ap_start(tCalc1_U0_ap_start),
-    .tCalc1ResultB_ap_vld(tCalc1_U0_tCalc1ResultB_ap_vld),
-    .ap_done(tCalc1_U0_ap_done),
-    .ap_ready(tCalc1_U0_ap_ready),
-    .ap_idle(tCalc1_U0_ap_idle),
-    .ap_continue(tCalc1_U0_ap_continue)
-);
-
-tTest_tCalc2 tCalc2_U0(
-    .tCalc1ResultA(tCalc1ResultA_dout),
-    .tCalc1ResultB(tCalc1ResultB_dout),
-    .p_read(meanDiff_dout),
-    .t(tCalc2_U0_t),
-    .ap_clk(ap_clk),
-    .ap_rst(ap_rst_n_inv),
-    .tCalc1ResultB_ap_vld(1'b0),
-    .tCalc1ResultA_ap_vld(1'b0),
-    .p_read_ap_vld(1'b0),
-    .t_ap_vld(tCalc2_U0_t_ap_vld),
-    .ap_start(tCalc2_U0_ap_start),
-    .ap_done(tCalc2_U0_ap_done),
-    .ap_ready(tCalc2_U0_ap_ready),
-    .ap_idle(tCalc2_U0_ap_idle),
-    .ap_continue(tCalc2_U0_ap_continue)
-);
-
-tTest_Block_entry2458_proc Block_entry2458_proc_U0(
-    .ap_clk(ap_clk),
-    .ap_rst(ap_rst_n_inv),
-    .ap_start(Block_entry2458_proc_U0_ap_start),
-    .ap_done(Block_entry2458_proc_U0_ap_done),
-    .ap_continue(Block_entry2458_proc_U0_ap_continue),
-    .ap_idle(Block_entry2458_proc_U0_ap_idle),
-    .ap_ready(Block_entry2458_proc_U0_ap_ready),
-    .t(t_dout),
+    .ap_start(Block_entry2347_proc6_U0_ap_start),
+    .ap_done(Block_entry2347_proc6_U0_ap_done),
+    .ap_continue(Block_entry2347_proc6_U0_ap_continue),
+    .ap_idle(Block_entry2347_proc6_U0_ap_idle),
+    .ap_ready(Block_entry2347_proc6_U0_ap_ready),
+    .p_read(numDataA_channel_dout),
+    .p_read1(numDataB_channel_dout),
     .C_dout(C_c_dout),
     .C_num_data_valid(C_c_num_data_valid),
     .C_fifo_cap(C_c_fifo_cap),
     .C_empty_n(C_c_empty_n),
-    .C_read(Block_entry2458_proc_U0_C_read),
-    .m_axi_gmem_AWVALID(Block_entry2458_proc_U0_m_axi_gmem_AWVALID),
+    .C_read(Block_entry2347_proc6_U0_C_read),
+    .m_axi_gmem_AWVALID(Block_entry2347_proc6_U0_m_axi_gmem_AWVALID),
     .m_axi_gmem_AWREADY(gmem_AWREADY),
-    .m_axi_gmem_AWADDR(Block_entry2458_proc_U0_m_axi_gmem_AWADDR),
-    .m_axi_gmem_AWID(Block_entry2458_proc_U0_m_axi_gmem_AWID),
-    .m_axi_gmem_AWLEN(Block_entry2458_proc_U0_m_axi_gmem_AWLEN),
-    .m_axi_gmem_AWSIZE(Block_entry2458_proc_U0_m_axi_gmem_AWSIZE),
-    .m_axi_gmem_AWBURST(Block_entry2458_proc_U0_m_axi_gmem_AWBURST),
-    .m_axi_gmem_AWLOCK(Block_entry2458_proc_U0_m_axi_gmem_AWLOCK),
-    .m_axi_gmem_AWCACHE(Block_entry2458_proc_U0_m_axi_gmem_AWCACHE),
-    .m_axi_gmem_AWPROT(Block_entry2458_proc_U0_m_axi_gmem_AWPROT),
-    .m_axi_gmem_AWQOS(Block_entry2458_proc_U0_m_axi_gmem_AWQOS),
-    .m_axi_gmem_AWREGION(Block_entry2458_proc_U0_m_axi_gmem_AWREGION),
-    .m_axi_gmem_AWUSER(Block_entry2458_proc_U0_m_axi_gmem_AWUSER),
-    .m_axi_gmem_WVALID(Block_entry2458_proc_U0_m_axi_gmem_WVALID),
+    .m_axi_gmem_AWADDR(Block_entry2347_proc6_U0_m_axi_gmem_AWADDR),
+    .m_axi_gmem_AWID(Block_entry2347_proc6_U0_m_axi_gmem_AWID),
+    .m_axi_gmem_AWLEN(Block_entry2347_proc6_U0_m_axi_gmem_AWLEN),
+    .m_axi_gmem_AWSIZE(Block_entry2347_proc6_U0_m_axi_gmem_AWSIZE),
+    .m_axi_gmem_AWBURST(Block_entry2347_proc6_U0_m_axi_gmem_AWBURST),
+    .m_axi_gmem_AWLOCK(Block_entry2347_proc6_U0_m_axi_gmem_AWLOCK),
+    .m_axi_gmem_AWCACHE(Block_entry2347_proc6_U0_m_axi_gmem_AWCACHE),
+    .m_axi_gmem_AWPROT(Block_entry2347_proc6_U0_m_axi_gmem_AWPROT),
+    .m_axi_gmem_AWQOS(Block_entry2347_proc6_U0_m_axi_gmem_AWQOS),
+    .m_axi_gmem_AWREGION(Block_entry2347_proc6_U0_m_axi_gmem_AWREGION),
+    .m_axi_gmem_AWUSER(Block_entry2347_proc6_U0_m_axi_gmem_AWUSER),
+    .m_axi_gmem_WVALID(Block_entry2347_proc6_U0_m_axi_gmem_WVALID),
     .m_axi_gmem_WREADY(gmem_WREADY),
-    .m_axi_gmem_WDATA(Block_entry2458_proc_U0_m_axi_gmem_WDATA),
-    .m_axi_gmem_WSTRB(Block_entry2458_proc_U0_m_axi_gmem_WSTRB),
-    .m_axi_gmem_WLAST(Block_entry2458_proc_U0_m_axi_gmem_WLAST),
-    .m_axi_gmem_WID(Block_entry2458_proc_U0_m_axi_gmem_WID),
-    .m_axi_gmem_WUSER(Block_entry2458_proc_U0_m_axi_gmem_WUSER),
-    .m_axi_gmem_ARVALID(Block_entry2458_proc_U0_m_axi_gmem_ARVALID),
+    .m_axi_gmem_WDATA(Block_entry2347_proc6_U0_m_axi_gmem_WDATA),
+    .m_axi_gmem_WSTRB(Block_entry2347_proc6_U0_m_axi_gmem_WSTRB),
+    .m_axi_gmem_WLAST(Block_entry2347_proc6_U0_m_axi_gmem_WLAST),
+    .m_axi_gmem_WID(Block_entry2347_proc6_U0_m_axi_gmem_WID),
+    .m_axi_gmem_WUSER(Block_entry2347_proc6_U0_m_axi_gmem_WUSER),
+    .m_axi_gmem_ARVALID(Block_entry2347_proc6_U0_m_axi_gmem_ARVALID),
     .m_axi_gmem_ARREADY(1'b0),
-    .m_axi_gmem_ARADDR(Block_entry2458_proc_U0_m_axi_gmem_ARADDR),
-    .m_axi_gmem_ARID(Block_entry2458_proc_U0_m_axi_gmem_ARID),
-    .m_axi_gmem_ARLEN(Block_entry2458_proc_U0_m_axi_gmem_ARLEN),
-    .m_axi_gmem_ARSIZE(Block_entry2458_proc_U0_m_axi_gmem_ARSIZE),
-    .m_axi_gmem_ARBURST(Block_entry2458_proc_U0_m_axi_gmem_ARBURST),
-    .m_axi_gmem_ARLOCK(Block_entry2458_proc_U0_m_axi_gmem_ARLOCK),
-    .m_axi_gmem_ARCACHE(Block_entry2458_proc_U0_m_axi_gmem_ARCACHE),
-    .m_axi_gmem_ARPROT(Block_entry2458_proc_U0_m_axi_gmem_ARPROT),
-    .m_axi_gmem_ARQOS(Block_entry2458_proc_U0_m_axi_gmem_ARQOS),
-    .m_axi_gmem_ARREGION(Block_entry2458_proc_U0_m_axi_gmem_ARREGION),
-    .m_axi_gmem_ARUSER(Block_entry2458_proc_U0_m_axi_gmem_ARUSER),
+    .m_axi_gmem_ARADDR(Block_entry2347_proc6_U0_m_axi_gmem_ARADDR),
+    .m_axi_gmem_ARID(Block_entry2347_proc6_U0_m_axi_gmem_ARID),
+    .m_axi_gmem_ARLEN(Block_entry2347_proc6_U0_m_axi_gmem_ARLEN),
+    .m_axi_gmem_ARSIZE(Block_entry2347_proc6_U0_m_axi_gmem_ARSIZE),
+    .m_axi_gmem_ARBURST(Block_entry2347_proc6_U0_m_axi_gmem_ARBURST),
+    .m_axi_gmem_ARLOCK(Block_entry2347_proc6_U0_m_axi_gmem_ARLOCK),
+    .m_axi_gmem_ARCACHE(Block_entry2347_proc6_U0_m_axi_gmem_ARCACHE),
+    .m_axi_gmem_ARPROT(Block_entry2347_proc6_U0_m_axi_gmem_ARPROT),
+    .m_axi_gmem_ARQOS(Block_entry2347_proc6_U0_m_axi_gmem_ARQOS),
+    .m_axi_gmem_ARREGION(Block_entry2347_proc6_U0_m_axi_gmem_ARREGION),
+    .m_axi_gmem_ARUSER(Block_entry2347_proc6_U0_m_axi_gmem_ARUSER),
     .m_axi_gmem_RVALID(1'b0),
-    .m_axi_gmem_RREADY(Block_entry2458_proc_U0_m_axi_gmem_RREADY),
+    .m_axi_gmem_RREADY(Block_entry2347_proc6_U0_m_axi_gmem_RREADY),
     .m_axi_gmem_RDATA(32'd0),
     .m_axi_gmem_RLAST(1'b0),
     .m_axi_gmem_RID(1'd0),
@@ -907,13 +640,21 @@ tTest_Block_entry2458_proc Block_entry2458_proc_U0(
     .m_axi_gmem_RUSER(1'd0),
     .m_axi_gmem_RRESP(2'd0),
     .m_axi_gmem_BVALID(gmem_BVALID),
-    .m_axi_gmem_BREADY(Block_entry2458_proc_U0_m_axi_gmem_BREADY),
+    .m_axi_gmem_BREADY(Block_entry2347_proc6_U0_m_axi_gmem_BREADY),
     .m_axi_gmem_BRESP(gmem_BRESP),
     .m_axi_gmem_BID(gmem_BID),
-    .m_axi_gmem_BUSER(gmem_BUSER)
+    .m_axi_gmem_BUSER(gmem_BUSER),
+    .p_read2(sumA_channel_dout),
+    .p_read3(sumB_channel_dout),
+    .famA_address0(Block_entry2347_proc6_U0_famA_address0),
+    .famA_ce0(Block_entry2347_proc6_U0_famA_ce0),
+    .famA_q0(famA_t_q0),
+    .famB_address0(Block_entry2347_proc6_U0_famB_address0),
+    .famB_ce0(Block_entry2347_proc6_U0_famB_ce0),
+    .famB_q0(famB_t_q0)
 );
 
-tTest_fifo_w32_d7_S C_c_U(
+tTest_fifo_w32_d3_S C_c_U(
     .clk(ap_clk),
     .reset(ap_rst_n_inv),
     .if_read_ce(1'b1),
@@ -925,7 +666,7 @@ tTest_fifo_w32_d7_S C_c_U(
     .if_num_data_valid(C_c_num_data_valid),
     .if_fifo_cap(C_c_fifo_cap),
     .if_empty_n(C_c_empty_n),
-    .if_read(Block_entry2458_proc_U0_C_read)
+    .if_read(Block_entry2347_proc6_U0_C_read)
 );
 
 tTest_fifo_w47_d2_S sumA_channel_U(
@@ -940,22 +681,22 @@ tTest_fifo_w47_d2_S sumA_channel_U(
     .if_num_data_valid(sumA_channel_num_data_valid),
     .if_fifo_cap(sumA_channel_fifo_cap),
     .if_empty_n(sumA_channel_empty_n),
-    .if_read(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_ready)
+    .if_read(Block_entry2347_proc6_U0_ap_ready)
 );
 
-tTest_fifo_w40_d2_S_x0 numDataA_c70_channel_U(
+tTest_fifo_w40_d2_S numDataA_channel_U(
     .clk(ap_clk),
     .reset(ap_rst_n_inv),
     .if_read_ce(1'b1),
     .if_write_ce(1'b1),
     .if_din(sumStream_U0_ap_return_1),
-    .if_full_n(numDataA_c70_channel_full_n),
-    .if_write(ap_channel_done_numDataA_c70_channel),
-    .if_dout(numDataA_c70_channel_dout),
-    .if_num_data_valid(numDataA_c70_channel_num_data_valid),
-    .if_fifo_cap(numDataA_c70_channel_fifo_cap),
-    .if_empty_n(numDataA_c70_channel_empty_n),
-    .if_read(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_ready)
+    .if_full_n(numDataA_channel_full_n),
+    .if_write(ap_channel_done_numDataA_channel),
+    .if_dout(numDataA_channel_dout),
+    .if_num_data_valid(numDataA_channel_num_data_valid),
+    .if_fifo_cap(numDataA_channel_fifo_cap),
+    .if_empty_n(numDataA_channel_empty_n),
+    .if_read(Block_entry2347_proc6_U0_ap_ready)
 );
 
 tTest_fifo_w47_d2_S sumB_channel_U(
@@ -963,209 +704,29 @@ tTest_fifo_w47_d2_S sumB_channel_U(
     .reset(ap_rst_n_inv),
     .if_read_ce(1'b1),
     .if_write_ce(1'b1),
-    .if_din(sumStream_4_U0_ap_return_0),
+    .if_din(sumStream_1_U0_ap_return_0),
     .if_full_n(sumB_channel_full_n),
     .if_write(ap_channel_done_sumB_channel),
     .if_dout(sumB_channel_dout),
     .if_num_data_valid(sumB_channel_num_data_valid),
     .if_fifo_cap(sumB_channel_fifo_cap),
     .if_empty_n(sumB_channel_empty_n),
-    .if_read(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_ready)
+    .if_read(Block_entry2347_proc6_U0_ap_ready)
 );
 
-tTest_fifo_w40_d2_S_x0 numDataB_c71_channel_U(
+tTest_fifo_w40_d2_S numDataB_channel_U(
     .clk(ap_clk),
     .reset(ap_rst_n_inv),
     .if_read_ce(1'b1),
     .if_write_ce(1'b1),
-    .if_din(sumStream_4_U0_ap_return_1),
-    .if_full_n(numDataB_c71_channel_full_n),
-    .if_write(ap_channel_done_numDataB_c71_channel),
-    .if_dout(numDataB_c71_channel_dout),
-    .if_num_data_valid(numDataB_c71_channel_num_data_valid),
-    .if_fifo_cap(numDataB_c71_channel_fifo_cap),
-    .if_empty_n(numDataB_c71_channel_empty_n),
-    .if_read(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_ready)
-);
-
-tTest_fifo_w40_d3_S numDataA_c_U(
-    .clk(ap_clk),
-    .reset(ap_rst_n_inv),
-    .if_read_ce(1'b1),
-    .if_write_ce(1'b1),
-    .if_din(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_numDataA_c_din),
-    .if_full_n(numDataA_c_full_n),
-    .if_write(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_numDataA_c_write),
-    .if_dout(numDataA_c_dout),
-    .if_num_data_valid(numDataA_c_num_data_valid),
-    .if_fifo_cap(numDataA_c_fifo_cap),
-    .if_empty_n(numDataA_c_empty_n),
-    .if_read(tCalc1_2_U0_numDataA_read)
-);
-
-tTest_fifo_w16_d2_S meanA_c_channel_U(
-    .clk(ap_clk),
-    .reset(ap_rst_n_inv),
-    .if_read_ce(1'b1),
-    .if_write_ce(1'b1),
-    .if_din(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_return_0),
-    .if_full_n(meanA_c_channel_full_n),
-    .if_write(ap_channel_done_meanA_c_channel),
-    .if_dout(meanA_c_channel_dout),
-    .if_num_data_valid(meanA_c_channel_num_data_valid),
-    .if_fifo_cap(meanA_c_channel_fifo_cap),
-    .if_empty_n(meanA_c_channel_empty_n),
-    .if_read(varSum_U0_ap_ready)
-);
-
-tTest_fifo_w16_d2_S meanA_c72_channel_U(
-    .clk(ap_clk),
-    .reset(ap_rst_n_inv),
-    .if_read_ce(1'b1),
-    .if_write_ce(1'b1),
-    .if_din(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_return_1),
-    .if_full_n(meanA_c72_channel_full_n),
-    .if_write(ap_channel_done_meanA_c72_channel),
-    .if_dout(meanA_c72_channel_dout),
-    .if_num_data_valid(meanA_c72_channel_num_data_valid),
-    .if_fifo_cap(meanA_c72_channel_fifo_cap),
-    .if_empty_n(meanA_c72_channel_empty_n),
-    .if_read(diff_U0_ap_ready)
-);
-
-tTest_fifo_w40_d3_S numDataB_c_U(
-    .clk(ap_clk),
-    .reset(ap_rst_n_inv),
-    .if_read_ce(1'b1),
-    .if_write_ce(1'b1),
-    .if_din(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_numDataB_c_din),
-    .if_full_n(numDataB_c_full_n),
-    .if_write(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_numDataB_c_write),
-    .if_dout(numDataB_c_dout),
-    .if_num_data_valid(numDataB_c_num_data_valid),
-    .if_fifo_cap(numDataB_c_fifo_cap),
-    .if_empty_n(numDataB_c_empty_n),
-    .if_read(tCalc1_U0_numDataB_read)
-);
-
-tTest_fifo_w16_d2_S meanB_c_channel_U(
-    .clk(ap_clk),
-    .reset(ap_rst_n_inv),
-    .if_read_ce(1'b1),
-    .if_write_ce(1'b1),
-    .if_din(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_return_0),
-    .if_full_n(meanB_c_channel_full_n),
-    .if_write(ap_channel_done_meanB_c_channel),
-    .if_dout(meanB_c_channel_dout),
-    .if_num_data_valid(meanB_c_channel_num_data_valid),
-    .if_fifo_cap(meanB_c_channel_fifo_cap),
-    .if_empty_n(meanB_c_channel_empty_n),
-    .if_read(varSum_5_U0_ap_ready)
-);
-
-tTest_fifo_w16_d2_S meanB_c73_channel_U(
-    .clk(ap_clk),
-    .reset(ap_rst_n_inv),
-    .if_read_ce(1'b1),
-    .if_write_ce(1'b1),
-    .if_din(divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_return_1),
-    .if_full_n(meanB_c73_channel_full_n),
-    .if_write(ap_channel_done_meanB_c73_channel),
-    .if_dout(meanB_c73_channel_dout),
-    .if_num_data_valid(meanB_c73_channel_num_data_valid),
-    .if_fifo_cap(meanB_c73_channel_fifo_cap),
-    .if_empty_n(meanB_c73_channel_empty_n),
-    .if_read(diff_U0_ap_ready)
-);
-
-tTest_fifo_w16_d3_S meanDiff_U(
-    .clk(ap_clk),
-    .reset(ap_rst_n_inv),
-    .if_read_ce(1'b1),
-    .if_write_ce(1'b1),
-    .if_din(diff_U0_ap_return),
-    .if_full_n(meanDiff_full_n),
-    .if_write(diff_U0_ap_done),
-    .if_dout(meanDiff_dout),
-    .if_num_data_valid(meanDiff_num_data_valid),
-    .if_fifo_cap(meanDiff_fifo_cap),
-    .if_empty_n(meanDiff_empty_n),
-    .if_read(tCalc2_U0_ap_ready)
-);
-
-tTest_fifo_w63_d2_S varSumA_channel_U(
-    .clk(ap_clk),
-    .reset(ap_rst_n_inv),
-    .if_read_ce(1'b1),
-    .if_write_ce(1'b1),
-    .if_din(varSum_U0_ap_return),
-    .if_full_n(varSumA_channel_full_n),
-    .if_write(varSum_U0_ap_done),
-    .if_dout(varSumA_channel_dout),
-    .if_num_data_valid(varSumA_channel_num_data_valid),
-    .if_fifo_cap(varSumA_channel_fifo_cap),
-    .if_empty_n(varSumA_channel_empty_n),
-    .if_read(tCalc1_2_U0_ap_ready)
-);
-
-tTest_fifo_w63_d2_S varSumB_channel_U(
-    .clk(ap_clk),
-    .reset(ap_rst_n_inv),
-    .if_read_ce(1'b1),
-    .if_write_ce(1'b1),
-    .if_din(varSum_5_U0_ap_return),
-    .if_full_n(varSumB_channel_full_n),
-    .if_write(varSum_5_U0_ap_done),
-    .if_dout(varSumB_channel_dout),
-    .if_num_data_valid(varSumB_channel_num_data_valid),
-    .if_fifo_cap(varSumB_channel_fifo_cap),
-    .if_empty_n(varSumB_channel_empty_n),
-    .if_read(tCalc1_U0_ap_ready)
-);
-
-tTest_fifo_w32_d2_S tCalc1ResultA_U(
-    .clk(ap_clk),
-    .reset(ap_rst_n_inv),
-    .if_read_ce(1'b1),
-    .if_write_ce(1'b1),
-    .if_din(tCalc1_2_U0_tCalc1ResultA),
-    .if_full_n(tCalc1ResultA_full_n),
-    .if_write(tCalc1_2_U0_ap_done),
-    .if_dout(tCalc1ResultA_dout),
-    .if_num_data_valid(tCalc1ResultA_num_data_valid),
-    .if_fifo_cap(tCalc1ResultA_fifo_cap),
-    .if_empty_n(tCalc1ResultA_empty_n),
-    .if_read(tCalc2_U0_ap_ready)
-);
-
-tTest_fifo_w32_d2_S tCalc1ResultB_U(
-    .clk(ap_clk),
-    .reset(ap_rst_n_inv),
-    .if_read_ce(1'b1),
-    .if_write_ce(1'b1),
-    .if_din(tCalc1_U0_tCalc1ResultB),
-    .if_full_n(tCalc1ResultB_full_n),
-    .if_write(tCalc1_U0_ap_done),
-    .if_dout(tCalc1ResultB_dout),
-    .if_num_data_valid(tCalc1ResultB_num_data_valid),
-    .if_fifo_cap(tCalc1ResultB_fifo_cap),
-    .if_empty_n(tCalc1ResultB_empty_n),
-    .if_read(tCalc2_U0_ap_ready)
-);
-
-tTest_fifo_w32_d2_S t_U(
-    .clk(ap_clk),
-    .reset(ap_rst_n_inv),
-    .if_read_ce(1'b1),
-    .if_write_ce(1'b1),
-    .if_din(tCalc2_U0_t),
-    .if_full_n(t_full_n),
-    .if_write(tCalc2_U0_ap_done),
-    .if_dout(t_dout),
-    .if_num_data_valid(t_num_data_valid),
-    .if_fifo_cap(t_fifo_cap),
-    .if_empty_n(t_empty_n),
-    .if_read(Block_entry2458_proc_U0_ap_ready)
+    .if_din(sumStream_1_U0_ap_return_1),
+    .if_full_n(numDataB_channel_full_n),
+    .if_write(ap_channel_done_numDataB_channel),
+    .if_dout(numDataB_channel_dout),
+    .if_num_data_valid(numDataB_channel_num_data_valid),
+    .if_fifo_cap(numDataB_channel_fifo_cap),
+    .if_empty_n(numDataB_channel_empty_n),
+    .if_read(Block_entry2347_proc6_U0_ap_ready)
 );
 
 always @ (posedge ap_clk) begin
@@ -1184,7 +745,7 @@ always @ (posedge ap_clk) begin
     if (ap_rst_n_inv == 1'b1) begin
         ap_sync_reg_channel_write_famB <= 1'b0;
     end else begin
-        if (((sumStream_4_U0_ap_done & sumStream_4_U0_ap_continue) == 1'b1)) begin
+        if (((sumStream_1_U0_ap_done & sumStream_1_U0_ap_continue) == 1'b1)) begin
             ap_sync_reg_channel_write_famB <= 1'b0;
         end else begin
             ap_sync_reg_channel_write_famB <= ap_sync_channel_write_famB;
@@ -1194,72 +755,24 @@ end
 
 always @ (posedge ap_clk) begin
     if (ap_rst_n_inv == 1'b1) begin
-        ap_sync_reg_channel_write_meanA_c72_channel <= 1'b0;
-    end else begin
-        if (((divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_done & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_continue) == 1'b1)) begin
-            ap_sync_reg_channel_write_meanA_c72_channel <= 1'b0;
-        end else begin
-            ap_sync_reg_channel_write_meanA_c72_channel <= ap_sync_channel_write_meanA_c72_channel;
-        end
-    end
-end
-
-always @ (posedge ap_clk) begin
-    if (ap_rst_n_inv == 1'b1) begin
-        ap_sync_reg_channel_write_meanA_c_channel <= 1'b0;
-    end else begin
-        if (((divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_done & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_continue) == 1'b1)) begin
-            ap_sync_reg_channel_write_meanA_c_channel <= 1'b0;
-        end else begin
-            ap_sync_reg_channel_write_meanA_c_channel <= ap_sync_channel_write_meanA_c_channel;
-        end
-    end
-end
-
-always @ (posedge ap_clk) begin
-    if (ap_rst_n_inv == 1'b1) begin
-        ap_sync_reg_channel_write_meanB_c73_channel <= 1'b0;
-    end else begin
-        if (((divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_done & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_continue) == 1'b1)) begin
-            ap_sync_reg_channel_write_meanB_c73_channel <= 1'b0;
-        end else begin
-            ap_sync_reg_channel_write_meanB_c73_channel <= ap_sync_channel_write_meanB_c73_channel;
-        end
-    end
-end
-
-always @ (posedge ap_clk) begin
-    if (ap_rst_n_inv == 1'b1) begin
-        ap_sync_reg_channel_write_meanB_c_channel <= 1'b0;
-    end else begin
-        if (((divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_done & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_continue) == 1'b1)) begin
-            ap_sync_reg_channel_write_meanB_c_channel <= 1'b0;
-        end else begin
-            ap_sync_reg_channel_write_meanB_c_channel <= ap_sync_channel_write_meanB_c_channel;
-        end
-    end
-end
-
-always @ (posedge ap_clk) begin
-    if (ap_rst_n_inv == 1'b1) begin
-        ap_sync_reg_channel_write_numDataA_c70_channel <= 1'b0;
+        ap_sync_reg_channel_write_numDataA_channel <= 1'b0;
     end else begin
         if (((sumStream_U0_ap_done & sumStream_U0_ap_continue) == 1'b1)) begin
-            ap_sync_reg_channel_write_numDataA_c70_channel <= 1'b0;
+            ap_sync_reg_channel_write_numDataA_channel <= 1'b0;
         end else begin
-            ap_sync_reg_channel_write_numDataA_c70_channel <= ap_sync_channel_write_numDataA_c70_channel;
+            ap_sync_reg_channel_write_numDataA_channel <= ap_sync_channel_write_numDataA_channel;
         end
     end
 end
 
 always @ (posedge ap_clk) begin
     if (ap_rst_n_inv == 1'b1) begin
-        ap_sync_reg_channel_write_numDataB_c71_channel <= 1'b0;
+        ap_sync_reg_channel_write_numDataB_channel <= 1'b0;
     end else begin
-        if (((sumStream_4_U0_ap_done & sumStream_4_U0_ap_continue) == 1'b1)) begin
-            ap_sync_reg_channel_write_numDataB_c71_channel <= 1'b0;
+        if (((sumStream_1_U0_ap_done & sumStream_1_U0_ap_continue) == 1'b1)) begin
+            ap_sync_reg_channel_write_numDataB_channel <= 1'b0;
         end else begin
-            ap_sync_reg_channel_write_numDataB_c71_channel <= ap_sync_channel_write_numDataB_c71_channel;
+            ap_sync_reg_channel_write_numDataB_channel <= ap_sync_channel_write_numDataB_channel;
         end
     end
 end
@@ -1280,7 +793,7 @@ always @ (posedge ap_clk) begin
     if (ap_rst_n_inv == 1'b1) begin
         ap_sync_reg_channel_write_sumB_channel <= 1'b0;
     end else begin
-        if (((sumStream_4_U0_ap_done & sumStream_4_U0_ap_continue) == 1'b1)) begin
+        if (((sumStream_1_U0_ap_done & sumStream_1_U0_ap_continue) == 1'b1)) begin
             ap_sync_reg_channel_write_sumB_channel <= 1'b0;
         end else begin
             ap_sync_reg_channel_write_sumB_channel <= ap_sync_channel_write_sumB_channel;
@@ -1302,12 +815,12 @@ end
 
 always @ (posedge ap_clk) begin
     if (ap_rst_n_inv == 1'b1) begin
-        ap_sync_reg_sumStream_4_U0_ap_ready <= 1'b0;
+        ap_sync_reg_sumStream_1_U0_ap_ready <= 1'b0;
     end else begin
         if (((ap_sync_ready & ap_start) == 1'b1)) begin
-            ap_sync_reg_sumStream_4_U0_ap_ready <= 1'b0;
+            ap_sync_reg_sumStream_1_U0_ap_ready <= 1'b0;
         end else begin
-            ap_sync_reg_sumStream_4_U0_ap_ready <= ap_sync_sumStream_4_U0_ap_ready;
+            ap_sync_reg_sumStream_1_U0_ap_ready <= ap_sync_sumStream_1_U0_ap_ready;
         end
     end
 end
@@ -1326,35 +839,27 @@ end
 
 assign A_TREADY = sumStream_U0_A_TREADY;
 
-assign B_TREADY = sumStream_4_U0_B_TREADY;
+assign B_TREADY = sumStream_1_U0_B_TREADY;
 
-assign Block_entry2458_proc_U0_ap_continue = 1'b1;
+assign Block_entry2347_proc6_U0_ap_continue = 1'b1;
 
-assign Block_entry2458_proc_U0_ap_start = t_empty_n;
+assign Block_entry2347_proc6_U0_ap_start = (sumB_channel_empty_n & sumA_channel_empty_n & numDataB_channel_empty_n & numDataA_channel_empty_n & famB_t_empty_n & famA_t_empty_n);
 
 assign ap_channel_done_famA = (sumStream_U0_ap_done & (ap_sync_reg_channel_write_famA ^ 1'b1));
 
-assign ap_channel_done_famB = (sumStream_4_U0_ap_done & (ap_sync_reg_channel_write_famB ^ 1'b1));
+assign ap_channel_done_famB = (sumStream_1_U0_ap_done & (ap_sync_reg_channel_write_famB ^ 1'b1));
 
-assign ap_channel_done_meanA_c72_channel = ((ap_sync_reg_channel_write_meanA_c72_channel ^ 1'b1) & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_done);
+assign ap_channel_done_numDataA_channel = (sumStream_U0_ap_done & (ap_sync_reg_channel_write_numDataA_channel ^ 1'b1));
 
-assign ap_channel_done_meanA_c_channel = ((ap_sync_reg_channel_write_meanA_c_channel ^ 1'b1) & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_done);
-
-assign ap_channel_done_meanB_c73_channel = ((ap_sync_reg_channel_write_meanB_c73_channel ^ 1'b1) & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_done);
-
-assign ap_channel_done_meanB_c_channel = ((ap_sync_reg_channel_write_meanB_c_channel ^ 1'b1) & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_done);
-
-assign ap_channel_done_numDataA_c70_channel = (sumStream_U0_ap_done & (ap_sync_reg_channel_write_numDataA_c70_channel ^ 1'b1));
-
-assign ap_channel_done_numDataB_c71_channel = (sumStream_4_U0_ap_done & (ap_sync_reg_channel_write_numDataB_c71_channel ^ 1'b1));
+assign ap_channel_done_numDataB_channel = (sumStream_1_U0_ap_done & (ap_sync_reg_channel_write_numDataB_channel ^ 1'b1));
 
 assign ap_channel_done_sumA_channel = (sumStream_U0_ap_done & (ap_sync_reg_channel_write_sumA_channel ^ 1'b1));
 
-assign ap_channel_done_sumB_channel = (sumStream_4_U0_ap_done & (ap_sync_reg_channel_write_sumB_channel ^ 1'b1));
+assign ap_channel_done_sumB_channel = (sumStream_1_U0_ap_done & (ap_sync_reg_channel_write_sumB_channel ^ 1'b1));
 
-assign ap_done = Block_entry2458_proc_U0_ap_done;
+assign ap_done = Block_entry2347_proc6_U0_ap_done;
 
-assign ap_idle = (varSum_U0_ap_idle & varSum_5_U0_ap_idle & tCalc2_U0_ap_idle & tCalc1_U0_ap_idle & tCalc1_2_U0_ap_idle & sumStream_U0_ap_idle & sumStream_4_U0_ap_idle & (t_empty_n ^ 1'b1) & (tCalc1ResultB_empty_n ^ 1'b1) & (tCalc1ResultA_empty_n ^ 1'b1) & (varSumB_channel_empty_n ^ 1'b1) & (varSumA_channel_empty_n ^ 1'b1) & (meanDiff_empty_n ^ 1'b1) & (meanB_c73_channel_empty_n ^ 1'b1) & (meanB_c_channel_empty_n ^ 1'b1) & (meanA_c72_channel_empty_n ^ 1'b1) & (meanA_c_channel_empty_n ^ 1'b1) & (numDataB_c71_channel_empty_n ^ 1'b1) & (sumB_channel_empty_n ^ 1'b1) & (numDataA_c70_channel_empty_n ^ 1'b1) & (sumA_channel_empty_n ^ 1'b1) & (famB_t_empty_n ^ 1'b1) & (famA_t_empty_n ^ 1'b1) & entry_proc_U0_ap_idle & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_idle & divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_idle & diff_U0_ap_idle & Block_entry2458_proc_U0_ap_idle);
+assign ap_idle = (sumStream_U0_ap_idle & sumStream_1_U0_ap_idle & (numDataB_channel_empty_n ^ 1'b1) & (sumB_channel_empty_n ^ 1'b1) & (numDataA_channel_empty_n ^ 1'b1) & (sumA_channel_empty_n ^ 1'b1) & (famB_t_empty_n ^ 1'b1) & (famA_t_empty_n ^ 1'b1) & entry_proc_U0_ap_idle & Block_entry2347_proc6_U0_ap_idle);
 
 assign ap_ready = ap_sync_ready;
 
@@ -1364,19 +869,11 @@ end
 
 assign ap_sync_channel_write_famA = ((sumStream_U0_fam_full_n & ap_channel_done_famA) | ap_sync_reg_channel_write_famA);
 
-assign ap_sync_channel_write_famB = ((sumStream_4_U0_fam_full_n & ap_channel_done_famB) | ap_sync_reg_channel_write_famB);
+assign ap_sync_channel_write_famB = ((sumStream_1_U0_fam_full_n & ap_channel_done_famB) | ap_sync_reg_channel_write_famB);
 
-assign ap_sync_channel_write_meanA_c72_channel = ((meanA_c72_channel_full_n & ap_channel_done_meanA_c72_channel) | ap_sync_reg_channel_write_meanA_c72_channel);
+assign ap_sync_channel_write_numDataA_channel = ((numDataA_channel_full_n & ap_channel_done_numDataA_channel) | ap_sync_reg_channel_write_numDataA_channel);
 
-assign ap_sync_channel_write_meanA_c_channel = ((meanA_c_channel_full_n & ap_channel_done_meanA_c_channel) | ap_sync_reg_channel_write_meanA_c_channel);
-
-assign ap_sync_channel_write_meanB_c73_channel = ((meanB_c73_channel_full_n & ap_channel_done_meanB_c73_channel) | ap_sync_reg_channel_write_meanB_c73_channel);
-
-assign ap_sync_channel_write_meanB_c_channel = ((meanB_c_channel_full_n & ap_channel_done_meanB_c_channel) | ap_sync_reg_channel_write_meanB_c_channel);
-
-assign ap_sync_channel_write_numDataA_c70_channel = ((numDataA_c70_channel_full_n & ap_channel_done_numDataA_c70_channel) | ap_sync_reg_channel_write_numDataA_c70_channel);
-
-assign ap_sync_channel_write_numDataB_c71_channel = ((numDataB_c71_channel_full_n & ap_channel_done_numDataB_c71_channel) | ap_sync_reg_channel_write_numDataB_c71_channel);
+assign ap_sync_channel_write_numDataB_channel = ((numDataB_channel_full_n & ap_channel_done_numDataB_channel) | ap_sync_reg_channel_write_numDataB_channel);
 
 assign ap_sync_channel_write_sumA_channel = ((sumA_channel_full_n & ap_channel_done_sumA_channel) | ap_sync_reg_channel_write_sumA_channel);
 
@@ -1384,23 +881,11 @@ assign ap_sync_channel_write_sumB_channel = ((sumB_channel_full_n & ap_channel_d
 
 assign ap_sync_entry_proc_U0_ap_ready = (entry_proc_U0_ap_ready | ap_sync_reg_entry_proc_U0_ap_ready);
 
-assign ap_sync_ready = (ap_sync_sumStream_U0_ap_ready & ap_sync_sumStream_4_U0_ap_ready & ap_sync_entry_proc_U0_ap_ready);
+assign ap_sync_ready = (ap_sync_sumStream_U0_ap_ready & ap_sync_sumStream_1_U0_ap_ready & ap_sync_entry_proc_U0_ap_ready);
 
-assign ap_sync_sumStream_4_U0_ap_ready = (sumStream_4_U0_ap_ready | ap_sync_reg_sumStream_4_U0_ap_ready);
+assign ap_sync_sumStream_1_U0_ap_ready = (sumStream_1_U0_ap_ready | ap_sync_reg_sumStream_1_U0_ap_ready);
 
 assign ap_sync_sumStream_U0_ap_ready = (sumStream_U0_ap_ready | ap_sync_reg_sumStream_U0_ap_ready);
-
-assign diff_U0_ap_continue = meanDiff_full_n;
-
-assign diff_U0_ap_start = (meanB_c73_channel_empty_n & meanA_c72_channel_empty_n);
-
-assign divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_continue = (ap_sync_channel_write_meanA_c_channel & ap_sync_channel_write_meanA_c72_channel);
-
-assign divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_1_U0_ap_start = (sumA_channel_empty_n & numDataA_c70_channel_empty_n);
-
-assign divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_continue = (ap_sync_channel_write_meanB_c_channel & ap_sync_channel_write_meanB_c73_channel);
-
-assign divVal_ap_uint_47_ap_ufixed_16_8_5_3_0_U0_ap_start = (sumB_channel_empty_n & numDataB_c71_channel_empty_n);
 
 assign entry_proc_U0_ap_continue = 1'b1;
 
@@ -1412,37 +897,17 @@ assign gmem_BRESP = 2'd0;
 
 assign gmem_BUSER = 1'd0;
 
-assign sumStream_4_U0_ap_continue = (ap_sync_channel_write_sumB_channel & ap_sync_channel_write_numDataB_c71_channel & ap_sync_channel_write_famB);
+assign sumStream_1_U0_ap_continue = (ap_sync_channel_write_sumB_channel & ap_sync_channel_write_numDataB_channel & ap_sync_channel_write_famB);
 
-assign sumStream_4_U0_ap_start = ((ap_sync_reg_sumStream_4_U0_ap_ready ^ 1'b1) & ap_start);
+assign sumStream_1_U0_ap_start = ((ap_sync_reg_sumStream_1_U0_ap_ready ^ 1'b1) & ap_start);
 
-assign sumStream_4_U0_fam_full_n = famB_i_full_n;
+assign sumStream_1_U0_fam_full_n = famB_i_full_n;
 
-assign sumStream_U0_ap_continue = (ap_sync_channel_write_sumA_channel & ap_sync_channel_write_numDataA_c70_channel & ap_sync_channel_write_famA);
+assign sumStream_U0_ap_continue = (ap_sync_channel_write_sumA_channel & ap_sync_channel_write_numDataA_channel & ap_sync_channel_write_famA);
 
 assign sumStream_U0_ap_start = ((ap_sync_reg_sumStream_U0_ap_ready ^ 1'b1) & ap_start);
 
 assign sumStream_U0_fam_full_n = famA_i_full_n;
-
-assign tCalc1_2_U0_ap_continue = tCalc1ResultA_full_n;
-
-assign tCalc1_2_U0_ap_start = varSumA_channel_empty_n;
-
-assign tCalc1_U0_ap_continue = tCalc1ResultB_full_n;
-
-assign tCalc1_U0_ap_start = varSumB_channel_empty_n;
-
-assign tCalc2_U0_ap_continue = t_full_n;
-
-assign tCalc2_U0_ap_start = (tCalc1ResultB_empty_n & tCalc1ResultA_empty_n & meanDiff_empty_n);
-
-assign varSum_5_U0_ap_continue = varSumB_channel_full_n;
-
-assign varSum_5_U0_ap_start = (meanB_c_channel_empty_n & famB_t_empty_n);
-
-assign varSum_U0_ap_continue = varSumA_channel_full_n;
-
-assign varSum_U0_ap_start = (meanA_c_channel_empty_n & famA_t_empty_n);
 
 
 reg find_df_deadlock = 0;

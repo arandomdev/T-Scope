@@ -9,13 +9,13 @@
 module tTest_tCalc2 (
         tCalc1ResultA,
         tCalc1ResultB,
-        p_read,
+        meanDiff,
         t,
         ap_clk,
         ap_rst,
         tCalc1ResultB_ap_vld,
         tCalc1ResultA_ap_vld,
-        p_read_ap_vld,
+        meanDiff_ap_vld,
         t_ap_vld,
         ap_start,
         ap_done,
@@ -25,15 +25,15 @@ module tTest_tCalc2 (
 );
 
 
-input  [31:0] tCalc1ResultA;
-input  [31:0] tCalc1ResultB;
-input  [15:0] p_read;
+input  [63:0] tCalc1ResultA;
+input  [63:0] tCalc1ResultB;
+input  [31:0] meanDiff;
 output  [31:0] t;
 input   ap_clk;
 input   ap_rst;
 input   tCalc1ResultB_ap_vld;
 input   tCalc1ResultA_ap_vld;
-input   p_read_ap_vld;
+input   meanDiff_ap_vld;
 output   t_ap_vld;
 input   ap_start;
 output   ap_done;
@@ -41,39 +41,41 @@ output   ap_ready;
 output   ap_idle;
 input   ap_continue;
 
-wire    tCalc2_Block_entry12_proc_U0_ap_start;
-wire    tCalc2_Block_entry12_proc_U0_ap_done;
-wire    tCalc2_Block_entry12_proc_U0_ap_continue;
-wire    tCalc2_Block_entry12_proc_U0_ap_idle;
-wire    tCalc2_Block_entry12_proc_U0_ap_ready;
-wire   [31:0] tCalc2_Block_entry12_proc_U0_t;
+wire    tCalc2_Block_entry21_proc_U0_ap_start;
+wire    tCalc2_Block_entry21_proc_U0_ap_done;
+wire    tCalc2_Block_entry21_proc_U0_ap_continue;
+wire    tCalc2_Block_entry21_proc_U0_ap_idle;
+wire    tCalc2_Block_entry21_proc_U0_ap_ready;
+wire   [31:0] tCalc2_Block_entry21_proc_U0_t;
+wire    tCalc2_Block_entry21_proc_U0_t_ap_vld;
 
-tTest_tCalc2_Block_entry12_proc tCalc2_Block_entry12_proc_U0(
+tTest_tCalc2_Block_entry21_proc tCalc2_Block_entry21_proc_U0(
     .ap_clk(ap_clk),
     .ap_rst(ap_rst),
-    .ap_start(tCalc2_Block_entry12_proc_U0_ap_start),
-    .ap_done(tCalc2_Block_entry12_proc_U0_ap_done),
-    .ap_continue(tCalc2_Block_entry12_proc_U0_ap_continue),
-    .ap_idle(tCalc2_Block_entry12_proc_U0_ap_idle),
-    .ap_ready(tCalc2_Block_entry12_proc_U0_ap_ready),
+    .ap_start(tCalc2_Block_entry21_proc_U0_ap_start),
+    .ap_done(tCalc2_Block_entry21_proc_U0_ap_done),
+    .ap_continue(tCalc2_Block_entry21_proc_U0_ap_continue),
+    .ap_idle(tCalc2_Block_entry21_proc_U0_ap_idle),
+    .ap_ready(tCalc2_Block_entry21_proc_U0_ap_ready),
     .tCalc1ResultB(tCalc1ResultB),
     .tCalc1ResultA(tCalc1ResultA),
-    .p_read(p_read),
-    .t(tCalc2_Block_entry12_proc_U0_t)
+    .meanDiff(meanDiff),
+    .t(tCalc2_Block_entry21_proc_U0_t),
+    .t_ap_vld(tCalc2_Block_entry21_proc_U0_t_ap_vld)
 );
 
-assign ap_done = tCalc2_Block_entry12_proc_U0_ap_done;
+assign ap_done = tCalc2_Block_entry21_proc_U0_ap_done;
 
-assign ap_idle = tCalc2_Block_entry12_proc_U0_ap_idle;
+assign ap_idle = tCalc2_Block_entry21_proc_U0_ap_idle;
 
-assign ap_ready = tCalc2_Block_entry12_proc_U0_ap_ready;
+assign ap_ready = tCalc2_Block_entry21_proc_U0_ap_ready;
 
-assign t = tCalc2_Block_entry12_proc_U0_t;
+assign t = tCalc2_Block_entry21_proc_U0_t;
 
-assign tCalc2_Block_entry12_proc_U0_ap_continue = ap_continue;
+assign tCalc2_Block_entry21_proc_U0_ap_continue = ap_continue;
 
-assign tCalc2_Block_entry12_proc_U0_ap_start = ap_start;
+assign tCalc2_Block_entry21_proc_U0_ap_start = ap_start;
 
-assign t_ap_vld = 1'b1;
+assign t_ap_vld = tCalc2_Block_entry21_proc_U0_t_ap_vld;
 
 endmodule //tTest_tCalc2

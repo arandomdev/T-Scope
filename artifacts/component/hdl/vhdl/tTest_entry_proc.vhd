@@ -19,8 +19,8 @@ port (
     ap_ready : OUT STD_LOGIC;
     C : IN STD_LOGIC_VECTOR (31 downto 0);
     C_c_din : OUT STD_LOGIC_VECTOR (31 downto 0);
-    C_c_num_data_valid : IN STD_LOGIC_VECTOR (3 downto 0);
-    C_c_fifo_cap : IN STD_LOGIC_VECTOR (3 downto 0);
+    C_c_num_data_valid : IN STD_LOGIC_VECTOR (2 downto 0);
+    C_c_fifo_cap : IN STD_LOGIC_VECTOR (2 downto 0);
     C_c_full_n : IN STD_LOGIC;
     C_c_write : OUT STD_LOGIC );
 end;

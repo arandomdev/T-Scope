@@ -33,8 +33,8 @@ output   ap_idle;
 output   ap_ready;
 input  [31:0] C;
 output  [31:0] C_c_din;
-input  [3:0] C_c_num_data_valid;
-input  [3:0] C_c_fifo_cap;
+input  [2:0] C_c_num_data_valid;
+input  [2:0] C_c_fifo_cap;
 input   C_c_full_n;
 output   C_c_write;
 
