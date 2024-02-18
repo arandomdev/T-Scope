@@ -18,4 +18,3 @@ class MemoryType(Enum):
     histA = 0
     histB = 1
     tvals = 2
-    temp = 3

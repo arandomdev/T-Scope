@@ -18,44 +18,6 @@ from .types import (
 )
 
 
-class HistogramStorage(Generic[HardwareScalarType]):
-    def __init__(
-        self,
-        traceLen: int,
-        histMemA: npt.NDArray[np.uint32],
-        histMemB: npt.NDArray[np.uint32],
-        dtype: Type[HardwareScalarType],
-    ) -> None:
-        self._histA = pyHistogram.Collector(traceLen, histMemA)
-        self._histB = pyHistogram.Collector(traceLen, histMemB)
-        self._dtype = dtype
-
-    def getHistograms(self) -> tuple[pyHistogram.Collector, pyHistogram.Collector]:
-        return self._histA, self._histB
-
-    def ingest(self, trace: npt.NDArray[HardwareScalarType], tType: TraceType):
-        if self._dtype is np.uint8:
-            if tType == TraceType.A:
-                self._histA.addTrace8(trace)  # type: ignore
-            elif tType == TraceType.B:
-                self._histB.addTrace8(trace)  # type: ignore
-            else:
-                raise NotImplementedError
-        elif self._dtype is np.uint16:
-            if tType == TraceType.A:
-                self._histA.addTrace10(trace)  # type: ignore
-            elif tType == TraceType.B:
-                self._histB.addTrace10(trace)  # type: ignore
-            else:
-                raise NotImplementedError
-        else:
-            raise NotImplementedError
-
-    def decimate(self):
-        self._histA.decimate()
-        self._histB.decimate()
-
-
 class MemoryManager(ABC):
     traceLen: int
 
@@ -128,3 +90,43 @@ class SoftwareMemoryManager(MemoryManager):
         exc_tb: TracebackType | None,
     ) -> None:
         pass
+
+
+class HistogramStorage(Generic[HardwareScalarType]):
+    def __init__(
+        self,
+        memManager: MemoryManager,
+        dtype: Type[HardwareScalarType],
+    ) -> None:
+        self._histA = pyHistogram.Collector(
+            memManager.traceLen, memManager.getArray(MemoryType.histA, np.uint32)
+        )
+        self._histB = pyHistogram.Collector(
+            memManager.traceLen, memManager.getArray(MemoryType.histB, np.uint32)
+        )
+        self._dtype = dtype
+
+    def getHistograms(self) -> tuple[pyHistogram.Collector, pyHistogram.Collector]:
+        return self._histA, self._histB
+
+    def ingest(self, trace: npt.NDArray[HardwareScalarType], tType: TraceType):
+        if self._dtype is np.uint8:
+            if tType == TraceType.A:
+                self._histA.addTrace8(trace)  # type: ignore
+            elif tType == TraceType.B:
+                self._histB.addTrace8(trace)  # type: ignore
+            else:
+                raise NotImplementedError
+        elif self._dtype is np.uint16:
+            if tType == TraceType.A:
+                self._histA.addTrace10(trace)  # type: ignore
+            elif tType == TraceType.B:
+                self._histB.addTrace10(trace)  # type: ignore
+            else:
+                raise NotImplementedError
+        else:
+            raise NotImplementedError
+
+    def decimate(self):
+        self._histA.decimate()
+        self._histB.decimate()

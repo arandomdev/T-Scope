@@ -17,18 +17,6 @@ try:
         str(pathlib.Path(__file__).parent / "overlay" / "tTestCore.bit")
     )
 
-    def _toFloat(x: int, e: int) -> float:
-        c = abs(x)
-        sign = 1
-        if x < 0:
-            # convert back from two's complement
-            c = x - 1
-            c = ~c
-            sign = -1
-        f = (1.0 * c) / (2**e)
-        f = f * sign
-        return f
-
     class PynqMemoryManager(MemoryManager):  # type: ignore
         def __init__(self, traceLen: int) -> None:
             self.traceLen = traceLen
@@ -50,11 +38,7 @@ try:
                 ),
                 MemoryType.tvals: pynq.allocate(  # type: ignore
                     shape=(self.traceLen,),
-                    dtype=np.float64,  # type: ignore
-                ),
-                MemoryType.temp: pynq.allocate(  # type: ignore
-                    shape=(1,),
-                    dtype=np.uint32,  # type: ignore
+                    dtype=np.float32,  # type: ignore
                 ),
             }
 
@@ -76,11 +60,9 @@ try:
 
             self._histA = memManager.getArray(MemoryType.histA, dtype=np.uint32)
             self._histB = memManager.getArray(MemoryType.histB, dtype=np.uint32)
-            self._tvals = memManager.getArray(MemoryType.tvals, dtype=np.float64)
-            self._coreOutput = memManager.getArray(MemoryType.temp, dtype=np.uint32)
+            self._tvals = memManager.getArray(MemoryType.tvals, dtype=np.float32)
 
             self._core = overlay.tTestCore  # type: ignore
-            self._core.register_map.C = self._coreOutput.physical_address  # type: ignore
             self._dmaHistA = overlay.dma0.sendchannel  # type: ignore
             self._dmaHistB = overlay.dma1.sendchannel  # type: ignore
 
@@ -88,14 +70,17 @@ try:
             # Calculate offset
             offset = self._phase * 256 * 4
 
+            # set destination address
+            self._core.register_map.C = self._tvals.physical_address + (  # type: ignore
+                self._phase * 32
+            )
+
             self._core.write(0x0, 0x1)
             self._dmaHistA.transfer(self._histA, start=offset)
             self._dmaHistB.transfer(self._histB, start=offset)
 
             while not self._core.register_map.CTRL.AP_DONE:
                 time.sleep(0.001)
-
-            self._tvals[self._phase] = _toFloat(self._coreOutput[0], 22)
 
             r = (self._phase, self._phase + 1)
             self._phase = (self._phase + 1) % self._traceLen

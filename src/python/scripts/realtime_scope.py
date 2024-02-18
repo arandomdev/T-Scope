@@ -62,9 +62,7 @@ class ProgramArguments(object):
 def ingestProcess(args: ProgramArguments, state: SharedState) -> None:
     """Gets new traces and stores them in histograms."""
 
-    histMemA = state.memoryManager.getArray(MemoryType.histA, np.uint32)
-    histMemB = state.memoryManager.getArray(MemoryType.histB, np.uint32)
-    store = HistogramStorage(args.traceLength, histMemA, histMemB, np.uint16)
+    store = HistogramStorage(state.memoryManager, np.uint16)
 
     if args.datasource == "random":
         dsInst = RandomDataSource(args.traceLength, np.uint16)
