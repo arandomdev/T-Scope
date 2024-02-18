@@ -56,7 +56,7 @@ try:
     class PynqEngine(Engine):  # type: ignore
         def __init__(self, memManager: PynqMemoryManager) -> None:
             self._traceLen = memManager.traceLen
-            self._phase = 0
+            self._currentSample = 0
 
             self._histA = memManager.getArray(MemoryType.histA, dtype=np.uint32)
             self._histB = memManager.getArray(MemoryType.histB, dtype=np.uint32)
@@ -68,11 +68,11 @@ try:
 
         def calculate(self) -> tuple[int, int]:
             # Calculate offset
-            offset = self._phase * 256 * 4
+            offset = self._currentSample * 256 * 4
 
             # set destination address
             self._core.register_map.C = self._tvals.physical_address + (  # type: ignore
-                self._phase * 32
+                self._currentSample * 32
             )
 
             self._core.write(0x0, 0x1)
@@ -82,8 +82,8 @@ try:
             while not self._core.register_map.CTRL.AP_DONE:
                 time.sleep(0.001)
 
-            r = (self._phase, self._phase + 1)
-            self._phase = (self._phase + 1) % self._traceLen
+            r = (self._currentSample, self._currentSample + 1)
+            self._currentSample = (self._currentSample + 1) % self._traceLen
             return r
 
 

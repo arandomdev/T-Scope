@@ -117,6 +117,13 @@ class ChipWhispererDataSource(Generic[HardwareScalarType]):
         self._scope.adc.samples = self._traceLength
 
         self._target = cw.target(self._scope)  # type: ignore
+
+        self._scope.clock.adc_src = "clkgen_x1"  # type: ignore
+        self._scope.adc.decimate = 2
+        self._scope.clock.clkgen_freq = 32000000  # type: ignore
+        self._target.baud = 166400  # type: ignore
+        self._scope.try_wait_clkgen_locked(10)  # type: ignore
+
         return self
 
     def __exit__(

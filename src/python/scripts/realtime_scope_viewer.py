@@ -122,7 +122,7 @@ def plotProcess(args: ProgramArguments, state: SharedState) -> None:
 @click.command(name="realtime_scope_client")
 @click.option("--port", help="Port to listen to.", type=int, default=31671)
 @click.option(
-    "--trace-length", help="How many samples per trace.", type=int, default=5000
+    "--trace-length", help="How many samples per trace.", type=int, default=8500
 )
 @click.option(
     "--statistical-value",

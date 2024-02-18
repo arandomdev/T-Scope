@@ -14,16 +14,8 @@ from pyTVLA.datasource import ChipWhispererDataSource, RandomDataSource
 from pyTVLA.engine import SoftwareEngine
 from pyTVLA.memory import HistogramStorage, MemoryManager, SoftwareMemoryManager
 from pyTVLA.pynq import PynqEngine, PynqMemoryManager
-from pyTVLA.scheduler import FixedRandomScheduler
+from pyTVLA.scheduler import AESBiasedRoundsScheduler
 from pyTVLA.types import MemoryType
-
-KEY = b"1234567812345678"
-TEXTS = (
-    b"AbcdAbcdAbcdAbcd",
-    b"zxczxczxczxczxcz",
-    b"alighagiagnnwnfg",
-    b"hkiwknjcwyjnklas",
-)
 
 
 @dataclass
@@ -67,7 +59,7 @@ def ingestProcess(args: ProgramArguments, state: SharedState) -> None:
     if args.datasource == "random":
         dsInst = RandomDataSource(args.traceLength, np.uint16)
     elif args.datasource == "chipwhisperer":
-        sch = FixedRandomScheduler(KEY, 16, TEXTS)
+        sch = AESBiasedRoundsScheduler(30)
         dsInst = ChipWhispererDataSource(args.traceLength, sch, np.uint16)
     else:
         raise NotImplementedError
@@ -138,7 +130,7 @@ def computeProcess(args: ProgramArguments, state: SharedState) -> None:
 @click.argument("viewer_address", type=str)
 @click.option("--port", help="Port of the viewer host.", type=int, default=31671)
 @click.option(
-    "--trace-length", help="How many samples per trace.", type=int, default=5000
+    "--trace-length", help="How many samples per trace.", type=int, default=8500
 )
 @click.option(
     "--datasource",
@@ -156,7 +148,7 @@ def computeProcess(args: ProgramArguments, state: SharedState) -> None:
     "--decimation-freq",
     help="How many traces should be ingested before decimation by 2. Set to -1 to disable.",
     type=int,
-    default=50,
+    default=30,
 )
 @click.option(
     "--datasource-delay",
@@ -168,7 +160,7 @@ def computeProcess(args: ProgramArguments, state: SharedState) -> None:
     "--engine-delay",
     help="How long to wait in seconds between calculating a new t-test trace.",
     type=float,
-    default=0.5,
+    default=0.1,
 )
 @click.option(
     "--samples-per-update",
