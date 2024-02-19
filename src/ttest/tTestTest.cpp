@@ -3,11 +3,12 @@
 
 int main() {
 	int err = 0;
-	float C;
 	hls::stream<streamPkt> Astream;
 	hls::stream<streamPkt> Bstream;
+	hls::stream<streamPkt> Cstream;
 	streamPkt dataStreamA;
 	streamPkt dataStreamB;
+
 
 	for (int i = 0; i < BINNUM ; i++) {
 		dataStreamA.data = hist3[i];
@@ -25,7 +26,10 @@ int main() {
 		Bstream.write(dataStreamB);
 	}
 
-	tTest(Astream,Bstream,&C);
-	printf("T Val = %f \n", C);
+	tTest(Astream,Bstream,Cstream);
+	streamPkt C = Cstream.read();
+	fpint k;
+	k.ival = C.data;
+	printf("T Val = %f \n", k.fval);
 	return err;
 }
