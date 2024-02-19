@@ -1,0 +1,12 @@
+{
+  "name": "ttest",
+  "type": "HLS",
+  "configuration": {
+    "componentType": "HLS",
+    "configFiles": [
+      "ttest_config.cfg"
+    ],
+    "work_dir": "ttest"
+  },
+  "previousBuildStatusMap": {}
+}

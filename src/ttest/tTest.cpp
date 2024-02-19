@@ -1,141 +1,270 @@
 #include "tTest.h"
+#include <assert.h>
+#include <hls_math.h>
+#include <hls_stream.h>
+#include <hls_streamofblocks.h>
+#include <iostream>
 
-void sumStream(hls::stream<streamPkt>& in_stream, hls::stream_of_blocks<blockData>& fam, hls::stream<sumType>& sum, hls::stream<numDataType>& numData, hls::stream<controlType>& done) {
-	streamPkt in_val;
-	ap_uint<9> i = 0;
-	sumType tempSum = 0;
-	numDataType tempNumData = 0;
-sumStreamLoop1:
-    do {
-    	hls::write_lock<blockData> famL(fam);
-    sumStreamLoop2:
-		do {
+void sumHist(hls::stream<Hist::BinPkt> &histStream,
+             hls::stream_of_blocks<Hist::Block> &histBlockStream,
+             hls::stream<Hist::SumPkt> &sumStream,
+             hls::stream<Hist::CountPkt> &countStream) {
+  bool eos = false;
+
+  Hist::SumPkt sumPkt;
+  Hist::CountPkt countPkt;
+
+StreamLoop:
+  while (!eos) {
+    hls::write_lock<Hist::Block> histBlockLock(histBlockStream);
+    sumPkt.data = 0;
+    countPkt.data = 0;
+
+  SumLoop:
+    for (int i = 0; i < N_BINS; i++) {
+#pragma HLS PIPELINE II = 2
+      Hist::BinPkt input = histStream.read();
+
+      histBlockLock[i] = input.data;
+      sumPkt.data += input.data * i;
+      countPkt.data += input.data;
+
+      sumPkt.last = input.last;
+      countPkt.last = input.last;
+      eos = input.last;
+    }
+
+    sumStream.write(sumPkt);
+    countStream.write(countPkt);
+  }
+}
+
+void calcMean(hls::stream<Hist::SumPkt> &sumStream,
+              hls::stream<Hist::CountPkt> &countStream,
+              hls::stream<Hist::MeanPkt> &meanStream) {
+  bool eos = false;
+
+  while (!eos) {
+    Hist::SumPkt sumPkt = sumStream.read();
+    Hist::CountPkt countPkt = countStream.read();
+
+    Hist::Mean mean =
+        (ap_ufixed<HIST_SUM_SIZE + FRAC_BITS, HIST_SUM_SIZE>)sumPkt.data /
+        countPkt.data;
+
+    assert(sumPkt.last == countPkt.last);
+    meanStream.write({mean, sumPkt.last});
+    eos = sumPkt.last;
+  }
+}
+
+template <typename T>
+void duplicateStream(hls::stream<T> &input, hls::stream<T> &a,
+                     hls::stream<T> &b) {
+  bool eos = false;
+  while (!eos) {
+    T pkt = input.read();
+    eos = pkt.last;
+    a.write(pkt);
+    b.write(pkt);
+  }
+}
+
+template <typename T>
+void duplicateStream(hls::stream<T> &input, hls::stream<T> &a,
+                     hls::stream<T> &b, hls::stream<T> &c) {
+  bool eos = false;
+  while (!eos) {
+    T pkt = input.read();
+    eos = pkt.last;
+    a.write(pkt);
+    b.write(pkt);
+    c.write(pkt);
+  }
+}
+
+void calcMeanDiff(hls::stream<Hist::MeanPkt> &meanAStream,
+                  hls::stream<Hist::MeanPkt> &meanBStream,
+                  hls::stream<Hist::MeanPkt> &meanDiffStream) {
+  bool eos = false;
+  while (!eos) {
+    Hist::MeanPkt aPkt = meanAStream.read();
+    Hist::MeanPkt bPkt = meanBStream.read();
+
+    Hist::Mean a = aPkt.data;
+    Hist::Mean b = bPkt.data;
+
+    Hist::Mean diff = (a > b) ? (Hist::Mean)(a - b) : (Hist::Mean)(b - a);
+
+    assert(aPkt.last == bPkt.last);
+    meanDiffStream.write({diff, aPkt.last});
+    eos = aPkt.last;
+  }
+}
+
+void calcVarSum(hls::stream_of_blocks<Hist::Block> &histBlockStream,
+                hls::stream<Hist::MeanPkt> &meanStream,
+                hls::stream<Hist::VarSumPkt> &varSumStream) {
+  bool eos = false;
+
+StreamLoop:
+  while (!eos) {
+    hls::read_lock<Hist::Block> histBlockLock(histBlockStream);
+    Hist::MeanPkt meanPkt = meanStream.read();
+    Hist::VarSum sum = 0;
+
+  OpLoop:
+    for (int i = 0; i < N_BINS; i++) {
 #pragma HLS PIPELINE
-    		in_val = in_stream.read();
-    		tempSum += in_val.data * i;
-    		tempNumData += in_val.data;
-    		famL[i] = in_val.data;
-    		i++;
-		} while (i < BINNUM);
-    	if (i == BINNUM) {
-    		numData.write(tempNumData);
-    		sum.write(tempSum);
-    		done.write(in_val.last);
-    		tempSum = 0;
-    		tempNumData = 0;
-    		i = 0;
-    	}
-    } while (!in_val.last);
+      Hist::CenteredWeight centeredWeight = i - meanPkt.data;
+      Hist::CenteredWeightSquared centeredWeightSquared =
+          centeredWeight * centeredWeight;
+      sum += centeredWeightSquared * histBlockLock[i];
+    }
+
+    eos = meanPkt.last;
+    varSumStream.write({sum, meanPkt.last});
+  }
 }
 
-void calcMean(hls::stream<sumType>& sum, hls::stream<numDataType>& numData, hls::stream<numDataType>& numDataOut, hls::stream<meanType>& quotient0, hls::stream<meanType>& quotient1, controlType done) {
-	do {
-		numDataType numDataLocal = numData.read();
-		numDataOut.write(numDataLocal);
-		meanType quotient = meanType(ap_ufixed<71,47>(sum.read())/numDataLocal);
-		quotient0.write(quotient);
-		quotient1.write(quotient);
-	} while (!done);
+void calcVar(hls::stream<Hist::VarSumPkt> &varSumStream,
+             hls::stream<Hist::CountPkt> &countStream,
+             hls::stream<Hist::VarPkt> &varStream) {
+  bool eos = false;
+  while (!eos) {
+    Hist::VarSumPkt varSumPkt = varSumStream.read();
+    Hist::CountPkt countPkt = countStream.read();
+
+    Hist::Var var =
+        (ap_ufixed<56 + FRAC_BITS, 56>)varSumPkt.data / (countPkt.data - 1);
+
+    assert(varSumPkt.last == countPkt.last);
+    varStream.write({var, varSumPkt.last});
+    eos = varSumPkt.last;
+  }
 }
 
-void diffMeans(hls::stream<meanType>& meanA, hls::stream<meanType>& meanB, hls::stream<meanType>& diff, controlType done) {
-	do {
-// #pragma HLS PIPELINE ???
-		meanType meanALocal = meanA.read();
-		meanType meanBLocal = meanB.read();
-		meanType meanDiff = (meanALocal > meanBLocal) ? meanType(meanALocal - meanBLocal) : meanType(meanBLocal - meanALocal);
-		diff.write(meanDiff);
-	} while (!done);
+void calcTval(hls::stream<Hist::MeanPkt> &meanDiffStream,
+              hls::stream<Hist::VarPkt> &varAStream,
+              hls::stream<Hist::VarPkt> &varBStream,
+              hls::stream<Hist::CountPkt> &countAStream,
+              hls::stream<Hist::CountPkt> &countBStream,
+              hls::stream<Hist::TvalPkt> &tvalStream) {
+  bool eos = false;
+  while (!eos) {
+#pragma HLS ALLOCATION operation instances=udiv limit=1
+    Hist::MeanPkt meanDiffPkt = meanDiffStream.read();
+    Hist::VarPkt varAPkt = varAStream.read();
+    Hist::VarPkt varBPkt = varBStream.read();
+    Hist::CountPkt countAPkt = countAStream.read();
+    Hist::CountPkt countBPkt = countBStream.read();
+
+    // divide by count
+    Hist::Var divA = varAPkt.data / countAPkt.data;
+    Hist::Var divB = varBPkt.data / countBPkt.data;
+
+    // Add
+    Hist::Var divSum = divA + divB;
+
+    // Sqrt
+    Hist::TvalDenom denom = sqrt(divSum.to_double());
+
+    // divide
+    Hist::Tval tval = meanDiffPkt.data / denom;
+
+    // Output
+    assert((meanDiffPkt.last == varAPkt.last) &&
+           (meanDiffPkt.last == varBPkt.last) &&
+           (meanDiffPkt.last == countAPkt.last) &&
+           (meanDiffPkt.last == countBPkt.last));
+    tvalStream.write({tval, meanDiffPkt.last});
+    eos = meanDiffPkt.last;
+  }
 }
 
-void varSum(hls::stream_of_blocks<blockData>& fam, hls::stream<meanType>& mean, hls::stream<varSumType>& sum, controlType done) {
-	ap_uint<9> i;
-	varSumType tmpSum = 0;
-	ap_fixed<17,9> tmp1[BINHALF];
-	ap_fixed<17,9> tmp3[BINHALF];
-	vecMultType tmp2[BINHALF];
-	vecMultType tmp4[BINHALF];
-	do {
-		hls::read_lock<blockData> famL(fam);
-		for (i = 0; i < BINHALF; i++) {
-#pragma HLS PIPELINE
-			meanType localMean = mean.read();
-			tmp1[i] = i - localMean;
-			tmp3[i] = i + BINHALF - localMean;
-			tmp2[i] = (vecSqType(tmp1[i] * tmp1[i])) * famL[i];
-			tmp4[i] = (vecSqType(tmp3[i] * tmp3[i])) * famL[i+BINHALF];
-			tmpSum += tmp2[i] + tmp4[i];
-		}
-		if (i == BINHALF) {
-			sum.write(tmpSum);
-			tmpSum = 0;
-		}
-	} while (!done);
+void convertToOutput(hls::stream<Hist::TvalPkt> &tvalStream,
+                     hls::stream<Hist::OutPkt> &outputStream) {
+  bool eos = false;
+  Hist::DoubleIntConverter conv;
+
+  while (!eos) {
+    Hist::TvalPkt tvalPkt = tvalStream.read();
+    conv.d = tvalPkt.data.to_double();
+    
+    Hist::OutPkt outPkt;
+    outPkt.data = conv.i;
+    outPkt.last = tvalPkt.last;
+    outPkt.keep = -1;
+    outputStream.write(outPkt);
+    eos = tvalPkt.last;
+  }
 }
 
-void tCalc1(hls::stream<varSumType>& varSum, hls::stream<numDataType>& numData, hls::stream<tCalcResultType1>& out, controlType done) {
-	do {
-// #pragma HLS PIPELINE ????
-		numDataType numDataLocal = numData.read();
-		ap_ufixed<64,23> num = (varSum.read())/(numDataType(numDataLocal - 1));
-		out.write(tCalcResultType1(num/numDataLocal));
-	} while (!done);
-}
+/// @brief Top function for core
+void tTest(hls::stream<Hist::BinPkt> &histAStream,
+           hls::stream<Hist::BinPkt> &histBStream,
+           hls::stream<Hist::OutPkt> &outputStream) {
+#pragma HLS INTERFACE mode = axis port = histAStream, histBStream, outputStream
+#pragma HLS INTERFACE mode = s_axilite port = return
 
-void tCalc2(hls::stream<tCalcResultType1>& tCalc1ResultA, hls::stream<tCalcResultType1>& tCalc1ResultB, hls::stream<meanType>& meanDiff, hls::stream<streamPkt>& t, hls::stream<controlType>& doneA, hls::stream<controlType>& doneB, controlType* done) {
-// #pragma HLS DATAFLOW
-	controlType localDoneA = 0, localDoneB = 0;
-	*done = 0;
-	streamPkt result;
-	result.keep = 1;
-	do {
-		tCalcResultType2 denom;
-		tCalcResultType1 sum = tCalc1ResultA.read() + tCalc1ResultB.read();
-		fxp_sqrt(denom, sum);
-		result.data = tResult(meanDiff.read()/denom);
-		if (doneA.read()) {
-			localDoneA = 1;
-		}
-		if (doneB.read()) {
-			localDoneB = 1;
-		}
-		if (localDoneA & localDoneB) {
-			*done = 1;
-		}
-		result.last = *done;
-		t.write(result);
-	} while (!(*done));
-}
-
-void tTest(hls::stream<streamPkt>&A,
-	     hls::stream<streamPkt>&B,
-		 hls::stream<streamPkt>&C) {
-#pragma HLS INTERFACE mode=axis port=A,B,C
-#pragma HLS INTERFACE mode=s_axilite port=return
 #pragma HLS DATAFLOW
-	streamPkt pktA, pktB;
-	hls::stream_of_blocks<blockData> famA, famB;
-#pragma HLS BIND_STORAGE variable=famA,famB type=RAM_1WNR impl=bram
-	hls::stream<sumType> sumA, sumB;
-	hls::stream<numDataType> numDataA0, numDataB0, numDataA1, numDataB1; // numDataA2, numDataB2;
-	hls::stream<meanType> meanA0, meanB0, meanA1, meanB1, meanDiff;
-	hls::stream<varSumType> varSumA, varSumB;
-	hls::stream<tCalcResultType1> tCalc1ResultA, tCalc1ResultB;
-	hls::stream<controlType> doneA, doneB;
-	controlType done = 0;
+  // Define streams
+  hls::stream_of_blocks<Hist::Block> histABlockStream;
+  hls::stream_of_blocks<Hist::Block> histBBlockStream;
+  hls::stream<Hist::SumPkt> sumAStream;
+  hls::stream<Hist::SumPkt> sumBStream;
+  hls::stream<Hist::CountPkt> countAStream;
+  hls::stream<Hist::CountPkt> countBStream;
+  hls::stream<Hist::CountPkt> countAStreamDup0;
+  hls::stream<Hist::CountPkt> countBStreamDup0;
+  hls::stream<Hist::CountPkt> countAStreamDup1;
+  hls::stream<Hist::CountPkt> countBStreamDup1;
+  hls::stream<Hist::CountPkt> countAStreamDup2;
+  hls::stream<Hist::CountPkt> countBStreamDup2;
 
-// data-driven task parallelism
-    sumStream(A, famA, sumA, numDataA0, doneA); // consume packets
-	sumStream(B, famB, sumB, numDataB0, doneB); // produce fam, sum, numData, done
-	//if ((numDataA == 0) || (numDataB == 0)) {
-	//	t = 0;
-	//}
-	calcMean(sumA, numDataA0, numDataA1, meanA0, meanA1, done); // consume sum, numData
-	calcMean(sumB, numDataB0, numDataB1, meanB0, meanB1, done); // produce numData, 2 mean
-	diffMeans(meanA1, meanB1, meanDiff, done); // consume mean, produce meanDiff
-	varSum(famA, meanA0, varSumA, done); // consume fam, consume mean
-	varSum(famB, meanB0, varSumB, done); // produce varSum
-	tCalc1(varSumA, numDataA1, tCalc1ResultA, done); // consume varSum, numData
-	tCalc1(varSumB, numDataB1, tCalc1ResultB, done); // produce tCalc1Result
-	tCalc2(tCalc1ResultA, tCalc1ResultB, meanDiff, C, doneA, doneB, &done); // consume tCalcResult, meanDiff, done, produce t
+#pragma HLS BIND_STORAGE variable = histABlockStream type = RAM_2P impl = bram
+#pragma HLS BIND_STORAGE variable = histBBlockStream type = RAM_2P impl = bram
+
+  hls::stream<Hist::MeanPkt> meanAStream;
+  hls::stream<Hist::MeanPkt> meanBStream;
+  hls::stream<Hist::MeanPkt> meanAStreamDup0;
+  hls::stream<Hist::MeanPkt> meanBStreamDup0;
+  hls::stream<Hist::MeanPkt> meanAStreamDup1;
+  hls::stream<Hist::MeanPkt> meanBStreamDup1;
+
+  hls::stream<Hist::MeanPkt> meanDiffStream;
+
+  hls::stream<Hist::VarSumPkt> varSumAStream;
+  hls::stream<Hist::VarSumPkt> varSumBStream;
+
+  hls::stream<Hist::VarPkt> varAStream;
+  hls::stream<Hist::VarPkt> varBStream;
+
+  hls::stream<Hist::TvalPkt> tvalStream;
+
+  // Define tasks
+  sumHist(histAStream, histABlockStream, sumAStream, countAStream);
+  sumHist(histBStream, histBBlockStream, sumBStream, countBStream);
+  duplicateStream(countAStream, countAStreamDup0, countAStreamDup1,
+                  countAStreamDup2);
+  duplicateStream(countBStream, countBStreamDup0, countBStreamDup1,
+                  countBStreamDup2);
+
+  calcMean(sumAStream, countAStreamDup0, meanAStream);
+  calcMean(sumBStream, countBStreamDup0, meanBStream);
+  duplicateStream(meanAStream, meanAStreamDup0, meanAStreamDup1);
+  duplicateStream(meanBStream, meanBStreamDup0, meanBStreamDup1);
+
+  calcMeanDiff(meanAStreamDup0, meanBStreamDup0, meanDiffStream);
+
+  calcVarSum(histABlockStream, meanAStreamDup1, varSumAStream);
+  calcVarSum(histBBlockStream, meanBStreamDup1, varSumBStream);
+
+  calcVar(varSumAStream, countAStreamDup1, varAStream);
+  calcVar(varSumBStream, countBStreamDup1, varBStream);
+
+  calcTval(meanDiffStream, varAStream, varBStream, countAStreamDup2,
+           countBStreamDup2, tvalStream);
+
+  convertToOutput(tvalStream, outputStream);
 }

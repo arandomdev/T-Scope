@@ -2,3 +2,15 @@
 build
 venv
 __pycache__
+
+.peers.ini
+.repo.yaml
+src/**/.gitignore
+_ide
+.cache
+.Xil
+vitis_c++
+xcd.log
+compile_commands.json
+.theia
+src/ttest/ttest

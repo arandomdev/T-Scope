@@ -38,7 +38,7 @@ try:
                 ),
                 MemoryType.tvals: pynq.allocate(  # type: ignore
                     shape=(self.traceLen,),
-                    dtype=np.float32,  # type: ignore
+                    dtype=np.float64,  # type: ignore
                 ),
             }
 
@@ -56,35 +56,26 @@ try:
     class PynqEngine(Engine):  # type: ignore
         def __init__(self, memManager: PynqMemoryManager) -> None:
             self._traceLen = memManager.traceLen
-            self._phase = 0
 
             self._histA = memManager.getArray(MemoryType.histA, dtype=np.uint32)
             self._histB = memManager.getArray(MemoryType.histB, dtype=np.uint32)
             self._tvals = memManager.getArray(MemoryType.tvals, dtype=np.float32)
 
             self._core = overlay.tTestCore  # type: ignore
-            self._dmaHistA = overlay.dma0.sendchannel  # type: ignore
-            self._dmaHistB = overlay.dma1.sendchannel  # type: ignore
+            self._dmaHistA = overlay.DmaHistA.sendchannel  # type: ignore
+            self._dmaHistB = overlay.DmaHistB.sendchannel  # type: ignore
+            self._dmaTvals = overlay.DmaTvals.recvchannel  # type: ignore
 
         def calculate(self) -> tuple[int, int]:
-            # Calculate offset
-            offset = self._phase * 256 * 4
-
-            # set destination address
-            self._core.register_map.C = self._tvals.physical_address + (  # type: ignore
-                self._phase * 32
-            )
-
             self._core.write(0x0, 0x1)
-            self._dmaHistA.transfer(self._histA, start=offset)
-            self._dmaHistB.transfer(self._histB, start=offset)
+            self._dmaHistA.transfer(self._histA)
+            self._dmaHistB.transfer(self._histB)
+            self._dmaTvals.transfer(self._tvals)
 
             while not self._core.register_map.CTRL.AP_DONE:
-                time.sleep(0.001)
+                time.sleep(0.01)
 
-            r = (self._phase, self._phase + 1)
-            self._phase = (self._phase + 1) % self._traceLen
-            return r
+            return (0, self._traceLen)
 
 
 except ImportError:
