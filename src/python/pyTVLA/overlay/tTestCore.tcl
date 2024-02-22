@@ -1,6 +1,6 @@
 
 ################################################################
-# This is a generated script based on design: design_1
+# This is a generated script based on design: tTestCore
 #
 # Though there are limitations about the generated script,
 # the main purpose of this utility is to make learning
@@ -41,7 +41,7 @@ if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
 ################################################################
 
 # To test this script, run the following commands from Vivado Tcl console:
-# source design_1_script.tcl
+# source tTestCore_script.tcl
 
 # If there is no project opened, this script will create a
 # project, but make sure you do not have an existing project
@@ -56,7 +56,7 @@ if { $list_projs eq "" } {
 
 # CHANGE DESIGN NAME HERE
 variable design_name
-set design_name design_1
+set design_name tTestCore
 
 # If you do not already have an existing IP Integrator design open,
 # you can create a design using the following command:
@@ -130,9 +130,9 @@ set bCheckIPsPassed 1
 set bCheckIPs 1
 if { $bCheckIPs == 1 } {
    set list_check_ips "\ 
-xilinx.com:ip:processing_system7:5.5\
-amalnciof:hls:tTest:1.2\
 xilinx.com:ip:axi_dma:7.1\
+xilinx.com:ip:processing_system7:5.5\
+xilinx.com:hls:tTestCore:2.0\
 xilinx.com:ip:proc_sys_reset:5.0\
 "
 
@@ -204,8 +204,26 @@ proc create_root_design { parentCell } {
 
   # Create ports
 
-  # Create instance: ps, and set properties
-  set ps [ create_bd_cell -type ip -vlnv xilinx.com:ip:processing_system7:5.5 ps ]
+  # Create instance: DmaHistA, and set properties
+  set DmaHistA [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 DmaHistA ]
+  set_property -dict [list \
+    CONFIG.c_include_s2mm {0} \
+    CONFIG.c_include_sg {0} \
+    CONFIG.c_sg_length_width {26} \
+  ] $DmaHistA
+
+
+  # Create instance: DmaHistB, and set properties
+  set DmaHistB [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 DmaHistB ]
+  set_property -dict [list \
+    CONFIG.c_include_s2mm {0} \
+    CONFIG.c_include_sg {0} \
+    CONFIG.c_sg_length_width {26} \
+  ] $DmaHistB
+
+
+  # Create instance: processing_system7_0, and set properties
+  set processing_system7_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:processing_system7:5.5 processing_system7_0 ]
   set_property -dict [list \
     CONFIG.PCW_ACT_APU_PERIPHERAL_FREQMHZ {650.000000} \
     CONFIG.PCW_ACT_CAN0_PERIPHERAL_FREQMHZ {23.8095} \
@@ -740,43 +758,28 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_VALUE_SILVERSION {3} \
     CONFIG.PCW_WDT_PERIPHERAL_CLKSRC {CPU_1X} \
     CONFIG.PCW_WDT_PERIPHERAL_DIVISOR0 {1} \
-  ] $ps
+  ] $processing_system7_0
 
 
   # Create instance: tTestCore, and set properties
-  set tTestCore [ create_bd_cell -type ip -vlnv amalnciof:hls:tTest:1.2 tTestCore ]
+  set tTestCore [ create_bd_cell -type ip -vlnv xilinx.com:hls:tTestCore:2.0 tTestCore ]
 
-  # Create instance: dmaA, and set properties
-  set dmaA [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 dmaA ]
+  # Create instance: DmaTvals, and set properties
+  set DmaTvals [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 DmaTvals ]
   set_property -dict [list \
-    CONFIG.c_include_s2mm {0} \
+    CONFIG.c_include_mm2s {0} \
     CONFIG.c_include_sg {0} \
-    CONFIG.c_m_axi_mm2s_data_width {32} \
-    CONFIG.c_m_axis_mm2s_tdata_width {32} \
-    CONFIG.c_mm2s_burst_size {16} \
     CONFIG.c_sg_length_width {26} \
-  ] $dmaA
+  ] $DmaTvals
 
 
-  # Create instance: dmaB, and set properties
-  set dmaB [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 dmaB ]
-  set_property -dict [list \
-    CONFIG.c_include_s2mm {0} \
-    CONFIG.c_include_sg {0} \
-    CONFIG.c_m_axi_mm2s_data_width {32} \
-    CONFIG.c_m_axis_mm2s_tdata_width {32} \
-    CONFIG.c_mm2s_burst_size {16} \
-    CONFIG.c_sg_length_width {26} \
-  ] $dmaB
+  # Create instance: ps7_0_axi_periph, and set properties
+  set ps7_0_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 ps7_0_axi_periph ]
+  set_property CONFIG.NUM_MI {4} $ps7_0_axi_periph
 
 
-  # Create instance: ps_axi_periph, and set properties
-  set ps_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 ps_axi_periph ]
-  set_property CONFIG.NUM_MI {3} $ps_axi_periph
-
-
-  # Create instance: rst_ps_100M, and set properties
-  set rst_ps_100M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps_100M ]
+  # Create instance: rst_ps7_0_100M, and set properties
+  set rst_ps7_0_100M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_0_100M ]
 
   # Create instance: axi_mem_intercon, and set properties
   set axi_mem_intercon [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_mem_intercon ]
@@ -794,33 +797,36 @@ proc create_root_design { parentCell } {
 
 
   # Create interface connections
-  connect_bd_intf_net -intf_net axi_mem_intercon_1_M00_AXI [get_bd_intf_pins axi_mem_intercon_1/M00_AXI] [get_bd_intf_pins ps/S_AXI_HP1]
-  connect_bd_intf_net -intf_net axi_mem_intercon_2_M00_AXI [get_bd_intf_pins axi_mem_intercon_2/M00_AXI] [get_bd_intf_pins ps/S_AXI_HP2]
-  connect_bd_intf_net -intf_net axi_mem_intercon_M00_AXI [get_bd_intf_pins axi_mem_intercon/M00_AXI] [get_bd_intf_pins ps/S_AXI_HP0]
-  connect_bd_intf_net -intf_net dmaA_M_AXIS_MM2S [get_bd_intf_pins dmaA/M_AXIS_MM2S] [get_bd_intf_pins tTestCore/A]
-  connect_bd_intf_net -intf_net dmaA_M_AXI_MM2S [get_bd_intf_pins dmaA/M_AXI_MM2S] [get_bd_intf_pins axi_mem_intercon/S00_AXI]
-  connect_bd_intf_net -intf_net dmaB_M_AXIS_MM2S [get_bd_intf_pins dmaB/M_AXIS_MM2S] [get_bd_intf_pins tTestCore/B]
-  connect_bd_intf_net -intf_net dmaB_M_AXI_MM2S [get_bd_intf_pins dmaB/M_AXI_MM2S] [get_bd_intf_pins axi_mem_intercon_2/S00_AXI]
-  connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins ps/DDR]
-  connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins ps/FIXED_IO]
-  connect_bd_intf_net -intf_net ps_M_AXI_GP0 [get_bd_intf_pins ps/M_AXI_GP0] [get_bd_intf_pins ps_axi_periph/S00_AXI]
-  connect_bd_intf_net -intf_net ps_axi_periph_M00_AXI [get_bd_intf_pins ps_axi_periph/M00_AXI] [get_bd_intf_pins dmaA/S_AXI_LITE]
-  connect_bd_intf_net -intf_net ps_axi_periph_M01_AXI [get_bd_intf_pins ps_axi_periph/M01_AXI] [get_bd_intf_pins dmaB/S_AXI_LITE]
-  connect_bd_intf_net -intf_net ps_axi_periph_M02_AXI [get_bd_intf_pins ps_axi_periph/M02_AXI] [get_bd_intf_pins tTestCore/s_axi_control]
-  connect_bd_intf_net -intf_net tTestCore_m_axi_gmem [get_bd_intf_pins tTestCore/m_axi_gmem] [get_bd_intf_pins axi_mem_intercon_1/S00_AXI]
+  connect_bd_intf_net -intf_net DmaHistA_M_AXIS_MM2S [get_bd_intf_pins DmaHistA/M_AXIS_MM2S] [get_bd_intf_pins tTestCore/histAStream]
+  connect_bd_intf_net -intf_net DmaHistA_M_AXI_MM2S [get_bd_intf_pins DmaHistA/M_AXI_MM2S] [get_bd_intf_pins axi_mem_intercon/S00_AXI]
+  connect_bd_intf_net -intf_net DmaHistB_M_AXIS_MM2S [get_bd_intf_pins DmaHistB/M_AXIS_MM2S] [get_bd_intf_pins tTestCore/histBStream]
+  connect_bd_intf_net -intf_net DmaHistB_M_AXI_MM2S [get_bd_intf_pins DmaHistB/M_AXI_MM2S] [get_bd_intf_pins axi_mem_intercon_1/S00_AXI]
+  connect_bd_intf_net -intf_net DmaTvals_M_AXI_S2MM [get_bd_intf_pins DmaTvals/M_AXI_S2MM] [get_bd_intf_pins axi_mem_intercon_2/S00_AXI]
+  connect_bd_intf_net -intf_net axi_mem_intercon_1_M00_AXI [get_bd_intf_pins axi_mem_intercon_1/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP1]
+  connect_bd_intf_net -intf_net axi_mem_intercon_2_M00_AXI [get_bd_intf_pins axi_mem_intercon_2/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP2]
+  connect_bd_intf_net -intf_net axi_mem_intercon_M00_AXI [get_bd_intf_pins axi_mem_intercon/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
+  connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins processing_system7_0/DDR]
+  connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins processing_system7_0/FIXED_IO]
+  connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins processing_system7_0/M_AXI_GP0] [get_bd_intf_pins ps7_0_axi_periph/S00_AXI]
+  connect_bd_intf_net -intf_net ps7_0_axi_periph_M00_AXI [get_bd_intf_pins ps7_0_axi_periph/M00_AXI] [get_bd_intf_pins DmaHistA/S_AXI_LITE]
+  connect_bd_intf_net -intf_net ps7_0_axi_periph_M01_AXI [get_bd_intf_pins ps7_0_axi_periph/M01_AXI] [get_bd_intf_pins DmaHistB/S_AXI_LITE]
+  connect_bd_intf_net -intf_net ps7_0_axi_periph_M02_AXI [get_bd_intf_pins ps7_0_axi_periph/M02_AXI] [get_bd_intf_pins DmaTvals/S_AXI_LITE]
+  connect_bd_intf_net -intf_net ps7_0_axi_periph_M03_AXI [get_bd_intf_pins ps7_0_axi_periph/M03_AXI] [get_bd_intf_pins tTestCore/s_axi_control]
+  connect_bd_intf_net -intf_net tTestCore_0_outputStream [get_bd_intf_pins DmaTvals/S_AXIS_S2MM] [get_bd_intf_pins tTestCore/outputStream]
 
   # Create port connections
-  connect_bd_net -net ps_FCLK_CLK0 [get_bd_pins ps/FCLK_CLK0] [get_bd_pins ps/M_AXI_GP0_ACLK] [get_bd_pins ps_axi_periph/S00_ACLK] [get_bd_pins rst_ps_100M/slowest_sync_clk] [get_bd_pins dmaA/s_axi_lite_aclk] [get_bd_pins ps_axi_periph/M00_ACLK] [get_bd_pins ps_axi_periph/ACLK] [get_bd_pins dmaB/s_axi_lite_aclk] [get_bd_pins ps_axi_periph/M01_ACLK] [get_bd_pins dmaA/m_axi_mm2s_aclk] [get_bd_pins axi_mem_intercon/S00_ACLK] [get_bd_pins ps/S_AXI_HP0_ACLK] [get_bd_pins axi_mem_intercon/M00_ACLK] [get_bd_pins axi_mem_intercon/ACLK] [get_bd_pins axi_mem_intercon_1/S00_ACLK] [get_bd_pins ps/S_AXI_HP1_ACLK] [get_bd_pins axi_mem_intercon_1/M00_ACLK] [get_bd_pins axi_mem_intercon_1/ACLK] [get_bd_pins dmaB/m_axi_mm2s_aclk] [get_bd_pins axi_mem_intercon_2/S00_ACLK] [get_bd_pins ps/S_AXI_HP2_ACLK] [get_bd_pins axi_mem_intercon_2/M00_ACLK] [get_bd_pins axi_mem_intercon_2/ACLK] [get_bd_pins ps_axi_periph/M02_ACLK] [get_bd_pins tTestCore/ap_clk]
-  connect_bd_net -net ps_FCLK_RESET0_N [get_bd_pins ps/FCLK_RESET0_N] [get_bd_pins rst_ps_100M/ext_reset_in]
-  connect_bd_net -net rst_ps_100M_peripheral_aresetn [get_bd_pins rst_ps_100M/peripheral_aresetn] [get_bd_pins ps_axi_periph/S00_ARESETN] [get_bd_pins dmaA/axi_resetn] [get_bd_pins ps_axi_periph/M00_ARESETN] [get_bd_pins ps_axi_periph/ARESETN] [get_bd_pins dmaB/axi_resetn] [get_bd_pins ps_axi_periph/M01_ARESETN] [get_bd_pins axi_mem_intercon/S00_ARESETN] [get_bd_pins axi_mem_intercon/M00_ARESETN] [get_bd_pins axi_mem_intercon/ARESETN] [get_bd_pins axi_mem_intercon_1/S00_ARESETN] [get_bd_pins axi_mem_intercon_1/M00_ARESETN] [get_bd_pins axi_mem_intercon_1/ARESETN] [get_bd_pins axi_mem_intercon_2/S00_ARESETN] [get_bd_pins axi_mem_intercon_2/M00_ARESETN] [get_bd_pins axi_mem_intercon_2/ARESETN] [get_bd_pins ps_axi_periph/M02_ARESETN] [get_bd_pins tTestCore/ap_rst_n]
+  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins ps7_0_axi_periph/S00_ACLK] [get_bd_pins rst_ps7_0_100M/slowest_sync_clk] [get_bd_pins DmaHistA/s_axi_lite_aclk] [get_bd_pins ps7_0_axi_periph/M00_ACLK] [get_bd_pins ps7_0_axi_periph/ACLK] [get_bd_pins DmaHistB/s_axi_lite_aclk] [get_bd_pins ps7_0_axi_periph/M01_ACLK] [get_bd_pins DmaTvals/s_axi_lite_aclk] [get_bd_pins ps7_0_axi_periph/M02_ACLK] [get_bd_pins DmaHistA/m_axi_mm2s_aclk] [get_bd_pins axi_mem_intercon/S00_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] [get_bd_pins axi_mem_intercon/M00_ACLK] [get_bd_pins axi_mem_intercon/ACLK] [get_bd_pins DmaHistB/m_axi_mm2s_aclk] [get_bd_pins axi_mem_intercon_1/S00_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP1_ACLK] [get_bd_pins axi_mem_intercon_1/M00_ACLK] [get_bd_pins axi_mem_intercon_1/ACLK] [get_bd_pins DmaTvals/m_axi_s2mm_aclk] [get_bd_pins axi_mem_intercon_2/S00_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP2_ACLK] [get_bd_pins axi_mem_intercon_2/M00_ACLK] [get_bd_pins axi_mem_intercon_2/ACLK] [get_bd_pins ps7_0_axi_periph/M03_ACLK] [get_bd_pins tTestCore/ap_clk]
+  connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins rst_ps7_0_100M/ext_reset_in]
+  connect_bd_net -net rst_ps7_0_100M_peripheral_aresetn [get_bd_pins rst_ps7_0_100M/peripheral_aresetn] [get_bd_pins ps7_0_axi_periph/S00_ARESETN] [get_bd_pins DmaHistA/axi_resetn] [get_bd_pins ps7_0_axi_periph/M00_ARESETN] [get_bd_pins ps7_0_axi_periph/ARESETN] [get_bd_pins DmaHistB/axi_resetn] [get_bd_pins ps7_0_axi_periph/M01_ARESETN] [get_bd_pins DmaTvals/axi_resetn] [get_bd_pins ps7_0_axi_periph/M02_ARESETN] [get_bd_pins axi_mem_intercon/S00_ARESETN] [get_bd_pins axi_mem_intercon/M00_ARESETN] [get_bd_pins axi_mem_intercon/ARESETN] [get_bd_pins axi_mem_intercon_1/S00_ARESETN] [get_bd_pins axi_mem_intercon_1/M00_ARESETN] [get_bd_pins axi_mem_intercon_1/ARESETN] [get_bd_pins axi_mem_intercon_2/S00_ARESETN] [get_bd_pins axi_mem_intercon_2/M00_ARESETN] [get_bd_pins axi_mem_intercon_2/ARESETN] [get_bd_pins ps7_0_axi_periph/M03_ARESETN] [get_bd_pins tTestCore/ap_rst_n]
 
   # Create address segments
-  assign_bd_address -offset 0x41E00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ps/Data] [get_bd_addr_segs dmaA/S_AXI_LITE/Reg] -force
-  assign_bd_address -offset 0x41E10000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ps/Data] [get_bd_addr_segs dmaB/S_AXI_LITE/Reg] -force
-  assign_bd_address -offset 0x40000000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ps/Data] [get_bd_addr_segs tTestCore/s_axi_control/Reg] -force
-  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces tTestCore/Data_m_axi_gmem] [get_bd_addr_segs ps/S_AXI_HP1/HP1_DDR_LOWOCM] -force
-  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces dmaA/Data_MM2S] [get_bd_addr_segs ps/S_AXI_HP0/HP0_DDR_LOWOCM] -force
-  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces dmaB/Data_MM2S] [get_bd_addr_segs ps/S_AXI_HP2/HP2_DDR_LOWOCM] -force
+  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces DmaHistA/Data_MM2S] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
+  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces DmaHistB/Data_MM2S] [get_bd_addr_segs processing_system7_0/S_AXI_HP1/HP1_DDR_LOWOCM] -force
+  assign_bd_address -offset 0x41E00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs DmaHistA/S_AXI_LITE/Reg] -force
+  assign_bd_address -offset 0x41E10000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs DmaHistB/S_AXI_LITE/Reg] -force
+  assign_bd_address -offset 0x41E20000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs DmaTvals/S_AXI_LITE/Reg] -force
+  assign_bd_address -offset 0x40000000 -range 0x00010000 -with_name SEG_tTestCore_0_Reg -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs tTestCore/s_axi_control/Reg] -force
+  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces DmaTvals/Data_S2MM] [get_bd_addr_segs processing_system7_0/S_AXI_HP2/HP2_DDR_LOWOCM] -force
 
 
   # Restore current instance
