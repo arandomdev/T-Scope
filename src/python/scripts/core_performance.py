@@ -2,21 +2,14 @@
 
 import time
 from dataclasses import dataclass
-from typing import Any, Literal
+from typing import Any
 
 import click
 import numpy as np
-from pyTVLA.datasource import ChipWhispererDataSource, RandomDataSource
+from pyTVLA.datasource import RandomDataSource
 from pyTVLA.engine import SoftwareEngine
-from pyTVLA.memory import HistogramStorage, MemoryManager, SoftwareMemoryManager
+from pyTVLA.memory import HistogramStorage, SoftwareMemoryManager
 from pyTVLA.pynq import PynqEngine, PynqMemoryManager
-from pyTVLA.scheduler import AESBiasedRoundsScheduler
-from pyTVLA.types import MemoryType
-
-
-@dataclass
-class SharedState(object):
-    memoryManager: MemoryManager
 
 
 @dataclass
@@ -36,7 +29,10 @@ class ProgramArguments(object):
 
 @click.command(name="core_performance")
 @click.option(
-    "--trace-length", help="How many samples per trace.", type=int, default=2000 #8500
+    "--trace-length",
+    help="How many samples per trace.",
+    type=int,
+    default=2000,
 )
 @click.option(
     "--trials",
@@ -53,42 +49,42 @@ class ProgramArguments(object):
 def main(**kwargs: dict[str, Any]) -> None:
     args = ProgramArguments.fromDict(kwargs)
 
-    # sch = AESBiasedRoundsScheduler(30)
-    # dsInst = ChipWhispererDataSource(args.traceLength, sch, np.uint16)
-    dsInst = RandomDataSource(args.traceLength, np.uint16)
-    
-    with SoftwareMemoryManager(args.traceLength) as sMemManager, PynqMemoryManager(args.traceLength) as pMemManager, dsInst as ds:
+    with (
+        SoftwareMemoryManager(args.traceLength) as sMemManager,
+        PynqMemoryManager(args.traceLength) as pMemManager,
+        RandomDataSource(args.traceLength, np.uint16) as ds,
+    ):
         sStore = HistogramStorage(sMemManager, np.uint16)
         pStore = HistogramStorage(pMemManager, np.uint16)
 
-        for ii in range(args.numTraces):
+        for _ in range(args.numTraces):
             tType, trace = ds.next()
             sStore.ingest(trace, tType)
             pStore.ingest(trace, tType)
 
         stotal = 0
         sEngine = SoftwareEngine(sMemManager)
-        for ii in range(args.trials):
+        for _ in range(args.trials):
             t0 = time.time()
             sEngine.calculate()
             t1 = time.time()
-            stotal += t1-t0
+            stotal += t1 - t0
 
         ptotal = 0
         pEngine = PynqEngine(pMemManager)
-        for ii in range(args.trials):
+        for _ in range(args.trials):
             t0 = time.time()
             pEngine.calculate()
             t1 = time.time()
-            ptotal += t1-t0
-        
+            ptotal += t1 - t0
+
         bits = 2 * 32 * 256 * args.traceLength * args.trials
         print("Software Average Time(s): " + str(stotal / args.trials))
         print("Hardware Average Time(s): " + str(ptotal / args.trials))
-        print(str(stotal/ptotal) + " times faster")
+        print(str(stotal / ptotal) + " times faster")
         print("Software Throughput(bits/s): " + str(bits / stotal))
         print("Hardware Throughput(bits/s): " + str(bits / ptotal))
 
-    
+
 if __name__ == "__main__":
     main()
