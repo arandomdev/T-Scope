@@ -7,11 +7,8 @@ from .types import MemoryType
 
 
 class Engine(ABC):
-    def calculate(self) -> tuple[int, int]:
-        """Calculate the next range of t-values.
-
-        Returns:
-            A continuous index range of the t-values updated."""
+    def calculate(self) -> None:
+        """Calculate the next trace of t-values."""
         ...
 
 
@@ -22,7 +19,7 @@ class SoftwareEngine(Engine):
         self._tvals = memManager.getArray(MemoryType.tvals, np.float64)
         self._histBinWeights = np.arange(start=0, stop=256, step=1)  # type: ignore
 
-    def calculate(self) -> tuple[int, int]:
+    def calculate(self) -> None:
         with np.errstate(divide="ignore", invalid="ignore"):
             histA = np.copy(self._histA)  # type: ignore
             histB = np.copy(self._histB)  # type: ignore
@@ -44,4 +41,3 @@ class SoftwareEngine(Engine):
             # Calculate t-test
             t = np.abs((meanA - meanB) / np.sqrt((varA / cardA) + (varB / cardB)))  # type: ignore
             self._tvals[:] = t  # type: ignore
-            return 0, len(t)

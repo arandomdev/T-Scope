@@ -66,7 +66,7 @@ try:
             self._dmaHistB = overlay.DmaHistB.sendchannel  # type: ignore
             self._dmaTvals = overlay.DmaTvals.recvchannel  # type: ignore
 
-        def calculate(self) -> tuple[int, int]:
+        def calculate(self) -> None:
             self._core.write(0x0, 0x1)
             self._dmaHistA.transfer(self._histA)
             self._dmaHistB.transfer(self._histB)
@@ -74,8 +74,6 @@ try:
 
             while not self._core.register_map.CTRL.AP_DONE:
                 time.sleep(0.01)
-
-            return (0, self._traceLen)
 
 
 except ImportError:

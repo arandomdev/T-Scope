@@ -107,11 +107,8 @@ def computeProcess(args: ProgramArguments, state: SharedState) -> None:
             if state.stop.is_set():
                 return
 
-            # Calculate entire trace
-            nSamples = 0
-            while nSamples < args.samplesPerUpdate:
-                start, end = engine.calculate()
-                nSamples += end - start
+            # Calculate next trace
+            engine.calculate()
 
             # Send in chunks
             for i in range(0, args.traceLength, args.samplesPerUpdate):
