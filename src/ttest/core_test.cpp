@@ -1,6 +1,8 @@
+#include "core_test.h"
 #include "tTest.h"
-#include "tTestVectors.h"
 #include "types.h"
+
+#define STARTING_HIST 0
 
 int main() {
   hls::stream<Hist::BinPkt> histAStream;
@@ -9,38 +11,27 @@ int main() {
   Hist::BinPkt histAPkt;
   Hist::BinPkt histBPkt;
 
-  // Write hist 0
-  for (int i = 0; i < N_BINS; i++) {
-    histAPkt.data = histA0[i];
-    histBPkt.data = histB0[i];
-    histAPkt.last = 0;
-    histBPkt.last = 0;
-    histAStream.write(histAPkt);
-    histBStream.write(histBPkt);
-  }
-
-  // Write hist 1
-  for (int i = 0; i < N_BINS; i++) {
-    histAPkt.data = histA1[i];
-    histBPkt.data = histB1[i];
-    if (i < (N_BINS - 1)) {
-      histAPkt.last = 0;
-      histBPkt.last = 0;
-    } else {
-      histAPkt.last = 1;
-      histBPkt.last = 1;
+  // Write histograms
+  for (int histI = STARTING_HIST; histI < N_HISTS; histI++) {
+    for (int i = 0; i < N_BINS; i++) {
+      bool last = (histI == N_HISTS - 1) && (i == N_BINS - 1);
+      histAPkt.data = histsA[histI][i];
+      histBPkt.data = histsB[histI][i];
+      histAPkt.last = last;
+      histBPkt.last = last;
+      histAStream.write(histAPkt);
+      histBStream.write(histBPkt);
     }
-    histAStream.write(histAPkt);
-    histBStream.write(histBPkt);
   }
 
   tTest(histAStream, histBStream, outputStream);
-  Hist::OutPkt outPkt0 = outputStream.read();
-  Hist::OutPkt outPkt1 = outputStream.read();
-  Hist::DoubleIntConverter c0;
-  Hist::DoubleIntConverter c1;
-  c0.i = outPkt0.data;
-  c1.i = outPkt1.data;
-  printf("T Val = {%f, %f}\n", c0.d, c1.d);
+
+  for (int i = STARTING_HIST; i < N_HISTS; i++) {
+    Hist::OutPkt val = outputStream.read();
+    Hist::DoubleIntConverter c;
+    c.i = val.data;
+    printf("%d: %f -> %f\n", i, tvals[i], c.d);
+  }
+
   return 0;
 }

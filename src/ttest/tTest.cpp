@@ -48,9 +48,13 @@ void calcMean(hls::stream<Hist::SumPkt> &sumStream,
     Hist::SumPkt sumPkt = sumStream.read();
     Hist::CountPkt countPkt = countStream.read();
 
-    Hist::Mean mean =
-        (ap_ufixed<HIST_SUM_SIZE + FRAC_BITS, HIST_SUM_SIZE>)sumPkt.data /
-        countPkt.data;
+    Hist::Mean mean;
+    if (countPkt.data) {
+      mean = (ap_ufixed<HIST_SUM_SIZE + FRAC_BITS, HIST_SUM_SIZE>)sumPkt.data /
+             countPkt.data;
+    } else {
+      mean = 0;
+    }
 
     assert(sumPkt.last == countPkt.last);
     meanStream.write({mean, sumPkt.last});
@@ -135,8 +139,12 @@ void calcVar(hls::stream<Hist::VarSumPkt> &varSumStream,
     Hist::VarSumPkt varSumPkt = varSumStream.read();
     Hist::CountPkt countPkt = countStream.read();
 
-    Hist::Var var =
-        (ap_ufixed<56 + FRAC_BITS, 56>)varSumPkt.data / (countPkt.data - 1);
+    Hist::Var var;
+    if (countPkt.data > 1) {
+      var = (ap_ufixed<56 + FRAC_BITS, 56>)varSumPkt.data / (countPkt.data - 1);
+    } else {
+      var = 0;
+    }
 
     assert(varSumPkt.last == countPkt.last);
     varStream.write({var, varSumPkt.last});
@@ -152,7 +160,7 @@ void calcTval(hls::stream<Hist::MeanPkt> &meanDiffStream,
               hls::stream<Hist::TvalPkt> &tvalStream) {
   bool eos = false;
   while (!eos) {
-#pragma HLS ALLOCATION operation instances=udiv limit=1
+#pragma HLS ALLOCATION operation instances = udiv limit = 1
     Hist::MeanPkt meanDiffPkt = meanDiffStream.read();
     Hist::VarPkt varAPkt = varAStream.read();
     Hist::VarPkt varBPkt = varBStream.read();
@@ -160,8 +168,18 @@ void calcTval(hls::stream<Hist::MeanPkt> &meanDiffStream,
     Hist::CountPkt countBPkt = countBStream.read();
 
     // divide by count
-    Hist::Var divA = varAPkt.data / countAPkt.data;
-    Hist::Var divB = varBPkt.data / countBPkt.data;
+    Hist::Var divA;
+    Hist::Var divB;
+    if (countAPkt.data) {
+      divA = varAPkt.data / countAPkt.data;
+    } else {
+      divA = 0;
+    }
+    if (countBPkt.data) {
+      divB = varBPkt.data / countBPkt.data;
+    } else {
+      divB = 0;
+    }
 
     // Add
     Hist::Var divSum = divA + divB;
@@ -170,7 +188,12 @@ void calcTval(hls::stream<Hist::MeanPkt> &meanDiffStream,
     Hist::TvalDenom denom = sqrt(divSum.to_double());
 
     // divide
-    Hist::Tval tval = meanDiffPkt.data / denom;
+    Hist::Tval tval;
+    if (denom) {
+      tval = meanDiffPkt.data / denom;
+    } else {
+      tval = 0;
+    }
 
     // Output
     assert((meanDiffPkt.last == varAPkt.last) &&
@@ -190,7 +213,7 @@ void convertToOutput(hls::stream<Hist::TvalPkt> &tvalStream,
   while (!eos) {
     Hist::TvalPkt tvalPkt = tvalStream.read();
     conv.d = tvalPkt.data.to_double();
-    
+
     Hist::OutPkt outPkt;
     outPkt.data = conv.i;
     outPkt.last = tvalPkt.last;
