@@ -3,7 +3,6 @@
 #include <hls_math.h>
 #include <hls_stream.h>
 #include <hls_streamofblocks.h>
-#include <iostream>
 
 void sumHist(hls::stream<Hist::BinPkt> &histStream,
              hls::stream_of_blocks<Hist::Block> &histBlockStream,
@@ -48,13 +47,11 @@ void calcMean(hls::stream<Hist::SumPkt> &sumStream,
     Hist::SumPkt sumPkt = sumStream.read();
     Hist::CountPkt countPkt = countStream.read();
 
-    Hist::Mean mean;
-    if (countPkt.data) {
-      mean = (ap_ufixed<HIST_SUM_SIZE + FRAC_BITS, HIST_SUM_SIZE>)sumPkt.data /
-             countPkt.data;
-    } else {
-      mean = 0;
-    }
+    Hist::CountInv countInv = countPkt.data
+                                  ? (Hist::CountInv)(1) / countPkt.data
+                                  : (Hist::CountInv)(0);
+
+    Hist::Mean mean = sumPkt.data * countInv;
 
     assert(sumPkt.last == countPkt.last);
     meanStream.write({mean, sumPkt.last});
@@ -139,12 +136,12 @@ void calcVar(hls::stream<Hist::VarSumPkt> &varSumStream,
     Hist::VarSumPkt varSumPkt = varSumStream.read();
     Hist::CountPkt countPkt = countStream.read();
 
-    Hist::Var var;
-    if (countPkt.data > 1) {
-      var = (ap_ufixed<56 + FRAC_BITS, 56>)varSumPkt.data / (countPkt.data - 1);
-    } else {
-      var = 0;
-    }
+    Hist::CountInv countInv =
+        (countPkt.data > 1)
+            ? (Hist::CountInv)(1) / (Hist::Count)(countPkt.data - 1)
+            : (Hist::CountInv)(0);
+
+    Hist::Var var = varSumPkt.data * countInv;
 
     assert(varSumPkt.last == countPkt.last);
     varStream.write({var, varSumPkt.last});
@@ -167,33 +164,26 @@ void calcTval(hls::stream<Hist::MeanPkt> &meanDiffStream,
     Hist::CountPkt countAPkt = countAStream.read();
     Hist::CountPkt countBPkt = countBStream.read();
 
+    Hist::CountInv countAInv = countAPkt.data
+                                   ? (Hist::CountInv)(1) / countAPkt.data
+                                   : (Hist::CountInv)(0);
+    Hist::CountInv countBInv = countBPkt.data
+                                   ? (Hist::CountInv)(1) / countBPkt.data
+                                   : (Hist::CountInv)(0);
+
     // divide by count
-    Hist::Var divA;
-    Hist::Var divB;
-    if (countAPkt.data) {
-      divA = varAPkt.data / countAPkt.data;
-    } else {
-      divA = 0;
-    }
-    if (countBPkt.data) {
-      divB = varBPkt.data / countBPkt.data;
-    } else {
-      divB = 0;
-    }
+    Hist::Var divA = varAPkt.data * countAInv;
+    Hist::Var divB = varBPkt.data * countBInv;
 
     // Add
     Hist::Var divSum = divA + divB;
 
     // Sqrt
-    Hist::TvalDenom denom = sqrt(divSum.to_double());
+    float denom = sqrtf(divSum.to_float());
+    float denomInv = denom ? 1 / denom : 0;
 
     // divide
-    Hist::Tval tval;
-    if (denom) {
-      tval = meanDiffPkt.data / denom;
-    } else {
-      tval = 0;
-    }
+    Hist::Tval tval = (float)meanDiffPkt.data * denomInv;
 
     // Output
     assert((meanDiffPkt.last == varAPkt.last) &&
@@ -212,7 +202,7 @@ void convertToOutput(hls::stream<Hist::TvalPkt> &tvalStream,
 
   while (!eos) {
     Hist::TvalPkt tvalPkt = tvalStream.read();
-    conv.d = tvalPkt.data.to_double();
+    conv.d = tvalPkt.data;
 
     Hist::OutPkt outPkt;
     outPkt.data = conv.i;

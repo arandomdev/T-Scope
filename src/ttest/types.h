@@ -25,15 +25,16 @@ union DoubleIntConverter {
 
 using Block = ap_uint<32>[N_BINS];      // Storage of whole histogram
 using Count = ap_uint<HIST_COUNT_SIZE>; // The number of items
-using Sum = ap_uint<HIST_SUM_SIZE>;     // The sum of all items
+using CountInv = ap_ufixed<41, 1>;
+using Sum = ap_uint<HIST_SUM_SIZE>; // The sum of all items
 
 using Mean = ap_ufixed<8 + FRAC_BITS, 8>;          // Max mean of 255
 using CenteredWeight = ap_fixed<8 + FRAC_BITS, 8>; // Max of 255
 using CenteredWeightSquared = ap_ufixed<16 + FRAC_BITS, 16>;
-using VarSum = ap_fixed<64, 56>;
+using VarSum = ap_fixed<64, 55>;
 using Var = ap_ufixed<15 + FRAC_BITS, 15>;
 using TvalDenom = ap_ufixed<8 + FRAC_BITS, 8>;
-using Tval = ap_ufixed<8 + FRAC_BITS, 8>;
+using Tval = float;
 
 using BinPkt = ap_axiu<BIN_SIZE, 0, 0, 0>; // Input stream type
 using OutPkt = ap_axiu<64, 0, 0, 0>;       // output 64 bit float
