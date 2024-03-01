@@ -12,14 +12,22 @@ int main() {
   Hist::InputPkt histAPkt;
   Hist::InputPkt histBPkt;
 
+  Hist::InputData inputDataA;
+  Hist::InputData inputDataB;
+
   // Write histograms
   for (int iter = 0; iter < N_ITERS; iter++) {
-    for (int binI = 0; binI < N_BINS; binI++) {
+    for (int binI = 0; binI < N_BINS; binI += 2) {
       int histI = iter % N_HISTS + STARTING_HIST;
-      bool last = (iter == N_ITERS - 1) && (binI == N_BINS - 1);
+      bool last = (iter == N_ITERS - 1) && (binI == N_BINS - 2);
 
-      histAPkt.data = histsA[histI][binI];
-      histBPkt.data = histsB[histI][binI];
+      inputDataA.a = histsA[histI][binI];
+      inputDataA.b = histsA[histI][binI + 1];
+      inputDataB.a = histsB[histI][binI];
+      inputDataB.b = histsB[histI][binI + 1];
+
+      histAPkt.data = inputDataA.raw;
+      histBPkt.data = inputDataB.raw;
       histAPkt.last = last;
       histBPkt.last = last;
       histAStream.write(histAPkt);

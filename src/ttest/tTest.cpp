@@ -20,16 +20,19 @@ StreamLoop:
     countPkt.data = 0;
 
   SumLoop:
-    for (int i = 0; i < N_BINS; i++) {
-      Hist::InputPkt input = histStream.read();
+    for (int i = 0; i < N_BINS; i += 2) {
+      auto inputPkt = histStream.read();
+      Hist::InputData data{.raw = inputPkt.data};
 
-      histBlockLock[i] = input.data;
-      sumPkt.data += input.data * i;
-      countPkt.data += input.data;
+      histBlockLock[i / 2] = data;
 
-      sumPkt.last = input.last;
-      countPkt.last = input.last;
-      eos = input.last;
+      sumPkt.data += (data.a * i) + (data.b * (i + 1));
+      countPkt.data += data.a + data.b;
+
+      bool last = inputPkt.last;
+      sumPkt.last = last;
+      countPkt.last = last;
+      eos = last;
     }
 
     sumStream.write(sumPkt);
@@ -121,12 +124,19 @@ StreamLoop:
     Hist::VarSum sum = 0;
 
   SumLoop:
-    for (int i = 0; i < N_BINS; i++) {
+    for (int i = 0; i < N_BINS; i += 2) {
 #pragma HLS PIPELINE
-      Hist::CenteredWeight centeredWeight = i - meanPkt.data;
-      Hist::CenteredWeightSquared centeredWeightSquared =
-          centeredWeight * centeredWeight;
-      sum += centeredWeightSquared * histBlockLock[i];
+      Hist::CenteredWeight centeredWeight1 = i - meanPkt.data;
+      Hist::CenteredWeightSquared centeredWeightSquared1 =
+          centeredWeight1 * centeredWeight1;
+
+      Hist::CenteredWeight centeredWeight2 = (i + 1) - meanPkt.data;
+      Hist::CenteredWeightSquared centeredWeightSquared2 =
+          centeredWeight2 * centeredWeight2;
+
+      auto data = histBlockLock[i / 2];
+      sum += centeredWeightSquared1 * data.a;
+      sum += centeredWeightSquared2 * data.b;
     }
 
     eos = meanPkt.last;

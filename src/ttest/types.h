@@ -28,12 +28,8 @@ private:
   };
 
 public:
-  static uint64_t toInt(double d) {
-    return Converter {.d = d}.i;
-  }
-  static double toDouble(uint64_t i) {
-    return Converter {.i = i}.d;
-  }
+  static uint64_t toInt(double d) { return Converter{.d = d}.i; }
+  static double toDouble(uint64_t i) { return Converter{.i = i}.d; }
 };
 
 /// @brief Generic stream packet with `last` signal
@@ -47,14 +43,14 @@ union InputData {
   struct {
     uint32_t a;
     uint32_t b;
-  } data;
+  };
   uint64_t raw;
 };
 
-using InputPkt = ap_axiu<32, 0, 0, 0>;  // Input stream type
+using InputPkt = ap_axiu<64, 0, 0, 0>;  // Input stream type
 using OutputPkt = ap_axiu<64, 0, 0, 0>; // output 64 bit float
 
-using Block = ap_uint<32>[N_BINS];      // Storage of whole histogram
+using Block = InputData[N_BINS / 2];    // Storage of whole histogram
 using Count = ap_uint<HIST_COUNT_SIZE>; // The number of items
 using CountInv = ap_ufixed<41, 1>;
 using Sum = ap_uint<HIST_SUM_SIZE>; // The sum of all items
