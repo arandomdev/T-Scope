@@ -4,6 +4,7 @@
 #include <ap_axi_sdata.h>
 #include <ap_fixed.h>
 #include <ap_int.h>
+#include <cstdint>
 
 namespace Hist {
 
@@ -18,10 +19,40 @@ namespace Hist {
 
 #define MEAN_INT_SIZE 8 // Max mean of 256
 
-union DoubleIntConverter {
-  double d;
-  uint64_t i;
+/// @brief Facilitates conversion between a double and integer
+class DoubleIntConverter {
+private:
+  union Converter {
+    double d;
+    uint64_t i;
+  };
+
+public:
+  static uint64_t toInt(double d) {
+    return Converter {.d = d}.i;
+  }
+  static double toDouble(uint64_t i) {
+    return Converter {.i = i}.d;
+  }
 };
+
+/// @brief Generic stream packet with `last` signal
+template <typename T> struct GenericPkt {
+  T data;
+  bool last;
+};
+
+/// @brief The input data type is 2 32-bit integers packed together
+union InputData {
+  struct {
+    uint32_t a;
+    uint32_t b;
+  } data;
+  uint64_t raw;
+};
+
+using InputPkt = ap_axiu<32, 0, 0, 0>;  // Input stream type
+using OutputPkt = ap_axiu<64, 0, 0, 0>; // output 64 bit float
 
 using Block = ap_uint<32>[N_BINS];      // Storage of whole histogram
 using Count = ap_uint<HIST_COUNT_SIZE>; // The number of items
@@ -34,25 +65,12 @@ using CenteredWeightSquared = ap_ufixed<16 + FRAC_BITS, 16>;
 using VarSum = ap_fixed<64, 55>;
 using Var = ap_ufixed<15 + FRAC_BITS, 15>;
 using TvalDenom = ap_ufixed<8 + FRAC_BITS, 8>;
-using Tval = float;
-
-using BinPkt = ap_axiu<BIN_SIZE, 0, 0, 0>; // Input stream type
-using OutPkt = ap_axiu<64, 0, 0, 0>;       // output 64 bit float
-
-/// @brief Generic stream packet with `last` signal
-template <typename _T> struct GenericPkt {
-  using Type = _T;
-
-  _T data;
-  bool last;
-};
 
 using SumPkt = GenericPkt<Sum>;
 using CountPkt = GenericPkt<Count>;
 using MeanPkt = GenericPkt<Mean>;
 using VarSumPkt = GenericPkt<VarSum>;
 using VarPkt = GenericPkt<Var>;
-using TvalPkt = GenericPkt<Tval>;
 
 } // namespace Hist
 

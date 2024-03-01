@@ -4,7 +4,7 @@
 #include <hls_stream.h>
 #include <hls_streamofblocks.h>
 
-void sumHist(hls::stream<Hist::BinPkt> &histStream,
+void sumHist(hls::stream<Hist::InputPkt> &histStream,
              hls::stream_of_blocks<Hist::Block> &histBlockStream,
              hls::stream<Hist::SumPkt> &sumStream,
              hls::stream<Hist::CountPkt> &countStream) {
@@ -21,8 +21,7 @@ StreamLoop:
 
   SumLoop:
     for (int i = 0; i < N_BINS; i++) {
-#pragma HLS PIPELINE II = 2
-      Hist::BinPkt input = histStream.read();
+      Hist::InputPkt input = histStream.read();
 
       histBlockLock[i] = input.data;
       sumPkt.data += input.data * i;
@@ -43,6 +42,7 @@ void calcMean(hls::stream<Hist::SumPkt> &sumStream,
               hls::stream<Hist::MeanPkt> &meanStream) {
   bool eos = false;
 
+StreamLoop:
   while (!eos) {
     Hist::SumPkt sumPkt = sumStream.read();
     Hist::CountPkt countPkt = countStream.read();
@@ -63,6 +63,8 @@ template <typename T>
 void duplicateStream(hls::stream<T> &input, hls::stream<T> &a,
                      hls::stream<T> &b) {
   bool eos = false;
+
+StreamLoop:
   while (!eos) {
     T pkt = input.read();
     eos = pkt.last;
@@ -75,6 +77,8 @@ template <typename T>
 void duplicateStream(hls::stream<T> &input, hls::stream<T> &a,
                      hls::stream<T> &b, hls::stream<T> &c) {
   bool eos = false;
+
+StreamLoop:
   while (!eos) {
     T pkt = input.read();
     eos = pkt.last;
@@ -88,6 +92,8 @@ void calcMeanDiff(hls::stream<Hist::MeanPkt> &meanAStream,
                   hls::stream<Hist::MeanPkt> &meanBStream,
                   hls::stream<Hist::MeanPkt> &meanDiffStream) {
   bool eos = false;
+
+StreamLoop:
   while (!eos) {
     Hist::MeanPkt aPkt = meanAStream.read();
     Hist::MeanPkt bPkt = meanBStream.read();
@@ -114,7 +120,7 @@ StreamLoop:
     Hist::MeanPkt meanPkt = meanStream.read();
     Hist::VarSum sum = 0;
 
-  OpLoop:
+  SumLoop:
     for (int i = 0; i < N_BINS; i++) {
 #pragma HLS PIPELINE
       Hist::CenteredWeight centeredWeight = i - meanPkt.data;
@@ -132,6 +138,8 @@ void calcVar(hls::stream<Hist::VarSumPkt> &varSumStream,
              hls::stream<Hist::CountPkt> &countStream,
              hls::stream<Hist::VarPkt> &varStream) {
   bool eos = false;
+
+StreamLoop:
   while (!eos) {
     Hist::VarSumPkt varSumPkt = varSumStream.read();
     Hist::CountPkt countPkt = countStream.read();
@@ -154,8 +162,10 @@ void calcTval(hls::stream<Hist::MeanPkt> &meanDiffStream,
               hls::stream<Hist::VarPkt> &varBStream,
               hls::stream<Hist::CountPkt> &countAStream,
               hls::stream<Hist::CountPkt> &countBStream,
-              hls::stream<Hist::TvalPkt> &tvalStream) {
+              hls::stream<Hist::OutputPkt> &outputStream) {
   bool eos = false;
+
+StreamLoop:
   while (!eos) {
 #pragma HLS ALLOCATION operation instances = udiv limit = 1
     Hist::MeanPkt meanDiffPkt = meanDiffStream.read();
@@ -183,40 +193,26 @@ void calcTval(hls::stream<Hist::MeanPkt> &meanDiffStream,
     float denomInv = denom ? 1 / denom : 0;
 
     // divide
-    Hist::Tval tval = (float)meanDiffPkt.data * denomInv;
+    float tval = (float)meanDiffPkt.data * denomInv;
 
     // Output
-    assert((meanDiffPkt.last == varAPkt.last) &&
-           (meanDiffPkt.last == varBPkt.last) &&
-           (meanDiffPkt.last == countAPkt.last) &&
-           (meanDiffPkt.last == countBPkt.last));
-    tvalStream.write({tval, meanDiffPkt.last});
-    eos = meanDiffPkt.last;
-  }
-}
+    bool last = meanDiffPkt.last;
+    assert((last == varAPkt.last) && (last == varBPkt.last) &&
+           (last == countAPkt.last) && (last == countBPkt.last));
 
-void convertToOutput(hls::stream<Hist::TvalPkt> &tvalStream,
-                     hls::stream<Hist::OutPkt> &outputStream) {
-  bool eos = false;
-  Hist::DoubleIntConverter conv;
-
-  while (!eos) {
-    Hist::TvalPkt tvalPkt = tvalStream.read();
-    conv.d = tvalPkt.data;
-
-    Hist::OutPkt outPkt;
-    outPkt.data = conv.i;
-    outPkt.last = tvalPkt.last;
-    outPkt.keep = -1;
-    outputStream.write(outPkt);
-    eos = tvalPkt.last;
+    Hist::OutputPkt outputPkt;
+    outputPkt.data = Hist::DoubleIntConverter::toInt(tval);
+    outputPkt.keep = -1;
+    outputPkt.last = last;
+    outputStream.write(outputPkt);
+    eos = last;
   }
 }
 
 /// @brief Top function for core
-void tTest(hls::stream<Hist::BinPkt> &histAStream,
-           hls::stream<Hist::BinPkt> &histBStream,
-           hls::stream<Hist::OutPkt> &outputStream) {
+void tTest(hls::stream<Hist::InputPkt> &histAStream,
+           hls::stream<Hist::InputPkt> &histBStream,
+           hls::stream<Hist::OutputPkt> &outputStream) {
 #pragma HLS INTERFACE mode = axis port = histAStream, histBStream, outputStream
 #pragma HLS INTERFACE mode = s_axilite port = return
 
@@ -253,8 +249,6 @@ void tTest(hls::stream<Hist::BinPkt> &histAStream,
   hls::stream<Hist::VarPkt> varAStream;
   hls::stream<Hist::VarPkt> varBStream;
 
-  hls::stream<Hist::TvalPkt> tvalStream;
-
   // Define tasks
   sumHist(histAStream, histABlockStream, sumAStream, countAStream);
   sumHist(histBStream, histBBlockStream, sumBStream, countBStream);
@@ -277,7 +271,5 @@ void tTest(hls::stream<Hist::BinPkt> &histAStream,
   calcVar(varSumBStream, countBStreamDup1, varBStream);
 
   calcTval(meanDiffStream, varAStream, varBStream, countAStreamDup2,
-           countBStreamDup2, tvalStream);
-
-  convertToOutput(tvalStream, outputStream);
+           countBStreamDup2, outputStream);
 }
