@@ -60,13 +60,22 @@ using CenteredWeight = ap_fixed<8 + FRAC_BITS, 8>; // Max of 255
 using CenteredWeightSquared = ap_ufixed<16 + FRAC_BITS, 16>;
 using VarSum = ap_fixed<64, 55>;
 using Var = ap_ufixed<15 + FRAC_BITS, 15>;
-using TvalDenom = ap_ufixed<8 + FRAC_BITS, 8>;
 
-using SumPkt = GenericPkt<Sum>;
-using CountPkt = GenericPkt<Count>;
+/// @brief Statistics on a histogram
+struct Stats {
+  Sum sum;
+  Count count;
+};
+
+struct CountInvPair {
+  CountInv countInv;
+  CountInv adjCountInv;
+};
+
+using StatsPkt = GenericPkt<Stats>;
+using CountInvPairPkt = GenericPkt<CountInvPair>;
 using MeanPkt = GenericPkt<Mean>;
 using VarSumPkt = GenericPkt<VarSum>;
-using VarPkt = GenericPkt<Var>;
 
 } // namespace Hist
 
