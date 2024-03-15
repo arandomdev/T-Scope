@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import datetime
 import multiprocessing as mp
+import multiprocessing.managers
 import socket
 import struct
 import threading
@@ -23,6 +25,9 @@ class SharedState(object):
     stop: threading.Event
     memoryManager: MemoryManager
 
+    capturesPerSec: multiprocessing.managers.ValueProxy[float]
+    tvalTracesPerSec: multiprocessing.managers.ValueProxy[float]
+
 
 @dataclass
 class ProgramArguments(object):
@@ -35,6 +40,7 @@ class ProgramArguments(object):
     datasourceDelay: float
     engineDelay: float
     samplesPerUpdate: int
+    reportInterval: float
 
     @classmethod
     def fromDict(cls, options: dict[str, Any]):
@@ -48,6 +54,7 @@ class ProgramArguments(object):
             datasourceDelay=options["datasource_delay"],
             engineDelay=options["engine_delay"],
             samplesPerUpdate=options["samples_per_update"],
+            reportInterval=options["report_interval"],
         )
 
 
@@ -67,6 +74,9 @@ def ingestProcess(args: ProgramArguments, state: SharedState) -> None:
     with dsInst as ds:
         decimationPhase = 0
 
+        startTime = datetime.datetime.now()
+        iterCount = 0
+
         while True:
             # Check stop flag
             if state.stop.is_set():
@@ -81,6 +91,15 @@ def ingestProcess(args: ProgramArguments, state: SharedState) -> None:
             decimationPhase = (decimationPhase + 1) % args.decimationFreq
 
             time.sleep(args.datasourceDelay)
+
+            # Reports stats
+            iterCount += 1
+            endTime = datetime.datetime.now()
+            elapsed = (endTime - startTime).total_seconds()
+            if elapsed > args.reportInterval:
+                state.capturesPerSec.value = iterCount / elapsed
+                iterCount = 0
+                startTime = datetime.datetime.now()
 
 
 def computeProcess(args: ProgramArguments, state: SharedState) -> None:
@@ -102,6 +121,10 @@ def computeProcess(args: ProgramArguments, state: SharedState) -> None:
 
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as clientSocket:
         addr = (args.viewerAddress, args.port)
+
+        startTime = datetime.datetime.now()
+        iterCount = 0
+
         while True:
             # Check stop flag
             if state.stop.is_set():
@@ -121,6 +144,14 @@ def computeProcess(args: ProgramArguments, state: SharedState) -> None:
                 clientSocket.sendto(data, addr)
 
             time.sleep(args.engineDelay)
+
+            iterCount += 1
+            end = datetime.datetime.now()
+            elapsed = (end - startTime).total_seconds()
+            if elapsed > args.reportInterval:
+                state.tvalTracesPerSec.value = iterCount / elapsed
+                iterCount = 0
+                startTime = datetime.datetime.now()
 
 
 @click.command(name="realtime_scope")
@@ -151,13 +182,13 @@ def computeProcess(args: ProgramArguments, state: SharedState) -> None:
     "--datasource-delay",
     help="How long to wait in seconds between getting samples from the datasource.",
     type=float,
-    default=0.1,
+    default=0,
 )
 @click.option(
     "--engine-delay",
     help="How long to wait in seconds between calculating a new t-test trace.",
     type=float,
-    default=0.1,
+    default=0,
 )
 @click.option(
     "--samples-per-update",
@@ -165,7 +196,14 @@ def computeProcess(args: ProgramArguments, state: SharedState) -> None:
     type=int,
     default=60,
 )
+@click.option(
+    "--report-interval",
+    help="How long to wait before reporting statistics.",
+    type=float,
+    default=3,
+)
 def main(**kwargs: dict[str, Any]) -> None:
+    print("==== T-Scope ====")
     args = ProgramArguments.fromDict(kwargs)
 
     if args.engine == "software":
@@ -176,7 +214,9 @@ def main(**kwargs: dict[str, Any]) -> None:
         raise NotImplementedError
 
     with mp.Manager() as manager, memManType(args.traceLength) as memManager:
-        state = SharedState(manager.Event(), memManager)
+        state = SharedState(
+            manager.Event(), memManager, manager.Value("d", 0), manager.Value("d", 0)
+        )
 
         # Create and start processes
         procDefs = (ingestProcess, computeProcess)
@@ -188,11 +228,22 @@ def main(**kwargs: dict[str, Any]) -> None:
             p.start()
 
         try:
+            startTime = datetime.datetime.now()
             while True:
                 if any(not p.is_alive() for p in processes):
                     break
 
                 time.sleep(1)
+
+                endTime = datetime.datetime.now()
+                elapsed = (endTime - startTime).total_seconds()
+                if elapsed > args.reportInterval:
+                    print(
+                        f"{endTime}: "
+                        f"Captures/s: {state.capturesPerSec.get():.4f}, "
+                        f"Tval Traces Sent/s: {state.tvalTracesPerSec.get():.4f}"
+                    )
+                    startTime = datetime.datetime.now()
         except KeyboardInterrupt:
             pass
 

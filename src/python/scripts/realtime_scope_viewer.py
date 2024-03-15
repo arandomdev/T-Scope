@@ -73,6 +73,11 @@ class Scope(object):
         self.axs.set_xlim(0, length)
         self.axs.set_ylim(0, yBound)
 
+        # Labels
+        axs.set_title("Real-Time T-Values")  # type: ignore
+        axs.set_xlabel("Sample")  # type: ignore
+        axs.set_ylabel("T-Value")  # type: ignore
+
     def update(self, _: Any) -> tuple[matplotlib.container.StemContainer]:
         self.stems[:, 1, 1] = self.data  # type: ignore
 
