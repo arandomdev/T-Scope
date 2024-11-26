@@ -17,4 +17,8 @@ class TraceType(Enum):
 class MemoryType(Enum):
     histA = 0
     histB = 1
-    tvals = 2
+
+    tracesA = 2
+    tracesB = 3
+
+    tvals = 4

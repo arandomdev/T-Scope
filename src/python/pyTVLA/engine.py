@@ -2,7 +2,7 @@ from abc import ABC
 
 import numpy as np
 
-from .memory import SoftwareMemoryManager
+from .memory import SoftwareMemoryManager, TraditionalMemoryManager
 from .types import MemoryType
 
 
@@ -40,4 +40,27 @@ class SoftwareEngine(Engine):
 
             # Calculate t-test
             t = np.abs((meanA - meanB) / np.sqrt((varA / cardA) + (varB / cardB)))  # type: ignore
+            self._tvals[:] = t  # type: ignore
+
+
+class TraditionalEngine(Engine):
+    def __init__(self, memManager: TraditionalMemoryManager) -> None:
+        self._tracesA = memManager.getArray(MemoryType.tracesA, np.uint32)
+        self._tracesB = memManager.getArray(MemoryType.tracesB, np.uint32)
+        self._tvals = memManager.getArray(MemoryType.tvals, np.float64)
+        self._nTraces = memManager.nTraces
+
+    def calculate(self) -> None:
+        with np.errstate(divide="ignore", invalid="ignore"):
+            tracesA = self._tracesA
+            tracesB = self._tracesB
+            card = self._nTraces
+
+            meanA = tracesA.sum(axis=1) / card  # type: ignore
+            meanB = tracesB.sum(axis=1) / card  # type: ignore
+
+            varA = tracesA.var(axis=1, ddof=1)  # type: ignore
+            varB = tracesB.var(axis=1, ddof=1)  # type: ignore
+
+            t = np.abs((meanA - meanB) / np.sqrt((varA / card) + (varB / card)))  # type: ignore
             self._tvals[:] = t  # type: ignore

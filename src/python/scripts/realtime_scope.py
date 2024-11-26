@@ -13,8 +13,14 @@ from typing import Any, Literal
 import click
 import numpy as np
 from pyTVLA.datasource import ChipWhispererDataSource, RandomDataSource
-from pyTVLA.engine import SoftwareEngine
-from pyTVLA.memory import HistogramStorage, MemoryManager, SoftwareMemoryManager
+from pyTVLA.engine import SoftwareEngine, TraditionalEngine
+from pyTVLA.memory import (
+    HistogramStorage,
+    MemoryManager,
+    SoftwareMemoryManager,
+    TraditionalMemoryManager,
+    TraditionalStorage,
+)
 from pyTVLA.pynq import PynqEngine, PynqMemoryManager
 from pyTVLA.scheduler import AESBiasedRoundsScheduler
 from pyTVLA.types import MemoryType
@@ -35,7 +41,7 @@ class ProgramArguments(object):
     port: int
     traceLength: int
     datasource: Literal["random", "chipwhisperer"]
-    engine: Literal["software", "pynq"]
+    engine: Literal["software", "pynq", "traditional"]
     decimationFreq: int
     datasourceDelay: float
     engineDelay: float
@@ -61,7 +67,13 @@ class ProgramArguments(object):
 def ingestProcess(args: ProgramArguments, state: SharedState) -> None:
     """Gets new traces and stores them in histograms."""
 
-    store = HistogramStorage(state.memoryManager, np.uint16)
+    if args.engine == "pynq" or args.engine == "software":
+        store = HistogramStorage(state.memoryManager, np.uint16)
+    elif args.engine == "traditional":
+        assert isinstance(state.memoryManager, TraditionalMemoryManager)
+        store = TraditionalStorage(state.memoryManager, np.uint16)
+    else:
+        raise NotImplementedError
 
     if args.datasource == "random":
         dsInst = RandomDataSource(args.traceLength, np.uint16)
@@ -107,12 +119,16 @@ def computeProcess(args: ProgramArguments, state: SharedState) -> None:
 
     # create engine
     if args.engine == "software":
-        assert type(state.memoryManager) is SoftwareMemoryManager
+        assert isinstance(state.memoryManager, SoftwareMemoryManager)
         engine = SoftwareEngine(state.memoryManager)
         dtype = np.float64
     elif args.engine == "pynq":
-        assert type(state.memoryManager) is PynqMemoryManager
+        assert isinstance(state.memoryManager, PynqMemoryManager)
         engine = PynqEngine(state.memoryManager)
+        dtype = np.float64
+    elif args.engine == "traditional":
+        assert isinstance(state.memoryManager, TraditionalMemoryManager)
+        engine = TraditionalEngine(state.memoryManager)
         dtype = np.float64
     else:
         raise NotImplementedError
@@ -169,7 +185,7 @@ def computeProcess(args: ProgramArguments, state: SharedState) -> None:
 @click.option(
     "--engine",
     help="The engine to use.",
-    type=click.Choice(["software", "pynq"], case_sensitive=False),
+    type=click.Choice(["software", "pynq", "traditional"], case_sensitive=False),
     default="software",
 )
 @click.option(
@@ -207,13 +223,15 @@ def main(**kwargs: dict[str, Any]) -> None:
     args = ProgramArguments.fromDict(kwargs)
 
     if args.engine == "software":
-        memManType = SoftwareMemoryManager
+        memManInst = SoftwareMemoryManager(args.traceLength)
     elif args.engine == "pynq":
-        memManType = PynqMemoryManager
+        memManInst = PynqMemoryManager(args.traceLength)
+    elif args.engine == "traditional":
+        memManInst = TraditionalMemoryManager(args.traceLength, args.decimationFreq)
     else:
         raise NotImplementedError
 
-    with mp.Manager() as manager, memManType(args.traceLength) as memManager:
+    with mp.Manager() as manager, memManInst as memManager:
         state = SharedState(
             manager.Event(), memManager, manager.Value("d", 0), manager.Value("d", 0)
         )
